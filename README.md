@@ -12,6 +12,7 @@ We have a live [Gantt Chart](https://docs.google.com/spreadsheets/d/15XgqUaxVPFG
 
 ## Repository Structure
 
-- `Code/`: Contains all our code files
+- `Code/`: Contains all our code files related to hardware, simulation, and analysis.
 - `Documents/`: Contains all technical documents and diagrams related to the project Our Capstone submission documents can be found in our shared [Overleaf Project](https://www.overleaf.com/1921852215dqddskmyvwcp#9cba15).
-- `Resources/`: Contains any resources, such as textbooks, used by the members (note that this isn't the list of references for the project, but rather resources that may be used regularly by the team for technical guidance)
+- `Resources/`: Constains resources, for example datasheets, CAD files, simulation models, etc.
+- `Archive/`: Contains old versions or backups of code files, documents, models, etc.

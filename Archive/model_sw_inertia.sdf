@@ -1,0 +1,736 @@
+<sdf version='1.11'>
+  <model name='THex_Quadruped'>
+    <link name='base_link'>
+      <inertial>
+        <pose>0.0001796 -0.0086064999999999996 0.035786999999999999 0 0 0</pose>
+        <mass>0.30423</mass>
+        <inertia>
+          <ixx>0.00232</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00064</iyy>
+          <iyz>0.00008</iyz>
+          <izz>0.00225</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='bl_hip_joint' type='revolute'>
+      <pose relative_to='base_link'>-0.053156000000000002 -0.12709000000000001 0 0 0 -2.3570000000000002</pose>
+      <parent>base_link</parent>
+      <child>bl_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.7853</lower>
+          <upper>0.7853</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='bl_hip'>
+      <pose relative_to='bl_hip_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.0149715137794056 -0.0041788720385063198 0.012291206171491599 0 0 0</pose>
+        <mass>0.080321429092671703</mass>
+        <inertia>
+          <ixx>0.00005</ixx>
+          <ixy>0.00001</ixy>
+          <ixz>-0.00001</ixz>
+          <iyy>0.00005</iyy>
+          <iyz>0</iyz>
+          <izz>0.00006</izz>
+        </inertia>
+      </inertial>
+      <collision name='bl_hip_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bl_hip_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_hip.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='bl_knee_joint' type='revolute'>
+      <pose relative_to='bl_hip'>0.028468 0 0 -1.5707 0 -0.071951000000000015</pose>
+      <parent>bl_hip</parent>
+      <child>bl_knee</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='bl_knee'>
+      <pose relative_to='bl_knee_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.045321399247135997 0.0044813673973086998 0.000153257653723683 0 0 0</pose>
+        <mass>0.034681175593721698</mass>
+        <inertia>
+          <ixx>0.00002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00003</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+      <collision name='bl_knee_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_knee.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bl_knee_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_knee.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='bl_foot_joint' type='revolute'>
+      <pose relative_to='bl_knee'>0.072935 0.018648999999999999 0 3.1415 0 0.7853</pose>
+      <parent>bl_knee</parent>
+      <child>bl_foot</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='bl_foot'>
+      <pose relative_to='bl_foot_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.021140907524691499 0.0035784863304674499 -5.75329770011457e-05 0 0 0</pose>
+        <mass>0.057594735109815803</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00004</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004</izz>
+        </inertia>
+      </inertial>
+      <collision name='bl_foot_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_foot.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bl_foot_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/bl_foot.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='br_hip_joint' type='revolute'>
+      <pose relative_to='base_link'>0.053156000000000002 -0.12709000000000001 0 0 0 -0.78456000000000026</pose>
+      <parent>base_link</parent>
+      <child>br_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.7853</lower>
+          <upper>0.7853</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='br_hip'>
+      <pose relative_to='br_hip_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.01464 0.00436 0.01261 0 0 0</pose>
+        <mass>0.14763</mass>
+        <inertia>
+          <ixx>0.00005</ixx>
+          <ixy>-0.00001</ixy>
+          <ixz>-0.00001</ixz>
+          <iyy>0.00005</iyy>
+          <iyz>0</iyz>
+          <izz>0.00006</izz>
+        </inertia>
+      </inertial>
+      <collision name='br_hip_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='br_hip_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_hip.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='br_knee_joint' type='revolute'>
+      <pose relative_to='br_hip'>0.028468 0 0 1.5707 0 0</pose>
+      <parent>br_hip</parent>
+      <child>br_knee</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='br_knee'>
+      <pose relative_to='br_knee_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.04530 -0.00448 0.00016 0 0 0</pose>
+        <mass>0.03468</mass>
+        <inertia>
+          <ixx>0.00002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00003</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+      <collision name='br_knee_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_knee.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='br_knee_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_knee.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='br_foot_joint' type='revolute'>
+      <pose relative_to='br_knee'>0.072955999999999993 -0.018648999999999999 0 -3.1415 0 -0.7853</pose>
+      <parent>br_knee</parent>
+      <child>br_foot</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='br_foot'>
+      <pose relative_to='br_foot_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.020855637795625898 -0.0035806485840898499 -5.4412617953761302e-05 0 0 0</pose>
+        <mass>0.057594735109815803</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00004</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004</izz>
+        </inertia>
+      </inertial>
+      <collision name='br_foot_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_foot.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='br_foot_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/br_foot.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fl_hip_joint' type='revolute'>
+      <pose relative_to='base_link'>-0.059506000000000003 0.078833 0 0 0 2.3570000000000002</pose>
+      <parent>base_link</parent>
+      <child>fl_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.7853</lower>
+          <upper>0.7853</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fl_hip'>
+      <pose relative_to='fl_hip_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.0149716247702561 0.0057777451089918198 0.012291613219433801 0 0 0</pose>
+        <mass>0.080321429096442798</mass>
+        <inertia>
+          <ixx>0.00005</ixx>
+          <ixy>-0.00001</ixy>
+          <ixz>-0.00001</ixz>
+          <iyy>0.00005</iyy>
+          <iyz>0</iyz>
+          <izz>0.00006</izz>
+        </inertia>
+      </inertial>
+      <collision name='fl_hip_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fl_hip_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_hip.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fl_knee_joint' type='revolute'>
+      <pose relative_to='fl_hip'>0.028468 0 0 -1.5707 0 0</pose>
+      <parent>fl_hip</parent>
+      <child>fl_knee</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fl_knee'>
+      <pose relative_to='fl_knee_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.045270903487398498 0.0044813535834028499 0.00019220441685056201 0 0 0</pose>
+        <mass>0.034681175597501397</mass>
+        <inertia>
+          <ixx>0.00002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00003</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+      <collision name='fl_knee_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_knee.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fl_knee_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_knee.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fl_foot_joint' type='revolute'>
+      <pose relative_to='fl_knee'>0.073042999999999997 0.018648999999999999 0 3.1415 0 0.7853</pose>
+      <parent>fl_knee</parent>
+      <child>fl_foot</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fl_foot'>
+      <pose relative_to='fl_foot_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.0211409047516125 0.0035784866490062 -5.7534049239305099e-05 0 0 0</pose>
+        <mass>0.057594735109968903</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00004</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004</izz>
+        </inertia>
+      </inertial>
+      <collision name='fl_foot_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_foot.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fl_foot_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fl_foot.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fr_hip_joint' type='revolute'>
+      <pose relative_to='base_link'>0.059506000000000003 0.078833 0 0 0 0.78456000000000026</pose>
+      <parent>base_link</parent>
+      <child>fr_hip</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.7853</lower>
+          <upper>0.7853</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fr_hip'>
+      <pose relative_to='fr_hip_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.01464 -0.00588 0.01261 0 0 0</pose>
+        <mass>0.14763</mass>
+        <inertia>
+          <ixx>0.00005</ixx>
+          <ixy>0.00001</ixy>
+          <ixz>-0.00001</ixz>
+          <iyy>0.00005</iyy>
+          <iyz>0</iyz>
+          <izz>0.00006</izz>
+        </inertia>
+      </inertial>
+      <collision name='fr_hip_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_hip.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fr_hip_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_hip.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fr_knee_joint' type='revolute'>
+      <pose relative_to='fr_hip'>0.028468 0 0 1.5707 0 0</pose>
+      <parent>fr_hip</parent>
+      <child>fr_knee</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fr_knee'>
+      <pose relative_to='fr_knee_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.045275477631185397 -0.0044813504878377696 0.00020131850571926399 0 0 0</pose>
+        <mass>0.03468</mass>
+        <inertia>
+          <ixx>0.00002</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00003</iyy>
+          <iyz>0</iyz>
+          <izz>0.00002</izz>
+        </inertia>
+      </inertial>
+      <collision name='fr_knee_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_knee.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fr_knee_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_knee.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <joint name='fr_foot_joint' type='revolute'>
+      <pose relative_to='fr_knee'>0.073075000000000001 -0.018648999999999999 0 3.1415 0 -0.7853</pose>
+      <parent>fr_knee</parent>
+      <child>fr_foot</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-1.5707</lower>
+          <upper>1.5707</upper>
+          <effort>0.9414</effort>
+          <velocity>5.23</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+      </axis>
+    </joint>
+    <link name='fr_foot'>
+      <pose relative_to='fr_foot_joint'>0 0 0 0 0 0</pose>
+      <inertial>
+        <pose>0.01666 -0.00222 0.00043 0 0 0</pose>
+        <mass>0.09125</mass>
+        <inertia>
+          <ixx>0.00001</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.00004</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004</izz>
+        </inertia>
+      </inertial>
+      <collision name='fr_foot_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_foot.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='fr_foot_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://THex_Quadruped/meshes/fr_foot.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+          <ambient>1 1 1 1</ambient>
+        </material>
+      </visual>
+    </link>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fr_hip_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fr_knee_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fr_foot_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fl_hip_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fl_knee_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>fl_foot_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>bl_hip_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>bl_knee_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>bl_foot_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>br_hip_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>br_knee_joint</joint_name>
+    </plugin>
+    <plugin name="gz::sim::systems::JointPositionController" filename="libgz-sim-joint-position-controller-system.so">
+  	<joint_name>br_foot_joint</joint_name>
+    </plugin>
+  </model>
+</sdf>
