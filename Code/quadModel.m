@@ -722,7 +722,7 @@ L2 = 0.045;   % knee length0
 L3 = 0.030;   % knee length1
 L4 = 0.09;    % ankle length
 
-body = rigidBodyTree; % making leg structure
+body = rigidBodyTree; % making body structure
 
 % ASSUMING FRONT RIGHT LEG MOTIONS
 rft1 = deg2rad(0);  rft2 = deg2rad(0);  rft3 = deg2rad(0);  rft4 = deg2rad(0);  rft = deg2rad(0);
