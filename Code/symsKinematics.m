@@ -37,7 +37,6 @@ y_l = left(2, 4);
 z_l = left(3, 4);
 FK_l = [x_l; y_l ; z_l]
 
-% paper
 % paper = subs(T03, {alpha1, alpha2, alpha3, d1, d2, d3}, {pi/2, 0, 0, 0, 0, 0})
 % x_p = paper(1, 4);
 % y_p = paper(2, 4);
