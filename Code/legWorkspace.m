@@ -188,7 +188,7 @@ grid on;
 %% Workspace Calculation of Left Leg Using IK:
 % asin sols are chosen, but we also have 4 possibilities of acos sols
 
-% clc; close all; clear;
+clc; close all; clear;
 
 % measured lengths
 l1 = 3.1;    % hip length
