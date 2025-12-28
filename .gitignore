@@ -322,3 +322,10 @@ TSWLatexianTemp*
 
 # MATLAB ignore files
 *.asv
+
+# Python ignore files
+__pycache__/
+
+# Custom ignore files
+joint_commands_vs_states.png
+joint_torques.png
