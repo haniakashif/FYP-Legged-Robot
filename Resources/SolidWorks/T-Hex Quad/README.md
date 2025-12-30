@@ -1,0 +1,1 @@
+The parts must be in the OneDrive or SolidWorks doesn't like it.
