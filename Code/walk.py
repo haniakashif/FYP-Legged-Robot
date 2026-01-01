@@ -109,7 +109,7 @@ def joint_state_cb(msg):
     elif joint == "fl_foot_joint" and len(theta3_states["foot"]) < len(theta3_commands["foot"]):
         theta3_states["foot"].append(position)
 
-# NOTE: this computes the magnitude of the torque about every axis. Not sure if that is the approach in Garcia et al., and the resultant measured torques from this are much higher than expected. Furthermore, they also exceed the joint torque limits set in the SDF, so need to figure out
+# NOTE: This computes the magnitude of the torque about every axis and the resultant measured torques are much higher than expected from the torque analysis. Furthermore, they also exceed the joint torque limits set in the SDF, so need to figure out why that is.
 def joint_torque_cb(msg, leg, joint_type): 
 
     global torque0, torque1, torque2, torque3
