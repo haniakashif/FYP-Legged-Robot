@@ -2,7 +2,7 @@
 
 export GZ_SIM_RESOURCE_PATH=$HOME/.gz/models;
 
-gnome-terminal -- bash -c "gz sim ~/.gz/worlds/friction_world.sdf" &
+gnome-terminal -- bash -c "gz sim -v 4 ~/.gz/worlds/friction_world.sdf" &
 
 # gnome-terminal -- bash -c "nautilus /home/raahimhash/.gz/models/THex_Quadruped" &
 

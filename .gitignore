@@ -329,3 +329,4 @@ __pycache__/
 # Custom ignore files
 joint_commands_vs_states.png
 joint_torques.png
+required_torques.png

@@ -1,19 +1,14 @@
-import sys
+import kinematics as kin
 import time
 import math
-import numpy as np
-import kinematics as kin
 from gz.transport13 import Node
-from gz.msgs10 import double_pb2, model_pb2
+from gz.msgs10 import double_pb2, model_pb2, wrench_pb2
 
-# ================================================================
-# ---------------------- Configuration ---------------------------
-# ================================================================
-
-# Simulation Speed
+# commands frequency
 TARGET_FREQ = 10.0  # Hz
 DT = 1.0 / TARGET_FREQ
 
+# topics created by joint_position_controller plugins in sdf
 CMD_TOPICS = {
     "FR": {
         "hip": "/model/THex_Quadruped/joint/fr_hip_joint/0/cmd_pos",
@@ -37,6 +32,31 @@ CMD_TOPICS = {
     }
 }
 
+# topics created by the force_torque sensor in world and model sdf
+FORCE_TORQUE_TOPICS = {
+    "FR": {
+        "hip": "/fr_hip_force_torque",
+        "knee": "/fr_knee_force_torque",
+        "foot": "/fr_foot_force_torque",
+    },
+    "BR": {
+        "hip": "/br_hip_force_torque",
+        "knee": "/br_knee_force_torque",
+        "foot": "/br_foot_force_torque",
+    },
+    "BL": {
+        "hip": "/bl_hip_force_torque",
+        "knee": "/bl_knee_force_torque",
+        "foot": "/bl_foot_force_torque",
+    },
+    "FL": {
+        "hip": "/fl_hip_force_torque",
+        "knee": "/fl_knee_force_torque",
+        "foot": "/fl_foot_force_torque",
+    }
+}
+
+# topic created by joint_state plugin
 READ_TOPIC = "/world/friction_world/model/THex_Quadruped/joint_state"
 
 # store joint states
@@ -45,10 +65,17 @@ theta1_states = {"hip": [], "knee": [], "foot": []}
 theta2_states = {"hip": [], "knee": [], "foot": []}
 theta3_states = {"hip": [], "knee": [], "foot": []}
 
+# store joint commands
 theta0_commands = {"hip": [], "knee": [], "foot": []}
 theta1_commands = {"hip": [], "knee": [], "foot": []}
 theta2_commands = {"hip": [], "knee": [], "foot": []}
 theta3_commands = {"hip": [], "knee": [], "foot": []}
+
+# store joint torques
+torque0 = {"hip": [], "knee": [], "foot": []}
+torque1 = {"hip": [], "knee": [], "foot": []}
+torque2 = {"hip": [], "knee": [], "foot": []}
+torque3 = {"hip": [], "knee": [], "foot": []}
 
 def joint_state_cb(msg):
     
@@ -82,37 +109,60 @@ def joint_state_cb(msg):
     elif joint == "fl_foot_joint" and len(theta3_states["foot"]) < len(theta3_commands["foot"]):
         theta3_states["foot"].append(position)
 
+# NOTE: this computes the magnitude of the torque about every axis. Not sure if that is the approach in Garcia et al., and the resultant measured torques from this are much higher than expected. Furthermore, they also exceed the joint torque limits set in the SDF, so need to figure out
+def joint_torque_cb(msg, leg, joint_type): 
+
+    global torque0, torque1, torque2, torque3
+
+    torque_mag = math.sqrt(msg.torque.x**2 + msg.torque.y**2 + msg.torque.z**2)
+
+    if leg == "FR" and len(torque0[joint_type]) < len(theta0_commands[joint_type]):
+        torque0[joint_type].append(torque_mag)
+    elif leg == "BR" and len(torque1[joint_type]) < len(theta1_commands[joint_type]):
+        torque1[joint_type].append(torque_mag)
+    elif leg == "BL" and len(torque2[joint_type]) < len(theta2_commands[joint_type]):
+        torque2[joint_type].append(torque_mag)
+    elif leg == "FL" and len(torque3[joint_type]) < len(theta3_commands[joint_type]):
+        torque3[joint_type].append(torque_mag)
+
 def main():
-    # 1. Setup Gazebo Node
+    # setup Gazebo node
     node = Node()
     publishers = {}
 
     print("Initializing Publishers...")
     
-    # Create a publisher for EVERY joint in the map
+    # create a publisher for every joint
     for leg, joints in CMD_TOPICS.items():
         publishers[leg] = {}
         for joint_type, topic in joints.items():
-            # advertise(topic, message_type)
             publishers[leg][joint_type] = node.advertise(topic, double_pb2.Double)
-    
+
     print(f"Subscribing to {READ_TOPIC}...")
     node.subscribe(model_pb2.Model, READ_TOPIC, joint_state_cb)
+
+    print("Setting up Force/Torque Subscribers...")
+    for leg, joints in FORCE_TORQUE_TOPICS.items():
+        for joint_type, topic in joints.items():
+            node.subscribe(wrench_pb2.Wrench, topic, lambda msg, l=leg, j=joint_type: joint_torque_cb(msg, l, j))
     
-    # 2. Pre-compute Trajectory
+    # compute trajectory
     print("Pre-computing Trajectory...")
     xyz = kin.generate_trajectory()
 
+    # rotate trajectory to be parallel with the body for each leg
     xyz0 = kin.rotate_trajectory(0, xyz)  # FR
     xyz1 = kin.rotate_trajectory(1, xyz)  # BR
     xyz2 = kin.rotate_trajectory(2, xyz)  # BL
     xyz3 = kin.rotate_trajectory(3, xyz)  # FL
 
+    # shift trajectory to be in each leg's workspace
     xyz0 = kin.shift_trajectory(0, xyz0)
     xyz1 = kin.shift_trajectory(1, xyz1)
     xyz2 = kin.shift_trajectory(2, xyz2)
     xyz3 = kin.shift_trajectory(3, xyz3)
 
+    # compute joint angle commands
     theta0 = kin.inv_kin_array(xyz0, 0)  # FR
     theta1 = kin.inv_kin_array(xyz1, 1)  # BR
     theta2 = kin.inv_kin_array(xyz2, 2)  # BL
@@ -122,15 +172,14 @@ def main():
 
     print(f"Generated {len(theta0)} steps. Starting Loop at {TARGET_FREQ}Hz.")
     
-    # 3. Control Loop
     cycle = 0
-    msg = double_pb2.Double() # Reusable message object
+    msg = double_pb2.Double()
 
     while True:
         print(f"=== Gait Cycle {cycle} Started ===")
         
         for step_idx in range(len(theta0[0])):
-            # Extract joint angles for this step
+
             tA = theta0[0][step_idx] # FR: A, B, C
             tB = theta0[1][step_idx]
             tC = theta0[2][step_idx]
@@ -223,16 +272,17 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Plotting control curves...")
 
+        # ================= PLOTTING =================
         if len(theta0_states["hip"]) > 0:
             import matplotlib.pyplot as plt
 
             # plot subplots comparing commands vs states for each joint of each leg
             legs = ["FR", "BR", "BL", "FL"]
             joint_types = ["hip", "knee", "foot"]
+
             theta_states = [theta0_states, theta1_states, theta2_states, theta3_states]
             theta_commands = [theta0_commands, theta1_commands, theta2_commands, theta3_commands]
 
-            # Create a single figure with 4x3 subplots (4 legs x 3 joints)
             fig, axes = plt.subplots(4, 3, figsize=(15, 12))
             fig.suptitle("All Joints: Command vs State", fontsize=16)
 
@@ -253,4 +303,27 @@ if __name__ == "__main__":
 
             plt.tight_layout()
             plt.savefig("joint_commands_vs_states.png")
+
+            # plot torques for all joints
+            torques = [torque0, torque1, torque2, torque3]
+
+            fig2, axes2 = plt.subplots(4, 3, figsize=(15, 12))
+            fig2.suptitle("All Joints: Torque Magnitude", fontsize=16)
+
+            for leg_ind in range(len(legs)):
+                leg = legs[leg_ind]
+                torque_data = torques[leg_ind]
+
+                for joint_ind, joint_type in enumerate(joint_types):
+                    ax = axes2[leg_ind, joint_ind]
+                    if len(torque_data[joint_type]) > 0:
+                        ax.plot(torque_data[joint_type], label="Torque", linestyle='-', linewidth=1.5, color='r')
+                    ax.set_title(f"{leg} {joint_type}")
+                    ax.set_xlabel("Time Step")
+                    ax.set_ylabel("Torque Magnitude (N⋅m)")
+                    ax.legend()
+                    ax.grid(True, alpha=0.3)
+
+            plt.tight_layout()
+            plt.savefig("joint_torques.png")
             plt.show()

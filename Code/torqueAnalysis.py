@@ -269,7 +269,7 @@ def main():
             ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig("joint_torques.png")
+    plt.savefig("required_torques.png")
     plt.show()
 
 if __name__ == "__main__":

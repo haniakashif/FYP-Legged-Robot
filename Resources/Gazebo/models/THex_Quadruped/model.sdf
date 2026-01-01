@@ -54,6 +54,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>bl_hip_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='bl_hip'>
       <pose relative_to='bl_hip_joint'>0 0 0 0 0 0</pose>
@@ -109,6 +122,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>bl_knee_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='bl_knee'>
       <pose relative_to='bl_knee_joint'>0 0 0 0 0 0</pose>
@@ -164,6 +190,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>bl_foot_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='bl_foot'>
       <pose relative_to='bl_foot_joint'>0 0 0 0 0 0</pose>
@@ -219,6 +258,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>br_hip_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='br_hip'>
       <pose relative_to='br_hip_joint'>0 0 0 0 0 0</pose>
@@ -274,6 +326,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>br_knee_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='br_knee'>
       <pose relative_to='br_knee_joint'>0 0 0 0 0 0</pose>
@@ -329,6 +394,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>br_foot_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='br_foot'>
       <pose relative_to='br_foot_joint'>0 0 0 0 0 0</pose>
@@ -384,6 +462,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fl_hip_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fl_hip'>
       <pose relative_to='fl_hip_joint'>0 0 0 0 0 0</pose>
@@ -439,6 +530,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fl_knee_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fl_knee'>
       <pose relative_to='fl_knee_joint'>0 0 0 0 0 0</pose>
@@ -494,6 +598,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fl_foot_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fl_foot'>
       <pose relative_to='fl_foot_joint'>0 0 0 0 0 0</pose>
@@ -549,6 +666,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fr_hip_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fr_hip'>
       <pose relative_to='fr_hip_joint'>0 0 0 0 0 0</pose>
@@ -604,6 +734,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fr_knee_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fr_knee'>
       <pose relative_to='fr_knee_joint'>0 0 0 0 0 0</pose>
@@ -659,6 +802,19 @@
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
+      <physics>
+        <provide_feedback>true</provide_feedback>
+      </physics>
+      <sensor name="force_torque_sensor" type="force_torque">
+        <update_rate>100</update_rate>
+        <always_on>true</always_on>
+        <visualize>true</visualize>
+        <topic>fr_foot_force_torque</topic>
+        <force_torque>
+          <frame>sensor</frame>
+          <measure_direction>parent_to_child</measure_direction>
+        </force_torque>
+      </sensor>
     </joint>
     <link name='fr_foot'>
       <pose relative_to='fr_foot_joint'>0 0 0 0 0 0</pose>
