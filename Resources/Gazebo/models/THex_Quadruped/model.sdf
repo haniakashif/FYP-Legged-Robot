@@ -19,7 +19,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/base_link.STL</uri>
+            <uri>model://THex_Quadruped/meshes/base_link_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -87,7 +87,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/bl_hip.STL</uri>
+            <uri>model://THex_Quadruped/meshes/bl_hip_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -155,7 +155,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/bl_knee.STL</uri>
+            <uri>model://THex_Quadruped/meshes/bl_knee_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -223,7 +223,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/bl_foot.STL</uri>
+            <uri>model://THex_Quadruped/meshes/bl_foot_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -291,7 +291,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/br_hip.STL</uri>
+            <uri>model://THex_Quadruped/meshes/br_hip_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -359,7 +359,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/br_knee.STL</uri>
+            <uri>model://THex_Quadruped/meshes/br_knee_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -427,7 +427,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/br_foot.STL</uri>
+            <uri>model://THex_Quadruped/meshes/br_foot_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -495,7 +495,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fl_hip.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fl_hip_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -563,7 +563,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fl_knee.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fl_knee_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -631,7 +631,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fl_foot.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fl_foot_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -699,7 +699,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fr_hip.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fr_hip_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -767,7 +767,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fr_knee.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fr_knee_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>
@@ -835,7 +835,7 @@
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://THex_Quadruped/meshes/fr_foot.STL</uri>
+            <uri>model://THex_Quadruped/meshes/fr_foot_collision.STL</uri>
           </mesh>
         </geometry>
       </collision>

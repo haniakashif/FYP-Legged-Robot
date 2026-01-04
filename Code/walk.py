@@ -272,8 +272,8 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Plotting control curves...")
 
-        # ================= PLOTTING =================
         if len(theta0_states["hip"]) > 0:
+            # ================= PLOTTING =================
             import matplotlib.pyplot as plt
 
             # plot subplots comparing commands vs states for each joint of each leg
@@ -307,23 +307,97 @@ if __name__ == "__main__":
             # plot torques for all joints
             torques = [torque0, torque1, torque2, torque3]
 
+            # Find global min and max torque values for consistent y-axis limits
+            all_torque_values = []
+            for joint_torques in torques:
+                for joint_type in joint_types:
+                    all_torque_values.extend(joint_torques[joint_type])
+            
+            if all_torque_values:
+                y_min = min(all_torque_values)
+                y_max = max(all_torque_values)
+                # Add some padding to the bounds
+                y_padding = (y_max - y_min) * 0.1
+                y_min -= y_padding
+                y_max += y_padding
+            else:
+                y_min, y_max = 0, 1
+
             fig2, axes2 = plt.subplots(4, 3, figsize=(15, 12))
             fig2.suptitle("All Joints: Torque Magnitude", fontsize=16)
 
             for leg_ind in range(len(legs)):
                 leg = legs[leg_ind]
-                torque_data = torques[leg_ind]
+                joint_torques = torques[leg_ind]
 
                 for joint_ind, joint_type in enumerate(joint_types):
                     ax = axes2[leg_ind, joint_ind]
-                    if len(torque_data[joint_type]) > 0:
-                        ax.plot(torque_data[joint_type], label="Torque", linestyle='-', linewidth=1.5, color='r')
+                    if len(joint_torques[joint_type]) > 0:
+                        ax.plot(joint_torques[joint_type], label="Torque", linestyle='-', linewidth=1.5, color='r')
                     ax.set_title(f"{leg} {joint_type}")
                     ax.set_xlabel("Time Step")
                     ax.set_ylabel("Torque Magnitude (N⋅m)")
+                    ax.set_ylim(y_min, y_max)
                     ax.legend()
                     ax.grid(True, alpha=0.3)
 
             plt.tight_layout()
             plt.savefig("joint_torques.png")
             plt.show()
+            
+            # ================= CSV EXPORT =================
+            import csv
+
+            # Save data to CSV
+            print("Saving data to CSV...")
+            
+            # Save joint commands and states
+            with open('joint_commands_vs_states.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                
+                # Write header
+                header = ['Time_Step']
+                for leg in legs:
+                    for joint_type in joint_types:
+                        header.extend([f'{leg}_{joint_type}_command', f'{leg}_{joint_type}_state'])
+                writer.writerow(header)
+                
+                # Write data rows
+                max_len = max(len(theta0_commands["hip"]), len(theta1_commands["hip"]), len(theta2_commands["hip"]), len(theta3_commands["hip"]))
+                
+                for i in range(max_len):
+                    row = [i]
+                    for leg_ind, leg in enumerate(legs):
+                        commands = theta_commands[leg_ind]
+                        states = theta_states[leg_ind]
+                        for joint_type in joint_types:
+                            cmd_val = math.degrees(commands[joint_type][i]) if i < len(commands[joint_type]) else ''
+                            state_val = math.degrees(states[joint_type][i]) if i < len(states[joint_type]) else ''
+                            row.extend([cmd_val, state_val])
+                    writer.writerow(row)
+            
+            print("Joint data saved to joint_commands_vs_states.csv")
+            
+            # Save torque data
+            with open('joint_torques.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                
+                # Write header
+                header = ['Time_Step']
+                for leg in legs:
+                    for joint_type in joint_types:
+                        header.append(f'{leg}_{joint_type}_torque')
+                writer.writerow(header)
+                
+                # Write data rows
+                max_len = max(len(torque0["hip"]), len(torque1["hip"]), len(torque2["hip"]), len(torque3["hip"]))
+                
+                for i in range(max_len):
+                    row = [i]
+                    for joint_torques in torques:
+                        for joint_type in joint_types:
+                            torque_val = joint_torques[joint_type][i] if i < len(joint_torques[joint_type]) else ''
+                            row.append(torque_val)
+                    writer.writerow(row)
+            
+            print("Torque data saved to joint_torques.csv")
