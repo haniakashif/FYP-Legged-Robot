@@ -5,10 +5,14 @@ import numpy as np
 PI = math.pi
 
 # Link Lengths
-L1 = 3.1
-L2 = 4.5
-L3 = 3.0
-L4 = 9.0
+# L1 = 3.1
+L1 = 2.845
+# L2 = 4.5
+L2 = 5.439
+# L3 = 3.0
+L3 = 2.637
+# L4 = 9.0
+L4 = 9.265
 
 # Trajectory Constants
 T_STALL = 2

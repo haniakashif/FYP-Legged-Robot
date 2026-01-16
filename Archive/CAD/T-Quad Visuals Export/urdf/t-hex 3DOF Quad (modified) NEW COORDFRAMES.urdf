@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="t-hex 3DOF Quad (modified) NEW COORDFRAMES">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-1.0171E-10 -0.0086065 0.03608"
+        rpy="0 0 0" />
+      <mass
+        value="0.30423" />
+      <inertia
+        ixx="0.0009137"
+        ixy="-1.0719E-13"
+        ixz="3.2476E-14"
+        iyy="0.00019907"
+        iyz="-4.2939E-05"
+        izz="0.00074891" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="fr_hip">
+    <inertial>
+      <origin
+        xyz="0.015044 -0.0059121 0.011971"
+        rpy="0 0 0" />
+      <mass
+        value="0.080321" />
+      <inertia
+        ixx="1.9516E-05"
+        ixy="4.7874E-07"
+        ixz="-3.7331E-07"
+        iyy="1.2616E-05"
+        iyz="-2.8574E-09"
+        izz="1.2576E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.059512 0.078854 0.0005334"
+      rpy="0 0 0.76931" />
+    <parent
+      link="base_link" />
+    <child
+      link="fr_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fr_knee">
+    <inertial>
+      <origin
+        xyz="0.045275 -0.0044813 -0.00025994"
+        rpy="0 0 0" />
+      <mass
+        value="0.034681" />
+      <inertia
+        ixx="1.6475E-05"
+        ixy="9.8627E-07"
+        ixz="-8.0147E-08"
+        iyy="2.0946E-05"
+        iyz="-1.0632E-08"
+        izz="9.0407E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_knee.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_knee.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028451 0 0"
+      rpy="1.5816 -0.78534 0" />
+    <parent
+      link="fr_hip" />
+    <child
+      link="fr_knee" />
+    <axis
+      xyz="-0.010779 0 -0.99994" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fr_foot">
+    <inertial>
+      <origin
+        xyz="0.020857 -0.003581 -0.0013921"
+        rpy="0 0 0" />
+      <mass
+        value="0.057595" />
+      <inertia
+        ixx="6.4423E-06"
+        ixy="-3.9831E-07"
+        ixz="1.4001E-08"
+        iyy="1.1705E-05"
+        iyz="3.7382E-07"
+        izz="9.2683E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fr_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.07307 -0.018656 0.0002011"
+      rpy="3.1339 -0.0075232 -2.3433" />
+    <parent
+      link="fr_knee" />
+    <child
+      link="fr_foot" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_hip">
+    <inertial>
+      <origin
+        xyz="0.015006 0.0056423 0.012299"
+        rpy="0 0 0" />
+      <mass
+        value="0.080321" />
+      <inertia
+        ixx="1.9522E-05"
+        ixy="-4.398E-07"
+        ixz="-3.738E-07"
+        iyy="1.261E-05"
+        iyz="6.3953E-09"
+        izz="1.2576E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.059512 0.078854 0"
+      rpy="0 0 2.3666" />
+    <parent
+      link="base_link" />
+    <child
+      link="fl_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_knee">
+    <inertial>
+      <origin
+        xyz="0.045273 0.0044813 -0.00044769"
+        rpy="0 0 0" />
+      <mass
+        value="0.034681" />
+      <inertia
+        ixx="1.6475E-05"
+        ixy="-9.863E-07"
+        ixz="-5.0096E-08"
+        iyy="2.0946E-05"
+        iyz="6.6452E-09"
+        izz="9.0402E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_knee.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_knee.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028449 0 0"
+      rpy="-1.5775 -0.78538 0" />
+    <parent
+      link="fl_hip" />
+    <child
+      link="fl_knee" />
+    <axis
+      xyz="-0.0067372 0 -0.99998" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_foot">
+    <inertial>
+      <origin
+        xyz="0.021142 0.0035788 -0.0013921"
+        rpy="0 0 0" />
+      <mass
+        value="0.057595" />
+      <inertia
+        ixx="6.4423E-06"
+        ixy="3.9845E-07"
+        ixz="1.1196E-08"
+        iyy="1.1705E-05"
+        iyz="-3.7378E-07"
+        izz="9.2683E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/fl_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073066 0.018656 0.00012569"
+      rpy="-3.1368 -0.0047025 2.3434" />
+    <parent
+      link="fl_knee" />
+    <child
+      link="fl_foot" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_hip">
+    <inertial>
+      <origin
+        xyz="0.015013 -0.0039618 0.012299"
+        rpy="0 0 0" />
+      <mass
+        value="0.080321" />
+      <inertia
+        ixx="1.9539E-05"
+        ixy="-2.7002E-07"
+        ixz="-3.7333E-07"
+        iyy="1.2593E-05"
+        iyz="-3.7558E-08"
+        izz="1.2576E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.053162 -0.12711 0"
+      rpy="0 0 -2.372" />
+    <parent
+      link="base_link" />
+    <child
+      link="bl_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_knee">
+    <inertial>
+      <origin
+        xyz="0.045291 0.0044813 -0.0012523"
+        rpy="0 0 0" />
+      <mass
+        value="0.034681" />
+      <inertia
+        ixx="1.6475E-05"
+        ixy="-9.8627E-07"
+        ixz="7.8716E-08"
+        iyy="2.0946E-05"
+        iyz="-1.0442E-08"
+        izz="9.0407E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_knee.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_knee.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028451 0 0"
+      rpy="-1.5602 -0.78534 0" />
+    <parent
+      link="bl_hip" />
+    <child
+      link="bl_knee" />
+    <axis
+      xyz="0.010587 0 -0.99994" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_foot">
+    <inertial>
+      <origin
+        xyz="0.021142 0.0035788 -0.0013921"
+        rpy="0 0 0" />
+      <mass
+        value="0.057595" />
+      <inertia
+        ixx="6.4423E-06"
+        ixy="3.9845E-07"
+        ixz="1.1196E-08"
+        iyy="1.1705E-05"
+        iyz="-3.7378E-07"
+        izz="9.2683E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/bl_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073069 0.018656 -0.00019751"
+      rpy="3.134 0.0073895 2.3434" />
+    <parent
+      link="bl_knee" />
+    <child
+      link="bl_foot" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_hip">
+    <inertial>
+      <origin
+        xyz="0.014987 0.0036918 0.011971"
+        rpy="0 0 0" />
+      <mass
+        value="0.080321" />
+      <inertia
+        ixx="1.9536E-05"
+        ixy="3.0917E-07"
+        ixz="-3.73E-07"
+        iyy="1.2596E-05"
+        iyz="4.1086E-08"
+        izz="1.2576E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_hip.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_hip.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.053162 -0.12711 0.0005334"
+      rpy="0 0 -0.77529" />
+    <parent
+      link="base_link" />
+    <child
+      link="br_hip" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_knee">
+    <inertial>
+      <origin
+        xyz="0.045283 -0.0044813 -0.0010646"
+        rpy="0 0 0" />
+      <mass
+        value="0.034681" />
+      <inertia
+        ixx="1.6475E-05"
+        ixy="9.863E-07"
+        ixz="4.8664E-08"
+        iyy="2.0946E-05"
+        iyz="6.4551E-09"
+        izz="9.0401E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_knee.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.89804 0.91765 0.92941 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_knee.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028449 0 0"
+      rpy="1.5643 -0.78538 0" />
+    <parent
+      link="br_hip" />
+    <child
+      link="br_knee" />
+    <axis
+      xyz="0.0065447 0 -0.99998" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_foot">
+    <inertial>
+      <origin
+        xyz="0.020857 -0.003581 -0.0013921"
+        rpy="0 0 0" />
+      <mass
+        value="0.057595" />
+      <inertia
+        ixx="6.4423E-06"
+        ixy="-3.9831E-07"
+        ixz="1.4001E-08"
+        iyy="1.1705E-05"
+        iyz="3.7382E-07"
+        izz="9.2683E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_foot.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES/meshes/br_foot.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073065 -0.018656 -0.0001221"
+      rpy="-3.1369 0.0045678 -2.3433" />
+    <parent
+      link="br_knee" />
+    <child
+      link="br_foot" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+</robot>

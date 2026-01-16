@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM">
+  <link
+    name="base_link_collision">
+    <inertial>
+      <origin
+        xyz="-4.3368E-18 -0.0044549 0.05096"
+        rpy="0 0 0" />
+      <mass
+        value="1.397" />
+      <inertia
+        ixx="0.0074816"
+        ixy="-1.8104E-20"
+        ixz="2.2293E-20"
+        iyy="0.0018158"
+        iyz="-0.00054962"
+        izz="0.006296" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/base_link_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/base_link_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="fr_hip_collision">
+    <inertial>
+      <origin
+        xyz="0.014318 -0.0060629 0.01277"
+        rpy="0 0 0" />
+      <mass
+        value="0.11741" />
+      <inertia
+        ixx="4.9874E-05"
+        ixy="2.9422E-07"
+        ixz="-1.256E-20"
+        iyy="3.058E-05"
+        iyz="-2.9533E-21"
+        izz="3.0575E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_hip_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_hip_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.059512 0.078854 0.0005334"
+      rpy="0 0 0.76931" />
+    <parent
+      link="base_link_collision" />
+    <child
+      link="fr_hip_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fr_knee_collision">
+    <inertial>
+      <origin
+        xyz="0.041197 -0.0049457 -0.00040878"
+        rpy="0 0 0" />
+      <mass
+        value="0.0078453" />
+      <inertia
+        ixx="8.7896E-07"
+        ixy="1.1937E-06"
+        ixz="5.8907E-08"
+        iyy="5.4686E-06"
+        iyz="-1.2867E-08"
+        izz="6.3429E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_knee_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_knee_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028451 0 0"
+      rpy="1.5816 -0.78534 0" />
+    <parent
+      link="fr_hip_collision" />
+    <child
+      link="fr_knee_collision" />
+    <axis
+      xyz="-0.010779 0 -0.99994" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fr_foot_collision">
+    <inertial>
+      <origin
+        xyz="0.015759 -0.0029333 -0.001223"
+        rpy="0 0 0" />
+      <mass
+        value="0.074374" />
+      <inertia
+        ixx="1.4421E-05"
+        ixy="-2.2392E-07"
+        ixz="-7.6908E-18"
+        iyy="3.1799E-05"
+        iyz="-9.8256E-20"
+        izz="2.5344E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_foot_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fr_foot_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fr_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.07307 -0.018656 0.0002011"
+      rpy="3.1339 -0.0075232 -2.3433" />
+    <parent
+      link="fr_knee_collision" />
+    <child
+      link="fr_foot_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_hip_collision">
+    <inertial>
+      <origin
+        xyz="0.0143118421289124 0.00566169915127807 0.0132522"
+        rpy="0 0 0" />
+      <mass
+        value="0.11740896" />
+      <inertia
+        ixx="4.98771206226404E-05"
+        ixy="-1.83911028827696E-07"
+        ixz="-8.92087225726843E-21"
+        iyy="3.05768188628596E-05"
+        iyz="-1.48636104921113E-21"
+        izz="3.05750665485E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_hip_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_hip_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.059512 0.078854 0"
+      rpy="0 0 2.3666" />
+    <parent
+      link="base_link_collision" />
+    <child
+      link="fl_hip_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_knee_collision">
+    <inertial>
+      <origin
+        xyz="0.0411960169988735 0.00494573478578841 -0.000613013742021315"
+        rpy="0 0 0" />
+      <mass
+        value="0.00784531807080844" />
+      <inertia
+        ixx="8.78572849397936E-07"
+        ixy="-1.1937124100076E-06"
+        ixz="3.68196411199275E-08"
+        iyy="5.46859712302851E-06"
+        iyz="8.04246087838835E-09"
+        izz="6.34332650293932E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_knee_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_knee_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028449 0 0"
+      rpy="-1.5775 -0.78538 0" />
+    <parent
+      link="fl_hip_collision" />
+    <child
+      link="fl_knee_collision" />
+    <axis
+      xyz="-0.0067372 0 -0.99998" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="fl_foot_collision">
+    <inertial>
+      <origin
+        xyz="0.0162000810345276 0.00292882079345386 -0.00122295505133468"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743743135565135" />
+      <inertia
+        ixx="1.44214036778833E-05"
+        ixy="2.2264211176661E-07"
+        ixz="1.71068891609847E-18"
+        iyy="3.17988475428255E-05"
+        iyz="-2.11758236813575E-20"
+        izz="2.53438146690718E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_foot_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/fl_foot_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="fl_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073066 0.018656 0.00012569"
+      rpy="-3.1368 -0.0047025 2.3434" />
+    <parent
+      link="fl_knee_collision" />
+    <child
+      link="fl_foot_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_hip_collision">
+    <inertial>
+      <origin
+        xyz="0.0143285638345978 -0.00465620919207431 0.0132521999999991"
+        rpy="0 0 0" />
+      <mass
+        value="0.11740896" />
+      <inertia
+        ixx="4.98745463704744E-05"
+        ixy="2.88964501898982E-07"
+        ixz="-1.10768719551012E-20"
+        iyy="3.05793931150255E-05"
+        iyz="-8.68610851032969E-21"
+        izz="3.05750665485E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_hip_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_hip_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_hip_joint"
+    type="revolute">
+    <origin
+      xyz="-0.053162 -0.12711 0"
+      rpy="0 0 -2.372" />
+    <parent
+      link="base_link_collision" />
+    <child
+      link="bl_hip_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_knee_collision">
+    <inertial>
+      <origin
+        xyz="0.0412172768307167 0.00494573478578836 -0.00148818730146588"
+        rpy="0 0 0" />
+      <mass
+        value="0.00784531807080836" />
+      <inertia
+        ixx="8.78937314993222E-07"
+        ixy="-1.19367260449787E-06"
+        ixz="-5.7855577349967E-08"
+        iyy="5.46859712302846E-06"
+        iyz="-1.26377313771319E-08"
+        izz="6.34296203734397E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_knee_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_knee_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028451 0 0"
+      rpy="-1.5602 -0.78534 0" />
+    <parent
+      link="bl_hip_collision" />
+    <child
+      link="bl_knee_collision" />
+    <axis
+      xyz="0.010587 0 -0.99994" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="bl_foot_collision">
+    <inertial>
+      <origin
+        xyz="0.0162000810345233 0.00292882079344495 -0.00121932664294472"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743743135565135" />
+      <inertia
+        ixx="1.44214036778836E-05"
+        ixy="2.22642111775048E-07"
+        ixz="7.08066604345392E-21"
+        iyy="3.17988475428253E-05"
+        iyz="0"
+        izz="2.53438146690718E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_foot_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/bl_foot_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="bl_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073069 0.018656 -0.00019751"
+      rpy="3.134 0.0073895 2.3434" />
+    <parent
+      link="bl_knee_collision" />
+    <child
+      link="bl_foot_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_hip_collision">
+    <inertial>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <mass
+        value="0" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_hip_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_hip_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_hip_joint"
+    type="revolute">
+    <origin
+      xyz="0.053162 -0.12711 0.0005334"
+      rpy="0 0 -0.77529" />
+    <parent
+      link="base_link_collision" />
+    <child
+      link="br_hip_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-0.7853"
+      upper="0.7853"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_knee_collision">
+    <inertial>
+      <origin
+        xyz="0.0412085397053542 -0.00494573478578852 -0.00129036969014382"
+        rpy="0 0 0" />
+      <mass
+        value="0.00784531807080841" />
+      <inertia
+        ixx="8.78558877249241E-07"
+        ixy="1.19371393596472E-06"
+        ixz="-3.57677428188733E-08"
+        iyy="5.46859712302849E-06"
+        iyz="7.81268626892906E-09"
+        izz="6.34334047508799E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_knee_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_knee_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_knee_joint"
+    type="revolute">
+    <origin
+      xyz="0.028449 0 0"
+      rpy="1.5643 -0.78538 0" />
+    <parent
+      link="br_hip_collision" />
+    <child
+      link="br_knee_collision" />
+    <axis
+      xyz="0.0065447 0 -0.99998" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+  <link
+    name="br_foot_collision">
+    <inertial>
+      <origin
+        xyz="0.0157590951215469 -0.00293331070056918 -0.0012229550513437"
+        rpy="0 0 0" />
+      <mass
+        value="0.0743743135565136" />
+      <inertia
+        ixx="1.44214366030566E-05"
+        ixy="-2.23923344468741E-07"
+        ixz="1.06937909590855E-20"
+        iyy="3.17988146176522E-05"
+        iyz="0"
+        izz="2.53438146690718E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_foot_collision.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://t-hex 3DOF Quad (modified) NEW COORDFRAMES COLLISION.SLDASM/meshes/br_foot_collision.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="br_foot_joint"
+    type="revolute">
+    <origin
+      xyz="0.073065 -0.018656 -0.0001221"
+      rpy="-3.1369 0.0045678 -2.3433" />
+    <parent
+      link="br_knee_collision" />
+    <child
+      link="br_foot_collision" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.5707"
+      upper="1.5707"
+      effort="0.9414"
+      velocity="5.23" />
+  </joint>
+</robot>

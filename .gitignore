@@ -337,3 +337,7 @@ Code/joint_torques.csv
 Code/required_torques.png
 Code/joint_state_errors.png 
 Code/joint_torque_errors.png
+Code/joint_state_actual_vs_simplified*
+Code/joint_torque_actual_vs_simplified*
+Code/joint_state_percentage_errors*
+Code/joint_torque_percentage_errors*

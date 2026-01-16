@@ -114,7 +114,8 @@ def joint_torque_cb(msg, leg, joint_type):
 
     global torque0, torque1, torque2, torque3
 
-    torque_mag = math.sqrt(msg.torque.x**2 + msg.torque.y**2 + msg.torque.z**2)
+    # torque_mag = math.sqrt(msg.torque.x**2 + msg.torque.y**2 + msg.torque.z**2)
+    torque_mag = abs(msg.torque.z) # only compute torque about the z-axis
 
     if leg == "FR" and len(torque0[joint_type]) < len(theta0_commands[joint_type]):
         torque0[joint_type].append(torque_mag)
@@ -334,6 +335,7 @@ if __name__ == "__main__":
                     ax = axes2[leg_ind, joint_ind]
                     if len(joint_torques[joint_type]) > 0:
                         ax.plot(joint_torques[joint_type], label="Torque", linestyle='-', linewidth=1.5, color='r')
+                    ax.axhline(y=0.3*0.9414, color='g', linestyle=':', linewidth=2, label="30% Stall Torque")
                     ax.set_title(f"{leg} {joint_type}")
                     ax.set_xlabel("Time Step")
                     ax.set_ylabel("Torque Magnitude (N⋅m)")

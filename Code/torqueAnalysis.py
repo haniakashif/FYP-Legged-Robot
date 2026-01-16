@@ -19,7 +19,7 @@ Once the forces are obtained, the torque at each joint is computed using the equ
 
 PI = math.pi
 
-WEIGHT = 1.394 * 9.81 # mass in kg, acceleration in m/s^2
+WEIGHT = (1.394 + 0.170) * 9.81 # mass in kg, acceleration in m/s^2
 
 L1 = kin.L1/100  # convert cm to m
 L2 = kin.L2/100
@@ -262,10 +262,12 @@ def main():
             # Extract torque values for this joint across all time steps
             torque_values = [torque[joint_ind] for torque in torques]
             ax.plot(torque_values, linewidth=2)
+            ax.axhline(y=0.3*0.9414, color='g', linestyle=':', linewidth=2, label="30% Stall Torque")
             ax.set_title(f"{leg} {joint_type}")
             ax.set_xlabel("Time Step")
             ax.set_ylabel("Torque (N⋅m)")
             ax.set_ylim(y_min, y_max)
+            ax.legend()
             ax.grid(True, alpha=0.3)
 
     plt.tight_layout()

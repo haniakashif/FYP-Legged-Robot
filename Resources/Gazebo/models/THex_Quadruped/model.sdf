@@ -3,7 +3,7 @@
   <self_collide>true</self_collide>
     <link name='base_link'>
       <inertial>
-        <pose>0.00018 -0.00861 0.03579 0 0 0</pose>
+        <pose>-1.0171e-10 -0.0086064999999999996 0.036080000000000001 0 0 0</pose>
         <mass>0.30423</mass>
         <inertia>
           <ixx>0.00232</ixx>
@@ -38,7 +38,7 @@
       </visual>
     </link>
     <joint name='bl_hip_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.053156000000000002 -0.12709000000000001 0 0 0 -2.3570000000000002</pose>
+      <pose relative_to='base_link'>-0.053162000000000001 -0.12711 0 0 0 -2.3719999999999999</pose>
       <parent>base_link</parent>
       <child>bl_hip</child>
       <axis>
@@ -46,8 +46,8 @@
         <limit>
           <lower>-0.7853</lower>
           <upper>0.7853</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -71,7 +71,7 @@
     <link name='bl_hip'>
       <pose relative_to='bl_hip_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01464 -0.00468 0.01291 0 0 0</pose>
+        <pose>0.015013 -0.0039617999999999997 0.012298999999999999 0 0 0</pose>
         <mass>0.14763</mass>
         <inertia>
           <ixx>0.00005</ixx>
@@ -106,7 +106,7 @@
       </visual>
     </link>
     <joint name='bl_knee_joint' type='revolute'>
-      <pose relative_to='bl_hip'>0.028468 0 0 -1.5707 0 -0.071951000000000015</pose>
+      <pose relative_to='bl_hip'>0.028451000000000001 0 0 -1.5602 0 -7.8500057236944626e-17</pose>
       <parent>bl_hip</parent>
       <child>bl_knee</child>
       <axis>
@@ -114,8 +114,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -139,7 +139,7 @@
     <link name='bl_knee'>
       <pose relative_to='bl_knee_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.04532 0.00448 0.00015 0 0 0</pose>
+        <pose>0.045290999999999998 0.0044812999999999997 -0.0012523 0 0 0</pose>
         <mass>0.03468</mass>
         <inertia>
           <ixx>0.00002</ixx>
@@ -174,7 +174,7 @@
       </visual>
     </link>
     <joint name='bl_foot_joint' type='revolute'>
-      <pose relative_to='bl_knee'>0.072935 0.018648999999999999 0 3.1415 0 0.7853</pose>
+      <pose relative_to='bl_knee'>0.073068999999999995 0.018655999999999999 -0.00019751 3.1339999999999999 0.0073895000000000054 0.7853</pose>
       <parent>bl_knee</parent>
       <child>bl_foot</child>
       <axis>
@@ -182,8 +182,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -207,7 +207,7 @@
     <link name='bl_foot'>
       <pose relative_to='bl_foot_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01684 0.00222 0.00042 0 0 0</pose>
+        <pose>0.021142000000000001 0.0035788 -0.0013921000000000001 0 0 0</pose>
         <mass>0.09125</mass>
         <inertia>
           <ixx>0.00001</ixx>
@@ -242,7 +242,7 @@
       </visual>
     </link>
     <joint name='br_hip_joint' type='revolute'>
-      <pose relative_to='base_link'>0.053156000000000002 -0.12709000000000001 0 0 0 -0.78456000000000026</pose>
+      <pose relative_to='base_link'>0.053162000000000001 -0.12711 0.00053339999999999995 0 0 -0.77529000000000003</pose>
       <parent>base_link</parent>
       <child>br_hip</child>
       <axis>
@@ -250,8 +250,8 @@
         <limit>
           <lower>-0.7853</lower>
           <upper>0.7853</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -275,7 +275,7 @@
     <link name='br_hip'>
       <pose relative_to='br_hip_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01464 0.00436 0.01261 0 0 0</pose>
+        <pose>0.014987 0.0036917999999999999 0.011971000000000001 0 0 0</pose>
         <mass>0.14763</mass>
         <inertia>
           <ixx>0.00005</ixx>
@@ -310,7 +310,7 @@
       </visual>
     </link>
     <joint name='br_knee_joint' type='revolute'>
-      <pose relative_to='br_hip'>0.028468 0 0 1.5707 0 0</pose>
+      <pose relative_to='br_hip'>0.028448999999999999 0 0 1.5643 0 0</pose>
       <parent>br_hip</parent>
       <child>br_knee</child>
       <axis>
@@ -318,8 +318,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -343,7 +343,7 @@
     <link name='br_knee'>
       <pose relative_to='br_knee_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.04530 -0.00448 0.00016 0 0 0</pose>
+        <pose>0.045282999999999997 -0.0044812999999999997 -0.0010646 0 0 0</pose>
         <mass>0.03468</mass>
         <inertia>
           <ixx>0.00002</ixx>
@@ -378,7 +378,7 @@
       </visual>
     </link>
     <joint name='br_foot_joint' type='revolute'>
-      <pose relative_to='br_knee'>0.072955999999999993 -0.018648999999999999 0 -3.1415 0 -0.7853</pose>
+      <pose relative_to='br_knee'>0.073065000000000005 -0.018655999999999999 -0.00012210000000000001 -3.1368999999999998 0.0045678000000000021 -0.7853</pose>
       <parent>br_knee</parent>
       <child>br_foot</child>
       <axis>
@@ -386,8 +386,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -411,7 +411,7 @@
     <link name='br_foot'>
       <pose relative_to='br_foot_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01666 -0.00222 0.00043 0 0 0</pose>
+        <pose>0.020857000000000001 -0.003581 -0.0013921000000000001 0 0 0</pose>
         <mass>0.09125</mass>
         <inertia>
           <ixx>0.00001</ixx>
@@ -446,7 +446,7 @@
       </visual>
     </link>
     <joint name='fl_hip_joint' type='revolute'>
-      <pose relative_to='base_link'>-0.059506000000000003 0.078833 0 0 0 2.3570000000000002</pose>
+      <pose relative_to='base_link'>-0.059512000000000002 0.078853999999999994 0 0 0 2.3666</pose>
       <parent>base_link</parent>
       <child>fl_hip</child>
       <axis>
@@ -454,8 +454,8 @@
         <limit>
           <lower>-0.7853</lower>
           <upper>0.7853</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -479,7 +479,7 @@
     <link name='fl_hip'>
       <pose relative_to='fl_hip_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01464 0.00557 0.01291 0 0 0</pose>
+        <pose>0.015006 0.0056423000000000003 0.012298999999999999 0 0 0</pose>
         <mass>0.14763</mass>
         <inertia>
           <ixx>0.00005</ixx>
@@ -514,7 +514,7 @@
       </visual>
     </link>
     <joint name='fl_knee_joint' type='revolute'>
-      <pose relative_to='fl_hip'>0.028468 0 0 -1.5707 0 0</pose>
+      <pose relative_to='fl_hip'>0.028448999999999999 0 0 -1.5774999999999999 0 -7.8503197062369069e-17</pose>
       <parent>fl_hip</parent>
       <child>fl_knee</child>
       <axis>
@@ -522,8 +522,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -547,8 +547,8 @@
     <link name='fl_knee'>
       <pose relative_to='fl_knee_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.04527 0.00448 0.00019 0 0 0</pose>
-        <mass>0.03468</mass>
+        <pose>0.045273000000000001 0.0044812999999999997 -0.00044768999999999999 0 0 0</pose>
+        <mass>0.034680999999999997</mass>
         <inertia>
           <ixx>0.00002</ixx>
           <ixy>0</ixy>
@@ -582,7 +582,7 @@
       </visual>
     </link>
     <joint name='fl_foot_joint' type='revolute'>
-      <pose relative_to='fl_knee'>0.073042999999999997 0.018648999999999999 0 3.1415 0 0.7853</pose>
+      <pose relative_to='fl_knee'>0.073066000000000006 0.018655999999999999 0.00012569 -3.1368 -0.0047025000000000001 0.7853</pose>
       <parent>fl_knee</parent>
       <child>fl_foot</child>
       <axis>
@@ -590,8 +590,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -615,7 +615,7 @@
     <link name='fl_foot'>
       <pose relative_to='fl_foot_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01684 0.00222 0.00042 0 0 0</pose>
+        <pose>0.021142000000000001 0.0035788 -0.0013921000000000001 0 0 0</pose>
         <mass>0.09125</mass>
         <inertia>
           <ixx>0.00001</ixx>
@@ -650,7 +650,7 @@
       </visual>
     </link>
     <joint name='fr_hip_joint' type='revolute'>
-      <pose relative_to='base_link'>0.059506000000000003 0.078833 0 0 0 0.78456000000000026</pose>
+      <pose relative_to='base_link'>0.059512000000000002 0.078853999999999994 0.00053339999999999995 0 0 0.76931000000000005</pose>
       <parent>base_link</parent>
       <child>fr_hip</child>
       <axis>
@@ -658,8 +658,8 @@
         <limit>
           <lower>-0.7853</lower>
           <upper>0.7853</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -683,7 +683,7 @@
     <link name='fr_hip'>
       <pose relative_to='fr_hip_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01464 -0.00588 0.01261 0 0 0</pose>
+        <pose>0.015044 -0.0059121 0.011971000000000001 0 0 0</pose>
         <mass>0.14763</mass>
         <inertia>
           <ixx>0.00005</ixx>
@@ -718,7 +718,7 @@
       </visual>
     </link>
     <joint name='fr_knee_joint' type='revolute'>
-      <pose relative_to='fr_hip'>0.028468 0 0 1.5707 0 0</pose>
+      <pose relative_to='fr_hip'>0.028451000000000001 0 0 1.5816000000000001 0 0</pose>
       <parent>fr_hip</parent>
       <child>fr_knee</child>
       <axis>
@@ -726,8 +726,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -751,7 +751,7 @@
     <link name='fr_knee'>
       <pose relative_to='fr_knee_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.04528 -0.00448 0.00020 0 0 0</pose>
+        <pose>0.045275000000000003 -0.0044812999999999997 -0.00025994000000000001 0 0 0</pose>
         <mass>0.03468</mass>
         <inertia>
           <ixx>0.00002</ixx>
@@ -786,7 +786,7 @@
       </visual>
     </link>
     <joint name='fr_foot_joint' type='revolute'>
-      <pose relative_to='fr_knee'>0.073075000000000001 -0.018648999999999999 0 3.1415 0 -0.7853</pose>
+      <pose relative_to='fr_knee'>0.073069999999999996 -0.018655999999999999 0.00020110000000000001 3.1339000000000001 -0.0075232000000000007 -0.7853</pose>
       <parent>fr_knee</parent>
       <child>fr_foot</child>
       <axis>
@@ -794,8 +794,8 @@
         <limit>
           <lower>-1.5707</lower>
           <upper>1.5707</upper>
-          <effort>0.9414</effort>
-          <velocity>5.23</velocity>
+          <effort>0.94140000000000001</effort>
+          <velocity>5.2300000000000004</velocity>
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
@@ -819,7 +819,7 @@
     <link name='fr_foot'>
       <pose relative_to='fr_foot_joint'>0 0 0 0 0 0</pose>
       <inertial>
-        <pose>0.01666 -0.00222 0.00043 0 0 0</pose>
+        <pose>0.020857000000000001 -0.003581 -0.0013921000000000001 0 0 0</pose>
         <mass>0.09125</mass>
         <inertia>
           <ixx>0.00001</ixx>
