@@ -85,11 +85,11 @@ def inv_kin(x, y, z, leg_ind, step=0):
     LEGS = {0: "FR", 1: "BR", 2: "BL", 3: "FL"}
 
     if theta1 < -PI/4 or theta1 > PI/4:
-        print(f"Warning: For {LEGS[leg_ind]}, point {step}: theta1 out of bounds: {math.degrees(theta1)}") 
+        raise Exception(f"ERROR: For {LEGS[leg_ind]}, point {step}: theta1 out of bounds: {math.degrees(theta1)}") 
     if theta2 < -PI/2 or theta2 > PI/2:
-        print(f"Warning: For {LEGS[leg_ind]}, point {step}: theta2 out of bounds: {math.degrees(theta2)}")
+        raise Exception(f"ERROR: For {LEGS[leg_ind]}, point {step}: theta2 out of bounds: {math.degrees(theta2)}")
     if theta4 < -PI/2 or theta4 > PI/2:
-        print(f"Warning: For {LEGS[leg_ind]}, point {step}: theta4 out of bounds: {math.degrees(theta4)}")
+        raise Exception(f"ERROR: For {LEGS[leg_ind]}, point {step}: theta4 out of bounds: {math.degrees(theta4)}")
     return theta1, theta2, theta4
 
 def inv_kin_array(xyz, leg_ind):

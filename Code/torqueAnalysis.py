@@ -75,10 +75,10 @@ def compute_forces(xy1, xy2, xy3, xy4 = None): # compute vertical forces on stan
                         [1, 1, 1]])
 
     try:
-        print("Computing inverse of A matrix for torque analysis.")
+        # print("Computing inverse of A matrix for torque analysis.")
         Ainv = np.linalg.inv(A)
     except: 
-        print("Singular matrix encountered in torque analysis; using pseudo-inverse.")
+        # print("Singular matrix encountered in torque analysis; using pseudo-inverse.")
         Ainv = np.linalg.pinv(A) 
 
     F = Ainv @ W # vector of vertical forces on each stance foot
@@ -111,6 +111,37 @@ def compute_J(side, thetas): # compute Jacobian matrix for a given leg side ("L"
 
     return J
 
+def compute_torque(xyz_legs, leg_indices = [0, 1, 2]): # footholds in leg frame in cm along with leg_indices
+    
+    thetas = []
+
+    for ind in range(len(xyz_legs)):
+        x, y, z = xyz_legs[ind]
+        theta_leg = kin.inv_kin(x, y, z, leg_indices[ind])
+        thetas.append(theta_leg)
+    
+    xyz_body = [leg_to_body(leg_indices[ind], xyz_legs[ind]) for ind in range(len(xyz_legs))]
+    xy_body = [(xyz_body[ind][0], xyz_body[ind][1]) for ind in range(len(xyz_body))]
+    
+    if len(xyz_legs) == 3:
+        F_legs = compute_forces(xy_body[0], xy_body[1], xy_body[2])
+    else:
+        F_legs = compute_forces(xy_body[0], xy_body[1], xy_body[2], xy_body[3])
+
+    J_legs = []
+    for ind in range(len(xyz_legs)):
+        side = "R" if leg_indices[ind] in [0, 1] else "L"
+        J_leg = compute_J(side, thetas[ind])
+        J_legs.append(J_leg)
+
+    torques = []
+    for ind in range(len(J_legs)):
+        force_leg = np.array([[0], [0], [F_legs[ind, 0]]]) # force vector at the foot, assuming only vertical forces as per Garcia et al.
+        torque_leg = J_legs[ind].T @ force_leg # torque at each joint is given by J^T * F where F is the force vector at the foot
+        torques.append(torque_leg.flatten().tolist())
+    
+    return torques
+
 def main():
     # generate initial bezier curve trajectory (these points are generated in cm)
     xyz = kin.generate_trajectory()
@@ -133,102 +164,60 @@ def main():
     xyz2 = xyz2 * 3
     xyz3 = xyz3 * 3
 
-    # generate joint angle commands for each leg
-    theta0 = kin.inv_kin_array(xyz0, 0)  # FR
-    theta1 = kin.inv_kin_array(xyz1, 1)  # BR
-    theta2 = kin.inv_kin_array(xyz2, 2)  # BL
-    theta3 = kin.inv_kin_array(xyz3, 3)  # FL
-    
-    # transform foot positions to body frame for torque calculations
-    xyz0 = leg_to_body_array(0, xyz0)
-    xyz1 = leg_to_body_array(1, xyz1)
-    xyz2 = leg_to_body_array(2, xyz2)
-    xyz3 = leg_to_body_array(3, xyz3)
+    NUM_POINTS = len(xyz0)
+    STANCE_IDENTIFIER = xyz0[0][2] # the first leg starts off on the ground so we can use its z value as the identifier for footholds
 
     torques0 = []
     torques1 = []
     torques2 = []
     torques3 = []
 
-    ind = {0: {"xyz": xyz0, "theta": theta0, "side": "R"}, 
-           1: {"xyz": xyz1, "theta": theta1, "side": "R"},
-           2: {"xyz": xyz2, "theta": theta2, "side": "L"},
-           3: {"xyz": xyz3, "theta": theta3, "side": "L"}}
-
-    NUM_POINTS = len(xyz0)
-    STANCE_IDENTIFIER = xyz0[0][2] # the first leg starts off on the ground so we can use its z value as the identifier for footholds
-
     for i in range(NUM_POINTS):
+        xyz_legs = []
+        leg_indices = []
+        if xyz0[i][2] == STANCE_IDENTIFIER:
+            xyz_legs.append(xyz0[i])
+            leg_indices.append(0)
 
-        xy_legs = [] # stores the (x, y) positions of the stance legs
-        J_legs = [] # stores the Jacobian matrices of the stance legs
+        if xyz1[i][2] == STANCE_IDENTIFIER:
+            xyz_legs.append(xyz1[i])
+            leg_indices.append(1)
 
-        fr_stance = False
-        br_stance = False
-        bl_stance = False
-        fl_stance = False
+        if xyz2[i][2] == STANCE_IDENTIFIER:
+            xyz_legs.append(xyz2[i])
+            leg_indices.append(2)
 
-        for leg in range(4):
-            xyz_leg = ind[leg]["xyz"][i]
+        if xyz3[i][2] == STANCE_IDENTIFIER:
+            xyz_legs.append(xyz3[i])
+            leg_indices.append(3)
 
-            if xyz_leg[2] == STANCE_IDENTIFIER:                
-                if leg == 0:
-                    fr_stance = True
-                elif leg == 1:
-                    br_stance = True
-                elif leg == 2:
-                    bl_stance = True
-                elif leg == 3:
-                    fl_stance = True            
-            else:
-                continue # swing leg, forces and torques are zero
+        torques = compute_torque(xyz_legs, leg_indices)
+        indices_stance = [False, False, False, False]
 
-            xy_legs.append((xyz_leg[0], xyz_leg[1])) # store (x, y) position for force computation
-
-            # compute Jacobian for this leg
-            theta_leg = [ind[leg]["theta"][0][i], ind[leg]["theta"][1][i], ind[leg]["theta"][2][i]] 
-            J_leg = compute_J(ind[leg]["side"], theta_leg)
-            J_legs.append(J_leg) 
-
-        if fr_stance and br_stance and bl_stance and fl_stance: # if all 4 legs are in stance, xy_legs has 4 entries
-            F_legs = compute_forces(xy_legs[0], xy_legs[1], xy_legs[2], xy_legs[3])
-        else: # otherwise, xy_legs has 3 entries when only 3 legs are in stance
-            F_legs = compute_forces(xy_legs[0], xy_legs[1], xy_legs[2])
-
-        leg_index = 0 # to keep track of which leg's force and Jacobian to use
-
-        if fr_stance:
-            force0 = np.array([[0], [0], [F_legs[leg_index, 0]]]) # force vector at the foot, assuming only vertical forces as per Garcia et al.
-            torque0 = J_legs[leg_index].T @ force0 # torque at each joint is given by J^T * F where F is the force vector at the foot
-            leg_index += 1 # move to next leg in stance
-        else:
-            torque0 = np.array([[0], [0], [0]])
-
-        if br_stance:
-            force1 = np.array([[0], [0], [F_legs[leg_index, 0]]])
-            torque1 = J_legs[leg_index].T @ force1
-            leg_index += 1
-        else:
-            torque1 = np.array([[0], [0], [0]])
+        for ind in range(len(torques)):
+            if leg_indices[ind] == 0:
+                torques0.append(torques[ind])
+                indices_stance[0] = True
+            elif leg_indices[ind] == 1:
+                torques1.append(torques[ind])
+                indices_stance[1] = True
+            elif leg_indices[ind] == 2:
+                torques2.append(torques[ind])
+                indices_stance[2] = True
+            elif leg_indices[ind] == 3:
+                torques3.append(torques[ind])
+                indices_stance[3] = True
         
-        if bl_stance:
-            force2 = np.array([[0], [0], [F_legs[leg_index, 0]]])
-            torque2 = J_legs[leg_index].T @ force2
-            leg_index += 1
-        else:
-            torque2 = np.array([[0], [0], [0]])
-        
-        if fl_stance:
-            force3 = np.array([[0], [0], [F_legs[leg_index, 0]]])
-            torque3 = J_legs[leg_index].T @ force3
-            leg_index += 1
-        else:
-            torque3 = np.array([[0], [0], [0]])
-
-        torques0.append(torque0.flatten().tolist())
-        torques1.append(torque1.flatten().tolist())
-        torques2.append(torque2.flatten().tolist())
-        torques3.append(torque3.flatten().tolist())
+        for ind in range(4):
+            if not indices_stance[ind]:
+                if ind == 0:
+                    torques0.append([0, 0, 0])
+                elif ind == 1:
+                    torques1.append([0, 0, 0])
+                elif ind == 2:
+                    torques2.append([0, 0, 0])
+                elif ind == 3:
+                    torques3.append([0, 0, 0])
 
     # ================ PLOTTING ==================
     # Plot torques for each joint in a 4 x 3 grid
