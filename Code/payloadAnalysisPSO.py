@@ -138,3 +138,5 @@ xyz_legs = [(bests[-1][0], bests[-1][1], bests[-1][2]),
 torques = ta.compute_torque(xyz_legs, leg_indices=[0, 1, 2])
 print(f"\n\nWorst Footholds (hip frame in cm): {xyz_legs}")
 print(f"Torques at Worst Footholds (leg frame in Nm): {torques}")
+angles = [kin.inv_kin(xyz_legs[i][0], xyz_legs[i][1], xyz_legs[i][2], i) for i in range(3)]
+print(f"Joint Angles at Worst Footholds (leg frame in radians): {angles}")
