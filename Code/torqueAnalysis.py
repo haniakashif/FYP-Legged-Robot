@@ -26,8 +26,8 @@ L2 = kin.L2/100
 L3 = kin.L3/100
 L4 = kin.L4/100
 
-# NOTE: This transform is NOT taken at the body's center of gravity as per Garcia et al.; it is taken at the body frame origin as defined in the SolidWorks model. TO BE UPDATED LATER.
-def leg_to_body(leg_ind, xyz): # convert positions (in cm) from leg base frame to body frame (in m)
+# NOTE: This transform is taken at the body's center of gravity as found in the SolidWorks model
+def leg_to_cog(leg_ind, xyz): # convert positions (in cm) from leg base frame to body frame (in m)
 
     x, y, z = [xyz[0]/100, xyz[1]/100, xyz[2]/100]  # convert cm to m
 
@@ -48,12 +48,16 @@ def leg_to_body(leg_ind, xyz): # convert positions (in cm) from leg base frame t
     body_y = body_xyz_homogeneous[1, 0]
     body_z = body_xyz_homogeneous[2, 0]
 
-    return [body_x, body_y, body_z]
+    cog_x = body_x + 0
+    cog_y = body_y + 0.021066
+    cog_z = body_z - 0.021990
 
-def leg_to_body_array(leg_ind, xyz_arr):
+    return [cog_x, cog_y, cog_z]
+
+def leg_to_cog_array(leg_ind, xyz_arr):
     new_xyz_arr = []
     for xyz in xyz_arr:
-        new_xyz = leg_to_body(leg_ind, xyz)
+        new_xyz = leg_to_cog(leg_ind, xyz)
         new_xyz_arr.append(new_xyz)
     return new_xyz_arr
 
@@ -120,7 +124,7 @@ def compute_torque(xyz_legs, leg_indices = [0, 1, 2]): # footholds in leg frame 
         theta_leg = kin.inv_kin(x, y, z, leg_indices[ind])
         thetas.append(theta_leg)
     
-    xyz_body = [leg_to_body(leg_indices[ind], xyz_legs[ind]) for ind in range(len(xyz_legs))]
+    xyz_body = [leg_to_cog(leg_indices[ind], xyz_legs[ind]) for ind in range(len(xyz_legs))]
     xy_body = [(xyz_body[ind][0], xyz_body[ind][1]) for ind in range(len(xyz_body))]
     
     if len(xyz_legs) == 3:
@@ -132,6 +136,8 @@ def compute_torque(xyz_legs, leg_indices = [0, 1, 2]): # footholds in leg frame 
     for ind in range(len(xyz_legs)):
         side = "R" if leg_indices[ind] in [0, 1] else "L"
         J_leg = compute_J(side, thetas[ind])
+        # print determinant of J_leg to check for singularities
+        print(f"Determinant of J for leg {leg_indices[ind]}: {np.linalg.det(J_leg)}")
         J_legs.append(J_leg)
 
     torques = []

@@ -1,5 +1,6 @@
 import math 
 import random
+import numpy as np
 import matplotlib.pyplot as plt
 import kinematics as kin
 import torqueAnalysis as ta
@@ -8,15 +9,26 @@ def force_magnitude(footholds): # footholds = 12x1 array of footholds in hip fra
 
     num_footholds = len(footholds) // 3
 
+    # check if footholds have reasonable z distance
+    for i in range(num_footholds):
+        for j in range(i + 1, num_footholds):
+            z_dist = abs(footholds[i*3 + 2] - footholds[j*3 + 2])
+            if z_dist > 6: # if the maximum z distance between any two footholds is greater than 6 cm
+                return float('inf') # invalid foothold configuration due to excessive height difference
+
+    # check if footholds violate kinematic constraints or trigger singularities
     for leg in range(num_footholds):
         x, y, z = footholds[leg*3:leg*3+3]
         try:
-            kin.inv_kin(x, y, z, leg)
+            thetas = kin.inv_kin(x, y, z, leg)
+            J = ta.compute_J("R" if leg in [0, 1] else "L", thetas)
+            if abs(np.linalg.det(J)) < 1e-2: # NOTE: need to find the right threshold for singularity
+                return float('inf')
         except Exception:
             # print(f"Kinematic constraint violated for leg {leg} at foothold ({x}, {y}, {z})")
             return float('inf')
         
-    footholds_b = [ta.leg_to_body(leg, footholds[leg*3:leg*3+3]) for leg in range(num_footholds)]
+    footholds_b = [ta.leg_to_cog(leg, footholds[leg*3:leg*3+3]) for leg in range(num_footholds)]
     xy_legs = [(footholds_b[leg][0], footholds_b[leg][1]) for leg in range(num_footholds)]
 
     if num_footholds == 3:
@@ -40,6 +52,17 @@ def init_population(pop_size, bounds):
         positions.append(position)
         velocities.append(velocity)
 
+    # For flat terrain, make z same for all footholds
+    flat_z = random.uniform(bounds[2][0], bounds[2][1])
+    for i in range(pop_size):
+        for leg in range(dim // 3):
+            positions[i][leg*3 + 2] = flat_z
+
+    z_velocity = random.uniform(-1, 1)
+    for i in range(pop_size):
+        for leg in range(dim // 3):
+            velocities[i][leg*3 + 2] = z_velocity
+
     return positions, velocities
 
 def update(positions, velocities, p_best, g_best, w, c1, c2, bounds):
@@ -61,6 +84,10 @@ def update(positions, velocities, p_best, g_best, w, c1, c2, bounds):
             r2 = random.random()
 
             velocities[i][d] = w*velocities[i][d] + c1*r1*(p_best[i][d] - positions[i][d]) + c2*r2*(g_best[d] - positions[i][d])
+
+            # For flat terrain, make z velocity same for all footholds
+            if (d + 1) % 3 == 0:
+                velocities[i][d] = velocities[i][2]
 
             # clamp the velocity to be between -1 and 1
             if velocities[i][d] < -1:
@@ -99,7 +126,7 @@ def init_pso(pop_size, bounds, fitness_func):
 
     return positions, velocities, p_best, g_best
 
-POPULATION_SIZE = 1000
+POPULATION_SIZE = 100000
 MAX_ITERATIONS = 250 
 W = 0.5 # inertia weight
 C1 = 1.5 # cognitive coefficient
