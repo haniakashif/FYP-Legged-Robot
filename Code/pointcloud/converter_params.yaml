@@ -1,0 +1,32 @@
+elevation_mapping:
+  ros__parameters:
+    # --- Frame IDs ---
+    map_frame_id: "animated_rgbd_camera/link/rgbd_camera"
+    robot_base_frame_id: "animated_rgbd_camera/link/rgbd_camera"
+    track_point_frame_id: "animated_rgbd_camera/link/rgbd_camera"
+    use_tf_robot_pose: false
+    track_robot_with_tf: false
+
+    # --- Map Settings ---
+    length_in_x: 10.0
+    length_in_y: 10.0
+    resolution: 0.05
+    min_variance: 0.001
+    max_variance: 0.05
+    # Disable tracking topics (keep this as you had it)
+    robot_pose_with_covariance_topic: ""
+    robot_odom_topic: ""
+
+    time_tolerance: 1.0
+
+
+    # --- CRITICAL: This is the block it missed ---
+    input_sources: ["front_lidar"]
+
+    front_lidar:  # You can name this anything (e.g. 'my_sensor')
+        type: pointcloud
+        topic: /filtered_points # <--- MAKE SURE THIS MATCHES 'ros2 topic list'
+        queue_size: 10
+        publish_on_update: true
+        sensor_processor:
+            type: perfect

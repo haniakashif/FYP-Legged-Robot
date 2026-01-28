@@ -1,0 +1,68 @@
+launch world
+
+ros2 launch ros_gz_sim gz_sim.launch.py gz_args:="-r CameraTube.sdf"
+
+start gz->ros bridges
+
+ros2 run ros_gz_bridge parameter_bridge \
+/rgbd_camera/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked \
+/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V
+
+pcd to PointCloud2
+
+ros2 run pcl_ros pcd_to_pointcloud --ros-args -p file_name:=/home/syn/ros2_jazzy/cave.pcd -p rate:=10.0 -p frame_id:=map
+
+grid map
+
+
+ros2 launch grid_map_pcl grid_map_pcl_loader_launch.py pcd_filename:=/home/syn/ros2_jazzy/cave.pcd record_bag:=false resolution:=0.05 min_elevation:=-25.0 max_elevation:=100 use_cluster_extraction:=true cluster_tolerance:=0.20 min_cluster_size:=15 max_cluster_size:=100000 layers:="['elevation','elevation_max', 'variance', 'color']" publish_period:=1.0 output_grid_map:=/home/syn/ros2_jazzy/elevation_map.bag
+
+
+ros2 launch grid_map_pcl grid_map_pcl_loader_launch.py pcd_filename:=/home/syn/ros2_jazzy/cave.pcd resolution:=0.05 min_elevation:=-25.0 max_elevation:=100 use_cluster_extraction:=true cluster_tolerance:=0.20 min_cluster_size:=15 max_cluster_size:=100000 layers:="['elevation','elevation_max', 'variance', 'color']" publish_period:=1.0 output_grid_map:=/home/syn/ros2_jazzy/elevation_map.bag
+
+play bag
+
+ros2 bag play /home/syn/ros2_jazzy/elevation_map.bag -l
+
+save pointcloud
+
+ ros2 run pcl_ros pointcloud_to_pcd /rgbd_camera/points ~/ros2_jazzy
+
+ # Terminal 1: Launch the PCD Saver Node
+
+
+# Replace /your_pointcloud_topic with the actual topic name (e.g., /camera/depth/color/points)
+
+# Replace /path/to/save/directory with a local, writeable directory (e.g., ~/ros2_data)
+
+
+ros2 run pcl_ros pointcloud_to_pcd \
+    --ros-args \
+    -r input:=/rgbd_camera/points \
+    -p prefix:=my_scan \
+    -p fixed_frame:=map \
+    -p tf_timeout:=1.0 \
+    -p save_period:=1.0 \
+    -p max_pcds_to_save:=1 \
+    -p output_directory:=~/ros2_jazzy
+
+classification
+
+ros2 launch patchworkpp patchworkpp.launch.py visualize:=false use_sim_time:=true cloud_topic:=/cloud_pcd base_frame:=/base_link
+
+base frame for dynamic pointcloud
+animated_rgbd_camera/link/rgbd_camera
+
+
+ros2 launch patchworkpp patchworkpp.launch.py visualize:=false use_sim_time:=true cloud_topic:=/zed/zed_node/point_cloud/cloud_registered base_frame:=/zed_camera_link
+
+
+octomap
+
+ros2 run octomap_server octomap_server_node --ros-args     -p frame_id:=animated_rgbd_camera/link/ground_source_camera     -p resolution:=0.05     -p sensor_model.max_range:=15.0    -p pointcloud_max_z:=1.5     -p pointcloud_min_z:=-10.0     -p filter_ground:=true     -p ground_filter.plane_distance:=0.20     -r cloud_in:=/rgbd_camera/ground_source/points
+
+ros2 run tf2_ros static_transform_publisher 0 0 0 0 0 0 map base_link
+
+ros2 run elevation_mapping elevation_mapping --ros-args --params-file converter_params.yaml
+
+python3 ceiling_filter.py
