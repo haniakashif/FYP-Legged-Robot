@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="phantomx_description">
+    <static>false</static>
+
+    <!-- Main Body -->
+    <link name="base_link">
+      <visual name="body_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/body.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="body_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/body_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Connector Links (for each leg segment) -->
+    <link name="c1_lf">
+      <visual name="connect_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/connect.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="connect_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/connect_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="c1_rf">
+      <visual name="connect_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/connect.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="connect_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/connect_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Left Thighs -->
+    <link name="thigh_lf">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="thigh_lm">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="thigh_lr">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Right Thighs -->
+    <link name="thigh_rf">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="thigh_rm">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="thigh_rr">
+      <visual name="thigh_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="thigh_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/thigh_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Left Tibias -->
+    <link name="tibia_lf">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="tibia_lm">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="tibia_lr">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- Right Tibias -->
+    <link name="tibia_rf">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="tibia_rm">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+    <link name="tibia_rr">
+      <visual name="tibia_visual">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_r.STL</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <collision name="tibia_collision">
+        <geometry>
+          <mesh>
+            <uri>model:///home/syn/.gazebo/models/phantomx/meshes/tibia_l_coll.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+    </link>
+
+  </model>
+</sdf>
