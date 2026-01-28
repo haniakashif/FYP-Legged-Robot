@@ -1,0 +1,869 @@
+{
+    "generation_name": "Generation_2025_10_30_12_13_07",
+    "date": "2025_10_30_12_13_42",
+    "graph_generation_duration_minutes": 2.2172927856445312e-05,
+    "generation_size": [
+        60,
+        25,
+        16
+    ],
+    "generation_dimension": "3D",
+    "generation_type": "LAVATUBE",
+    "selected_algorithm": "gaussian_perlin",
+    "gpu_acceleration": 1,
+    "parallelization": false,
+    "high_poly": 1,
+    "node_visualization": false,
+    "node_visualization_format": ".png",
+    "node_visualization_saved": false,
+    "mesh_visualization": false,
+    "mesh_format": "obj",
+    "mesh_generated": 1,
+    "mesh_saved": 1,
+    "mesh_max_triangles": 100000000,
+    "mesh_sliced": 1,
+    "mesh_number_slices": 1,
+    "mesh_final_decimation": 1,
+    "mesh_final_decimation_factor": 0.1,
+    "texture_baked": 1,
+    "texture_size": 1024,
+    "gaussian_mean": false,
+    "gaussian_standard_deviation": 0.6,
+    "z_axis_gaussian_mean": false,
+    "z_axis_gaussian_standard_deviation": 0.2,
+    "z_axis_layer_probability": 15,
+    "z_axis_layer_step_size": 2.0,
+    "z_axis_step_xy_shift": 1.2,
+    "perlin_max_scale": 1.2,
+    "perlin_max_octave": 1.2,
+    "perlin_max_persistence": 1.2,
+    "perlin_max_lacunarity": 1.2,
+    "nodes_number": 55,
+    "nodes_max_new_nodes_created": 4,
+    "nodes_radius": 1,
+    "nodes": {
+        "0": {
+            "id": 0,
+            "parent": null,
+            "edges": [
+                1
+            ],
+            "coordinates": {
+                "x": 0.0,
+                "y": 11.28646097293195,
+                "z": 11.014690087102652
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "1": {
+            "id": 1,
+            "parent": null,
+            "edges": [
+                0,
+                2
+            ],
+            "coordinates": {
+                "x": 1.0,
+                "y": 13.54134705823223,
+                "z": 11.328315734620688
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "2": {
+            "id": 2,
+            "parent": null,
+            "edges": [
+                1,
+                3
+            ],
+            "coordinates": {
+                "x": 2.0,
+                "y": 13.404784822627983,
+                "z": 11.099865003924862
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "3": {
+            "id": 3,
+            "parent": null,
+            "edges": [
+                2,
+                4
+            ],
+            "coordinates": {
+                "x": 3.0,
+                "y": 13.539386470130854,
+                "z": 10.669798714157086
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "4": {
+            "id": 4,
+            "parent": null,
+            "edges": [
+                3,
+                5
+            ],
+            "coordinates": {
+                "x": 4.0,
+                "y": 15.372857713228038,
+                "z": 10.738198082006422
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "5": {
+            "id": 5,
+            "parent": null,
+            "edges": [
+                4,
+                6
+            ],
+            "coordinates": {
+                "x": 5.0,
+                "y": 15.628638079882611,
+                "z": 11.838337445226976
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "6": {
+            "id": 6,
+            "parent": null,
+            "edges": [
+                5,
+                7
+            ],
+            "coordinates": {
+                "x": 6.0,
+                "y": 18.65446050980539,
+                "z": 11.41775683311451
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "7": {
+            "id": 7,
+            "parent": null,
+            "edges": [
+                6,
+                8
+            ],
+            "coordinates": {
+                "x": 7.0,
+                "y": 18.70438374316425,
+                "z": 11.76198673060844
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "8": {
+            "id": 8,
+            "parent": null,
+            "edges": [
+                7,
+                9
+            ],
+            "coordinates": {
+                "x": 8.0,
+                "y": 19.619635972658305,
+                "z": 11.764078068743569
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "9": {
+            "id": 9,
+            "parent": null,
+            "edges": [
+                8,
+                10
+            ],
+            "coordinates": {
+                "x": 9.0,
+                "y": 20.287834638091077,
+                "z": 11.364299138975001
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "10": {
+            "id": 10,
+            "parent": null,
+            "edges": [
+                9,
+                11
+            ],
+            "coordinates": {
+                "x": 10.0,
+                "y": 21.196392902289173,
+                "z": 10.566675610134972
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "11": {
+            "id": 11,
+            "parent": null,
+            "edges": [
+                10,
+                12
+            ],
+            "coordinates": {
+                "x": 11.0,
+                "y": 22.042205964335984,
+                "z": 11.150757888356601
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "12": {
+            "id": 12,
+            "parent": null,
+            "edges": [
+                11,
+                13
+            ],
+            "coordinates": {
+                "x": 12.0,
+                "y": 21.452477068084765,
+                "z": 11.609640436651757
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "13": {
+            "id": 13,
+            "parent": null,
+            "edges": [
+                12,
+                14
+            ],
+            "coordinates": {
+                "x": 13.0,
+                "y": 21.35487758382588,
+                "z": 10.521391725666401
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "14": {
+            "id": 14,
+            "parent": null,
+            "edges": [
+                13,
+                15
+            ],
+            "coordinates": {
+                "x": 14.0,
+                "y": 22.208351690044697,
+                "z": 10.733117679750057
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "15": {
+            "id": 15,
+            "parent": null,
+            "edges": [
+                14,
+                16
+            ],
+            "coordinates": {
+                "x": 15.0,
+                "y": 23.152794294989192,
+                "z": 10.357232154295433
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "16": {
+            "id": 16,
+            "parent": null,
+            "edges": [
+                15,
+                17
+            ],
+            "coordinates": {
+                "x": 16.0,
+                "y": 21.701150936448215,
+                "z": 10.836498800593615
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "17": {
+            "id": 17,
+            "parent": null,
+            "edges": [
+                16,
+                18
+            ],
+            "coordinates": {
+                "x": 17.0,
+                "y": 24.534283347529477,
+                "z": 9.583850980998252
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "18": {
+            "id": 18,
+            "parent": null,
+            "edges": [
+                17,
+                19
+            ],
+            "coordinates": {
+                "x": 18.0,
+                "y": 22.56977712417219,
+                "z": 10.259645088464204
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "19": {
+            "id": 19,
+            "parent": null,
+            "edges": [
+                18,
+                20
+            ],
+            "coordinates": {
+                "x": 19.0,
+                "y": 24.403887055787397,
+                "z": 9.244744279667154
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "20": {
+            "id": 20,
+            "parent": null,
+            "edges": [
+                19,
+                21
+            ],
+            "coordinates": {
+                "x": 20.0,
+                "y": 23.87723368405419,
+                "z": 8.825385548791921
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "21": {
+            "id": 21,
+            "parent": null,
+            "edges": [
+                20,
+                22
+            ],
+            "coordinates": {
+                "x": 21.0,
+                "y": 24.128141153631667,
+                "z": 8.960097760335511
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "22": {
+            "id": 22,
+            "parent": null,
+            "edges": [
+                21,
+                23
+            ],
+            "coordinates": {
+                "x": 22.0,
+                "y": 23.455507986748323,
+                "z": 8.803315396633572
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "23": {
+            "id": 23,
+            "parent": null,
+            "edges": [
+                22,
+                24
+            ],
+            "coordinates": {
+                "x": 23.0,
+                "y": 23.71984048835452,
+                "z": 9.310727755362821
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "24": {
+            "id": 24,
+            "parent": null,
+            "edges": [
+                23,
+                25
+            ],
+            "coordinates": {
+                "x": 24.0,
+                "y": 22.945431417341393,
+                "z": 8.235337204475693
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "25": {
+            "id": 25,
+            "parent": null,
+            "edges": [
+                24,
+                26
+            ],
+            "coordinates": {
+                "x": 25.0,
+                "y": 22.52224231984679,
+                "z": 7.892329528928163
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "26": {
+            "id": 26,
+            "parent": null,
+            "edges": [
+                25,
+                27
+            ],
+            "coordinates": {
+                "x": 26.0,
+                "y": 21.84953032213728,
+                "z": 8.315190936501521
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "27": {
+            "id": 27,
+            "parent": null,
+            "edges": [
+                26,
+                28
+            ],
+            "coordinates": {
+                "x": 27.0,
+                "y": 23.04468249941978,
+                "z": 7.542164190749938
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "28": {
+            "id": 28,
+            "parent": null,
+            "edges": [
+                27,
+                29
+            ],
+            "coordinates": {
+                "x": 28.0,
+                "y": 21.66862769298092,
+                "z": 6.648868316461538
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "29": {
+            "id": 29,
+            "parent": null,
+            "edges": [
+                28,
+                30
+            ],
+            "coordinates": {
+                "x": 29.0,
+                "y": 20.933425132205667,
+                "z": 7.3849418377484275
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "30": {
+            "id": 30,
+            "parent": null,
+            "edges": [
+                29,
+                31
+            ],
+            "coordinates": {
+                "x": 30.0,
+                "y": 19.492664914991437,
+                "z": 6.081369063753342
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "31": {
+            "id": 31,
+            "parent": null,
+            "edges": [
+                30,
+                32
+            ],
+            "coordinates": {
+                "x": 31.0,
+                "y": 19.208097260156027,
+                "z": 5.880683785088114
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "32": {
+            "id": 32,
+            "parent": null,
+            "edges": [
+                31,
+                33
+            ],
+            "coordinates": {
+                "x": 32.0,
+                "y": 17.90120479175447,
+                "z": 5.546655958255443
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "33": {
+            "id": 33,
+            "parent": null,
+            "edges": [
+                32,
+                34
+            ],
+            "coordinates": {
+                "x": 33.0,
+                "y": 17.42605690973916,
+                "z": 5.281381888672341
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "34": {
+            "id": 34,
+            "parent": null,
+            "edges": [
+                33,
+                35
+            ],
+            "coordinates": {
+                "x": 34.0,
+                "y": 16.064184363371517,
+                "z": 5.709074636862093
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "35": {
+            "id": 35,
+            "parent": null,
+            "edges": [
+                34,
+                36
+            ],
+            "coordinates": {
+                "x": 35.0,
+                "y": 17.13225869441264,
+                "z": 5.22224018415048
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "36": {
+            "id": 36,
+            "parent": null,
+            "edges": [
+                35,
+                37
+            ],
+            "coordinates": {
+                "x": 36.0,
+                "y": 14.573597932575213,
+                "z": 3.4377532731403795
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "37": {
+            "id": 37,
+            "parent": null,
+            "edges": [
+                36,
+                38
+            ],
+            "coordinates": {
+                "x": 37.0,
+                "y": 13.554600038723112,
+                "z": 4.886411565750733
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "38": {
+            "id": 38,
+            "parent": null,
+            "edges": [
+                37,
+                39
+            ],
+            "coordinates": {
+                "x": 38.0,
+                "y": 12.28908864294741,
+                "z": 4.624350542060224
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "39": {
+            "id": 39,
+            "parent": null,
+            "edges": [
+                38,
+                40
+            ],
+            "coordinates": {
+                "x": 39.0,
+                "y": 11.719247885605952,
+                "z": 5.21241912661827
+            },
+            "radius": 11.75,
+            "active": true
+        },
+        "40": {
+            "id": 40,
+            "parent": null,
+            "edges": [
+                39,
+                41
+            ],
+            "coordinates": {
+                "x": 10.0,
+                "y": 21.196392902289173,
+                "z": 10.566675610134972
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "41": {
+            "id": 41,
+            "parent": null,
+            "edges": [
+                40,
+                42
+            ],
+            "coordinates": {
+                "x": 11.0,
+                "y": 24.68395114131002,
+                "z": 10.794243082391311
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "42": {
+            "id": 42,
+            "parent": null,
+            "edges": [
+                41,
+                43
+            ],
+            "coordinates": {
+                "x": 12.0,
+                "y": 26.60349928789216,
+                "z": 10.914487965768462
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "43": {
+            "id": 43,
+            "parent": null,
+            "edges": [
+                42,
+                44
+            ],
+            "coordinates": {
+                "x": 13.0,
+                "y": 28.756883083569857,
+                "z": 9.522459437459117
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "44": {
+            "id": 44,
+            "parent": null,
+            "edges": [
+                43,
+                45
+            ],
+            "coordinates": {
+                "x": 14.0,
+                "y": 31.49017300588485,
+                "z": 9.480496210327475
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "45": {
+            "id": 45,
+            "parent": null,
+            "edges": [
+                44,
+                46
+            ],
+            "coordinates": {
+                "x": 15.0,
+                "y": 33.84900214863878,
+                "z": 8.913733174626143
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "46": {
+            "id": 46,
+            "parent": null,
+            "edges": [
+                45,
+                47
+            ],
+            "coordinates": {
+                "x": 16.0,
+                "y": 33.275392802650906,
+                "z": 9.274505377045053
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "47": {
+            "id": 47,
+            "parent": null,
+            "edges": [
+                46,
+                48
+            ],
+            "coordinates": {
+                "x": 17.0,
+                "y": 36.40617840928877,
+                "z": 7.981687986143661
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "48": {
+            "id": 48,
+            "parent": null,
+            "edges": [
+                47,
+                49
+            ],
+            "coordinates": {
+                "x": 18.0,
+                "y": 34.14401899037488,
+                "z": 8.69765166491564
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "49": {
+            "id": 49,
+            "parent": null,
+            "edges": [
+                48,
+                50
+            ],
+            "coordinates": {
+                "x": 19.0,
+                "y": 35.10009490943699,
+                "z": 7.8012452999978645
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "50": {
+            "id": 50,
+            "parent": null,
+            "edges": [
+                49,
+                51
+            ],
+            "coordinates": {
+                "x": 20.0,
+                "y": 33.15905499989434,
+                "z": 7.572764079369338
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "51": {
+            "id": 51,
+            "parent": null,
+            "edges": [
+                50,
+                52
+            ],
+            "coordinates": {
+                "x": 21.0,
+                "y": 31.530146653375645,
+                "z": 7.9611654721282274
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "52": {
+            "id": 52,
+            "parent": null,
+            "edges": [
+                51,
+                53
+            ],
+            "coordinates": {
+                "x": 22.0,
+                "y": 28.60653020655572,
+                "z": 8.108162925750277
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "53": {
+            "id": 53,
+            "parent": null,
+            "edges": [
+                52,
+                54
+            ],
+            "coordinates": {
+                "x": 23.0,
+                "y": 26.36158566532856,
+                "z": 8.954212949397531
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        },
+        "54": {
+            "id": 54,
+            "parent": null,
+            "edges": [
+                53
+            ],
+            "coordinates": {
+                "x": 24.0,
+                "y": 22.945431417341393,
+                "z": 8.235337204475693
+            },
+            "radius": 12.36512024293744,
+            "active": true
+        }
+    }
+}
