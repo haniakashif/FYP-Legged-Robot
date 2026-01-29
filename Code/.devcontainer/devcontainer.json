@@ -1,0 +1,26 @@
+{
+    "name": "Quadruped Sim",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": {
+            "USERNAME": "ros"
+        }
+    },
+    "remoteUser": "ros",
+    "runArgs": [
+        "--network=host",
+        "--privileged",
+        "--env=DISPLAY",
+        "--env=QT_X11_NO_MITSHM=1",
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-iot.vscode-ros",
+                "ms-python.python"
+            ]
+        }
+    },
+    "postStartCommand": "sudo chmod 666 /dev/dri/renderD128"
+}

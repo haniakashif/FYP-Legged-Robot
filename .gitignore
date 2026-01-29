@@ -341,3 +341,11 @@ Code/joint_state_actual_vs_simplified*
 Code/joint_torque_actual_vs_simplified*
 Code/joint_state_percentage_errors*
 Code/joint_torque_percentage_errors*
+Code/ROS/build/
+Code/ROS/install/
+Code/ROS/log/
+Code/ROS/joint_commands_vs_states.png
+Code/ROS/joint_commands_vs_states.csv
+Code/ROS/joint_torques.png
+Code/ROS/joint_torques.csv
+
