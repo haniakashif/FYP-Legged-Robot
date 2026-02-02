@@ -10,10 +10,10 @@ This script details the following:
 clc; clear; close all;
 
 % measured lengths
-L1 = 0.02845;    % hip length
-L2 = 0.05439;   % knee length0
-L3 = 0.02637;   % knee length1
-L4 = 0.09265;    % ankle length
+L1 = 0.031;    % hip length
+L2 = 0.045;   % knee length0
+L3 = 0.03;   % knee length1
+L4 = 0.09;    % ankle length
 
 % lengths from the GitHub repository for THex
 % L1 = 0.029;   % hip length
@@ -455,10 +455,10 @@ t2 = deg2rad(54);
 tfixed = deg2rad(45);  
 t4 = deg2rad(90);
 
-L1 = 0.02845;    % hip length
-L2 = 0.05439;   % knee length0
-L3 = 0.02637;   % knee length1
-L4 = 0.09265;    % ankle length
+L1 = 0.031;    % hip length
+L2 = 0.045;   % knee length
+L3 = 0.030;   % bend length
+L4 = 0.09;    % ankle length
 
 theta1_min = -45;  theta1_max = 45;
 theta2_min = -90;  theta2_max = 90;
@@ -716,19 +716,18 @@ end
 
 clc; clear; close all;
 
-LDF = 0.0987;   % euclidean distance of front legs hip from robot base
-LDB = 0.1377;   % euclidean distance of back legs hip from robot base
-L1 = 0.02845;    % hip length
-L2 = 0.05439;   % knee length0
-L3 = 0.02637;   % knee length1
-L4 = 0.09265;    % ankle length
+LD = 0.1044;   % euclidean distance of leg hip from robot base
+L1 = 0.031;    % hip length
+L2 = 0.045;   % knee length0
+L3 = 0.030;   % knee length1
+L4 = 0.09;    % ankle length
 
-body = rigidBodyTree; % making body structure
+body = rigidBodyTree; % making leg structure
 
 % ASSUMING FRONT RIGHT LEG MOTIONS
 rft1 = deg2rad(0);  rft2 = deg2rad(0);  rft3 = deg2rad(0);  rft4 = deg2rad(0);  rft = deg2rad(0);
 
-rfdhparams = [LDF     0      0    rft
+rfdhparams = [LD     0      0    rft
               L1     pi/2   0    rft1;      % Link 1 (hip)
               L2     pi     0    rft2;      % Link 20 (knee)
               L3     0      0    rft3;  % Link 21 (bend)
@@ -768,7 +767,7 @@ addBody(body,rfankle,'rfankle_motor')
 
 rbt1 = deg2rad(0);  rbt2 = deg2rad(0);  rbt3 = deg2rad(0);  rbt4 = deg2rad(0);  rbt = deg2rad(0);
 
-rbdhparams = [LDB     0      0    rbt
+rbdhparams = [LD     0      0    rbt
               L1     pi/2   0    rbt1;      % Link 1 (hip)
               L2     pi     0    rbt2;      % Link 20 (knee)
               L3     0      0    rbt3;  % Link 21 (bend)
@@ -808,7 +807,7 @@ addBody(body,rbankle,'rbankle_motor')
 
 lft1 = deg2rad(0);  lft2 = deg2rad(0);  lft3 = deg2rad(0);  lft4 = deg2rad(0);  lft = deg2rad(0);
 
-lfdhparams = [LDF     0      0    lft
+lfdhparams = [LD     0      0    lft
               L1    -pi/2   0    lft1;      % Link 1 (hip)
               L2     pi     0    lft2;      % Link 20 (knee)
               L3     0      0    lft3;  % Link 21 (bend)
@@ -848,7 +847,7 @@ addBody(body,lfankle,'lfankle_motor')
 
 lbt1 = deg2rad(0);  lbt2 = deg2rad(0);  lbt3 = deg2rad(0);  lbt4 = deg2rad(0);  lbt = deg2rad(0);
 
-lbdhparams = [LDB     0      0    lbt
+lbdhparams = [LD     0      0    lbt
               L1    -pi/2   0    lbt1;      % Link 1 (hip)
               L2     pi     0    lbt2;      % Link 20 (knee)
               L3     0      0    lbt3;  % Link 21 (bend)
@@ -900,42 +899,21 @@ config = homeConfiguration(body); % making config to change thetas
 % config(11).JointPosition = lbt2;   % knee joint angle
 % config(12).JointPosition = lbt3;   % ankle joint angle
 
-% config(1).JointPosition = deg2rad(45);  
-% config(2).JointPosition = deg2rad(0);  
-% config(3).JointPosition = deg2rad(0);  
-% config(4).JointPosition = deg2rad(45);  
-% config(5).JointPosition = deg2rad(0);  
-% config(6).JointPosition = deg2rad(-45);   
-% config(7).JointPosition = deg2rad(0);   
-% config(8).JointPosition = deg2rad(0);  
-% config(9).JointPosition = deg2rad(45);  
-% config(10).JointPosition = deg2rad(0); 
-% config(11).JointPosition = deg2rad(135);   
-% config(12).JointPosition = deg2rad(0);  
-% config(13).JointPosition = deg2rad(0); 
-% config(14).JointPosition = deg2rad(-45);  
-% config(15).JointPosition = deg2rad(0);  
-% config(16).JointPosition = deg2rad(-135);  
-% config(17).JointPosition = deg2rad(0); 
-% config(18).JointPosition = deg2rad(0);  
-% config(19).JointPosition = deg2rad(-45);   
-% config(20).JointPosition = deg2rad(0);
-
 config(1).JointPosition = deg2rad(45);  
-config(2).JointPosition = -0.673;  
-config(3).JointPosition = 0.1981;  
+config(2).JointPosition = deg2rad(0);  
+config(3).JointPosition = deg2rad(0);  
 config(4).JointPosition = deg2rad(45);  
-config(5).JointPosition = -0.4008;  
+config(5).JointPosition = deg2rad(0);  
 config(6).JointPosition = deg2rad(-45);   
-config(7).JointPosition = -0.7032;   
-config(8).JointPosition = 0.0056;  
+config(7).JointPosition = deg2rad(0);   
+config(8).JointPosition = deg2rad(0);  
 config(9).JointPosition = deg2rad(45);  
-config(10).JointPosition = 1.475; 
+config(10).JointPosition = deg2rad(0); 
 config(11).JointPosition = deg2rad(135);   
-config(12).JointPosition = 0.7781;  
-config(13).JointPosition = -0.3264; 
+config(12).JointPosition = deg2rad(0);  
+config(13).JointPosition = deg2rad(0); 
 config(14).JointPosition = deg2rad(-45);  
-config(15).JointPosition = 0.3947;  
+config(15).JointPosition = deg2rad(0);  
 config(16).JointPosition = deg2rad(-135);  
 config(17).JointPosition = deg2rad(0); 
 config(18).JointPosition = deg2rad(0);  
