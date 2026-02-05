@@ -2,18 +2,19 @@
 
 clc; clear; close all;
 
-LD = 0.1044;   % euclidean distance of leg hip from robot base
-L1 = 0.031;    % hip length
-L2 = 0.045;   % knee length0
-L3 = 0.030;   % knee length1
-L4 = 0.09;    % ankle length
+LDF = 0.0987;   % euclidean distance of front legs hip from robot base
+LDB = 0.1377;   % euclidean distance of back legs hip from robot base
+L1 = 0.02845;    % hip length
+L2 = 0.05439;   % knee length0
+L3 = 0.02637;   % knee length1
+L4 = 0.09265;    % ankle length
 
 body = rigidBodyTree; % making body structure
 
 % ASSUMING FRONT RIGHT LEG MOTIONS
 rft1 = deg2rad(0);  rft2 = deg2rad(0);  rft3 = deg2rad(0);  rft4 = deg2rad(0);  rft = deg2rad(0);
 
-rfdhparams = [LD     0      0    rft
+rfdhparams = [LDF     0      0    rft
               L1     pi/2   0    rft1;      % Link 1 (hip)
               L2     pi     0    rft2;      % Link 20 (knee)
               L3     0      0    rft3;  % Link 21 (bend)
@@ -25,14 +26,14 @@ rfhip = rigidBody('rfknee_motor');
 rfknee = rigidBody('rfankle_motor');
 rfankle = rigidBody('rffoot');
 
-rfbasejnt = rigidBodyJoint('rfbase', 'revolute');
-rflegjnt = rigidBodyJoint('rflegjnt', 'revolute');
+rfbasejnt = rigidBodyJoint('rfbase', 'revolute')
+rflegjnt = rigidBodyJoint('rflegjnt', 'revolute')
 rfhipjnt = rigidBodyJoint('rfhipjnt','revolute');
 rfkneejnt = rigidBodyJoint('rfkneejnt','revolute');
 rfanklejnt = rigidBodyJoint('rfanklejnt','revolute');
 
-setFixedTransform(rfbasejnt,rfdhparams(1,:),'dh' );
-setFixedTransform(rflegjnt,rfdhparams(2,:),'dh' );
+setFixedTransform(rfbasejnt,rfdhparams(1,:),'dh' )
+setFixedTransform(rflegjnt,rfdhparams(2,:),'dh' )
 setFixedTransform(rfhipjnt,rfdhparams(3,:),'dh'); 
 setFixedTransform(rfkneejnt,rfdhparams(4,:),'dh');
 setFixedTransform(rfanklejnt,rfdhparams(5,:),'dh');
@@ -43,17 +44,17 @@ rfhip.Joint = rfhipjnt;
 rfknee.Joint = rfkneejnt;
 rfankle.Joint = rfanklejnt;
 
-addBody(body,rfbase, 'base');
-addBody(body,rfleg, 'rf_base');
-addBody(body,rfhip,'rfhip_motor');
-addBody(body,rfknee,'rfknee_motor');
-addBody(body,rfankle,'rfankle_motor');
+addBody(body,rfbase, 'base')
+addBody(body,rfleg, 'rf_base')
+addBody(body,rfhip,'rfhip_motor')
+addBody(body,rfknee,'rfknee_motor')
+addBody(body,rfankle,'rfankle_motor')
 
 % ASSUMING BACK RIGHT LEG MOTIONS
 
 rbt1 = deg2rad(0);  rbt2 = deg2rad(0);  rbt3 = deg2rad(0);  rbt4 = deg2rad(0);  rbt = deg2rad(0);
 
-rbdhparams = [LD     0      0    rbt
+rbdhparams = [LDB     0      0    rbt
               L1     pi/2   0    rbt1;      % Link 1 (hip)
               L2     pi     0    rbt2;      % Link 20 (knee)
               L3     0      0    rbt3;  % Link 21 (bend)
@@ -65,14 +66,14 @@ rbhip = rigidBody('rbknee_motor');
 rbknee = rigidBody('rbankle_motor');
 rbankle = rigidBody('rbfoot');
 
-rbbasejnt = rigidBodyJoint('rbbase', 'revolute');
-rblegjnt = rigidBodyJoint('rblegjnt', 'revolute');
+rbbasejnt = rigidBodyJoint('rbbase', 'revolute')
+rblegjnt = rigidBodyJoint('rblegjnt', 'revolute')
 rbhipjnt = rigidBodyJoint('rbhipjnt','revolute');
 rbkneejnt = rigidBodyJoint('rbkneejnt','revolute');
 rbanklejnt = rigidBodyJoint('rbanklejnt','revolute');
 
-setFixedTransform(rbbasejnt,rbdhparams(1,:),'dh' );
-setFixedTransform(rblegjnt,rbdhparams(2,:),'dh' );
+setFixedTransform(rbbasejnt,rbdhparams(1,:),'dh' )
+setFixedTransform(rblegjnt,rbdhparams(2,:),'dh' )
 setFixedTransform(rbhipjnt,rbdhparams(3,:),'dh'); 
 setFixedTransform(rbkneejnt,rbdhparams(4,:),'dh');
 setFixedTransform(rbanklejnt,rbdhparams(5,:),'dh');
@@ -83,17 +84,17 @@ rbhip.Joint = rbhipjnt;
 rbknee.Joint = rbkneejnt;
 rbankle.Joint = rbanklejnt;
 
-addBody(body,rbbase, 'base');
-addBody(body,rbleg, 'rb_base');
-addBody(body,rbhip,'rbhip_motor');
-addBody(body,rbknee,'rbknee_motor');
-addBody(body,rbankle,'rbankle_motor');
+addBody(body,rbbase, 'base')
+addBody(body,rbleg, 'rb_base')
+addBody(body,rbhip,'rbhip_motor')
+addBody(body,rbknee,'rbknee_motor')
+addBody(body,rbankle,'rbankle_motor')
 
 % LEFT FRONT OF ROBOT
 
 lft1 = deg2rad(0);  lft2 = deg2rad(0);  lft3 = deg2rad(0);  lft4 = deg2rad(0);  lft = deg2rad(0);
 
-lfdhparams = [LD     0      0    lft
+lfdhparams = [LDF     0      0    lft
               L1    -pi/2   0    lft1;      % Link 1 (hip)
               L2     pi     0    lft2;      % Link 20 (knee)
               L3     0      0    lft3;  % Link 21 (bend)
@@ -105,14 +106,14 @@ lfhip = rigidBody('lfknee_motor');
 lfknee = rigidBody('lfankle_motor');
 lfankle = rigidBody('lffoot');
 
-lfbasejnt = rigidBodyJoint('lfbase', 'revolute');
-lflegjnt = rigidBodyJoint('lflegjnt', 'revolute');
+lfbasejnt = rigidBodyJoint('lfbase', 'revolute')
+lflegjnt = rigidBodyJoint('lflegjnt', 'revolute')
 lfhipjnt = rigidBodyJoint('lfhipjnt','revolute');
 lfkneejnt = rigidBodyJoint('lfkneejnt','revolute');
 lfanklejnt = rigidBodyJoint('lfanklejnt','revolute');
 
-setFixedTransform(lfbasejnt,lfdhparams(1,:),'dh' );
-setFixedTransform(lflegjnt,lfdhparams(2,:),'dh' );
+setFixedTransform(lfbasejnt,lfdhparams(1,:),'dh' )
+setFixedTransform(lflegjnt,lfdhparams(2,:),'dh' )
 setFixedTransform(lfhipjnt,lfdhparams(3,:),'dh'); 
 setFixedTransform(lfkneejnt,lfdhparams(4,:),'dh');
 setFixedTransform(lfanklejnt,lfdhparams(5,:),'dh');
@@ -123,17 +124,17 @@ lfhip.Joint = lfhipjnt;
 lfknee.Joint = lfkneejnt;
 lfankle.Joint = lfanklejnt;
 
-addBody(body,lfbase, 'base');
-addBody(body,lfleg, 'lf_base');
-addBody(body,lfhip,'lfhip_motor');
-addBody(body,lfknee,'lfknee_motor');
-addBody(body,lfankle,'lfankle_motor');
+addBody(body,lfbase, 'base')
+addBody(body,lfleg, 'lf_base')
+addBody(body,lfhip,'lfhip_motor')
+addBody(body,lfknee,'lfknee_motor')
+addBody(body,lfankle,'lfankle_motor')
 
 % LEFT BACK OF ROBOT
 
 lbt1 = deg2rad(0);  lbt2 = deg2rad(0);  lbt3 = deg2rad(0);  lbt4 = deg2rad(0);  lbt = deg2rad(0);
 
-lbdhparams = [LD     0      0    lbt
+lbdhparams = [LDB     0      0    lbt
               L1    -pi/2   0    lbt1;      % Link 1 (hip)
               L2     pi     0    lbt2;      % Link 20 (knee)
               L3     0      0    lbt3;  % Link 21 (bend)
@@ -145,14 +146,14 @@ lbhip = rigidBody('lbknee_motor');
 lbknee = rigidBody('lbankle_motor');
 lbankle = rigidBody('lbfoot');
 
-lbbasejnt = rigidBodyJoint('lbbase', 'revolute');
-lblegjnt = rigidBodyJoint('lblegjnt', 'revolute');
+lbbasejnt = rigidBodyJoint('lbbase', 'revolute')
+lblegjnt = rigidBodyJoint('lblegjnt', 'revolute')
 lbhipjnt = rigidBodyJoint('lbhipjnt','revolute');
 lbkneejnt = rigidBodyJoint('lbkneejnt','revolute');
 lbanklejnt = rigidBodyJoint('lbanklejnt','revolute');
 
-setFixedTransform(lbbasejnt,lbdhparams(1,:),'dh' );
-setFixedTransform(lblegjnt,lbdhparams(2,:),'dh' );
+setFixedTransform(lbbasejnt,lbdhparams(1,:),'dh' )
+setFixedTransform(lblegjnt,lbdhparams(2,:),'dh' )
 setFixedTransform(lbhipjnt,lbdhparams(3,:),'dh'); 
 setFixedTransform(lbkneejnt,lbdhparams(4,:),'dh');
 setFixedTransform(lbanklejnt,lbdhparams(5,:),'dh');
@@ -163,11 +164,11 @@ lbhip.Joint = lbhipjnt;
 lbknee.Joint = lbkneejnt;
 lbankle.Joint = lbanklejnt;
 
-addBody(body,lbbase, 'base');
-addBody(body,lbleg, 'lb_base');
-addBody(body,lbhip,'lbhip_motor');
-addBody(body,lbknee,'lbknee_motor');
-addBody(body,lbankle,'lbankle_motor');
+addBody(body,lbbase, 'base')
+addBody(body,lbleg, 'lb_base')
+addBody(body,lbhip,'lbhip_motor')
+addBody(body,lbknee,'lbknee_motor')
+addBody(body,lbankle,'lbankle_motor')
 
 showdetails(body)  % shows rigidbodytree with properties
 config = homeConfiguration(body); % making config to change thetas
@@ -233,7 +234,7 @@ S = -0.11; % far down from the leg
 A = 0.04; % amplitude of curve
 T = 0.10; % width of curve
 x_offset = -0.02;
-y_offset = 0.02;
+y_offset = 0.05;
 
 T_STALL = 2;
 NUM_DATA_POINTS = 16;   
@@ -349,7 +350,6 @@ end
 
 while true
     for i = 1:NUM_DATA_POINTS + 2*T_STALL
-        pause(0.3);
         % constants
         theta3R = pi/4;  % for right side
         theta3L = -pi/4;  % for left side
@@ -374,7 +374,7 @@ while true
         phi2 = atan2(B2, A2);    % sin sol
         a2 = B2/sin(phi2); 
         theta2Rf = phi2 + asin(z/a2);
-        % fprintf("Front Right Step: %d, Thetas: %.2f, %.2f, %.2f\n", i-1, rad2deg(theta1Rf), rad2deg(theta2Rf), rad2deg(theta4Rf));
+        fprintf("Front Right Step: %d, Thetas: %.2f, %.2f, %.2f\n", i-1, rad2deg(theta1Rf), rad2deg(theta2Rf), rad2deg(theta4Rf));
         
         % BACK RIGHT LEG
         x = xyzRb(i,1);
@@ -396,7 +396,6 @@ while true
         phi2 = atan2(B2, A2);    % sin sol
         a2 = B2/sin(phi2); 
         theta2Rb = phi2 + asin(z/a2);
-        % fprintf("Back Right Step: %d, Thetas: %.2f, %.2f, %.2f\n", i-1, rad2deg(theta1Rb), rad2deg(theta2Rb), rad2deg(theta4Rb));
         
         % FRONT LEFT LEG
         x = xyzLf(i,1);
@@ -420,7 +419,6 @@ while true
         a2 = A2/sin(phi2);
         theta2Lf = acos(z/a2) - phi2;    
         % % dtheta2 = rad2deg(theta2Lf)
-        fprintf("Front Left Step: %d, Thetas: %.2f, %.2f, %.2f\n", i-1, rad2deg(theta1Lf), rad2deg(theta2Lf), rad2deg(theta4Lf));
         
         % BACK LEFT LEG
         x = xyzLb(i,1);
@@ -448,21 +446,21 @@ while true
 
         % check joint bounds and realness
         if isreal(theta1Rf) && isreal(theta2Rf) && isreal(theta4Rf) && ...
-            theta1Rf >= theta1_min && theta1Rf <= theta1_max && ...
-            theta2Rf >= theta2_min && theta2Rf <= theta2_max && ...
-            theta4Rf >= theta4_min && theta4Rf <= theta4_max && ...
-            isreal(theta1Rb) && isreal(theta2Rb) && isreal(theta4Rb) && ...
-            theta1Rb >= theta1_min && theta1Rb <= theta1_max && ...
-            theta2Rb >= theta2_min && theta2Rb <= theta2_max && ...
-            theta4Rb >= theta4_min && theta4Rb <= theta4_max && ...
-            isreal(theta1Lf) && isreal(theta2Lf) && isreal(theta4Lf) && ...
-            theta1Lf >= theta1_min && theta1Lf <= theta1_max && ...
-            theta2Lf >= theta2_min && theta2Lf <= theta2_max && ...
-            theta4Lf >= theta4_min && theta4Lf <= theta4_max && ...
-            isreal(theta1Lb) && isreal(theta2Lb) && isreal(theta4Lb) && ...
-            theta1Lb >= theta1_min && theta1Lb <= theta1_max && ...
-            theta2Lb >= theta2_min && theta2Lb <= theta2_max && ...
-            theta4Lb >= theta4_min && theta4Lb <= theta4_max
+                theta1Rf >= theta1_min && theta1Rf <= theta1_max && ...
+                theta2Rf >= theta2_min && theta2Rf <= theta2_max && ...
+                theta4Rf >= theta4_min && theta4Rf <= theta4_max && ...
+                isreal(theta1Rb) && isreal(theta2Rb) && isreal(theta4Rb) && ...
+                theta1Rb >= theta1_min && theta1Rb <= theta1_max && ...
+                theta2Rb >= theta2_min && theta2Rb <= theta2_max && ...
+                theta4Rb >= theta4_min && theta4Rb <= theta4_max && ...
+                isreal(theta1Lf) && isreal(theta2Lf) && isreal(theta4Lf) && ...
+                theta1Lf >= theta1_min && theta1Lf <= theta1_max && ...
+                theta2Lf >= theta2_min && theta2Lf <= theta2_max && ...
+                theta4Lf >= theta4_min && theta4Lf <= theta4_max && ...
+                isreal(theta1Lb) && isreal(theta2Lb) && isreal(theta4Lb) && ...
+                theta1Lb >= theta1_min && theta1Lb <= theta1_max && ...
+                theta2Lb >= theta2_min && theta2Lb <= theta2_max && ...
+                theta4Lb >= theta4_min && theta4Lb <= theta4_max
             
             
             config = homeConfiguration(body); % making config to change thetas
@@ -516,7 +514,6 @@ while true
             
             % update the robot pose in the same axes
             show(body, config, 'Frames', 'on', 'PreservePlot', false, 'Parent', ax);
-            pause(0.3);
         end
             
         linkLines = findobj(axbody, 'Type', 'Line');

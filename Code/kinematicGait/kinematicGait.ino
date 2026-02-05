@@ -61,10 +61,10 @@ const int y_offset = 5;
 // const int z_offset = 0;
 
 // link lengths
-const float L1 = 3.1;
-const float L2 = 4.5;
-const float L3 = 3.0;
-const float L4 = 9.0;
+const float L1 = 2.845;
+const float L2 = 5.439;
+const float L3 = 2.637;
+const float L4 = 9.265;
 
 // // x axis to the right of the robot, y axis to the front
 // float X_dist_fr = 5;
