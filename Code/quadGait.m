@@ -229,12 +229,21 @@ set(linkLines, 'LineWidth', 5, 'Color', 'y');  % yellow, thick links
 
 %% CRAWL GAIT (2)
 
-X = 0.12; % far out from leg
-S = -0.11; % far down from the leg
-A = 0.04; % amplitude of curve
-T = 0.10; % width of curve
-x_offset = -0.02;
-y_offset = 0.05;
+% X = 0.12; % far out from leg
+% S = -0.11; % far down from the leg
+% A = 0.04; % amplitude of curve
+% T = 0.10; % width of curve
+% x_offset = -0.02;
+% y_offset = 0.05;
+
+% trying out less spread out gait
+X = 0.15; % far out from leg
+S = -0.07; % far down from the leg
+A = 0.03; % amplitude of curve
+T = 0.06; % width of curve
+x_offset = -0.05;
+y_offset = 0.04;
+
 
 T_STALL = 2;
 NUM_DATA_POINTS = 16;   
