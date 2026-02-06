@@ -162,20 +162,23 @@ def rotate_trajectory(leg_ind, xyzK):
 
 def shift_trajectory(leg_ind, xyzK):
 
-    schedule = [0, 2, 1, 3] # Order of swing: FR, BL, BR, FL
-    # schedule = [3, 1, 2, 0] # Order of swing: FL, BR, BL, FR
-    # schedule = [0, 1, 3, 2] # Order of swing: FR, BL, BR, FL
+    # schedule = [(0, 0), (2, 1), (1, 2), (3, 3)] # Order of swing: FR, BL, BR, FL
+    # schedule = [(3, 0), (1, 1), (2, 2), (0, 3)] # Order of swing: FL, BR, BL, FR
+    # schedule = [(0, 0), (1, 1), (3, 2), (2, 3)] # Order of swing: FR, BL, BR, FL
+    schedule = [(1, 0), (2, 1), (0, 2), (3, 3)] # Order of swing: BR, BL, FR, FL
+    # schedule = [(0, 0), (3, 1), (1, 2), (2, 3) ] # Order of swing: FR, FL, BR, BL
+    # schedule = [(0, 0), (2, 0), (1, 1), (3, 1)] # Trot
 
-    for swing in range(len(schedule)):
-        if leg_ind == schedule[swing]:
+    for swing_leg, swing_index in schedule:
+        if leg_ind == swing_leg:
             xyzK_copy = xyzK.copy()
             xyzK_ind = 0
-            for i in range(int(NUM_DATA_POINTS + 2*T_STALL - swing*(NUM_DATA_POINTS*SWING_FACTOR)), int(NUM_DATA_POINTS + 2*T_STALL)):
+            for i in range(int(NUM_DATA_POINTS + 2*T_STALL - swing_index*(NUM_DATA_POINTS*SWING_FACTOR)), int(NUM_DATA_POINTS + 2*T_STALL)):
                 x, y, z = xyzK_copy[i]
                 xyzK[xyzK_ind] = (x, y, z)
                 xyzK_ind += 1
 
-            for i in range(0, int(NUM_DATA_POINTS + 2*T_STALL - swing*(NUM_DATA_POINTS*SWING_FACTOR))):
+            for i in range(0, int(NUM_DATA_POINTS + 2*T_STALL - swing_index*(NUM_DATA_POINTS*SWING_FACTOR))):
                 x, y, z = xyzK_copy[i]
                 xyzK[xyzK_ind] = (x, y, z)
                 xyzK_ind += 1
