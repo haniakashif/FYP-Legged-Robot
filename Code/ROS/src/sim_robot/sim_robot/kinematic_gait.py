@@ -15,7 +15,7 @@ class KinematicGait(Node):
         super().__init__('kinematic_gait_node')
         
         # --- 1. SETUP PARAMETERS ---
-        self.target_freq = 5
+        self.target_freq = 10
         self.dt = 1.0 / self.target_freq
         
         # --- 2. DATA STORAGE ---
@@ -52,10 +52,10 @@ class KinematicGait(Node):
         for leg in self.legs:
             for joint in self.joint_types:
                 topic = f'/{leg.lower()}_{joint}/command'
-                self.pubs[f'{leg}_{joint}'] = self.create_publisher(Float64, topic, 10)
+                self.pubs[f'{leg}_{joint}'] = self.create_publisher(Float64, topic, 1)
         
         # Subscribe to Joint States
-        self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 10)
+        self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
 
         # Subscribe to Force/Torque Sensors
         for i, leg in enumerate(self.legs):
@@ -65,7 +65,7 @@ class KinematicGait(Node):
                     WrenchStamped, 
                     topic, 
                     lambda msg, l=i, j=joint: self.joint_torque_cb(msg, l, j), 
-                    10
+                    1
                 )
 
         # --- 4. PRE-COMPUTE TRAJECTORY ---
