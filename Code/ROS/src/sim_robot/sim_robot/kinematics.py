@@ -16,21 +16,21 @@ L4 = 9.265
 
 # Trajectory Constants
 T_STALL = 2
-NUM_DATA_POINTS = 20
+NUM_DATA_POINTS = 16
 SWING_FACTOR = 1/4 # SWING_FACTOR of the points are for swing phase
 STANCE_FACTOR = 1 - SWING_FACTOR
 
-X = 8
-S = -11
+X = 15
+S = -7
 A = 3
-T = 8
+T = 6
 
 P1 = [-T/2, S]
 P2 = [0, S + 2*A]
 P3 = [T/2, S]
 
-X_OFFSET = -2
-Y_OFFSET = 5
+X_OFFSET = -5
+Y_OFFSET = 4
 
 # Helpers
 
