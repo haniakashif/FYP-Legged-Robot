@@ -6,7 +6,7 @@ PI = math.pi
 
 # Link Lengths
 # L1 = 3.1
-L1 = 2.845
+L1 = 2.845  # in cm
 # L2 = 4.5
 L2 = 5.439
 # L3 = 3.0

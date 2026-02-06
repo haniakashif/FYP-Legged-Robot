@@ -1,10 +1,46 @@
 // analog input from pot wiper
-const int potA   = A0; 
-const int potB   = A2; 
-const int potC   = A5; 
 
-const int adcMinA = 75;     // ADC at 0°
-const int adcMaxA = 387;    // ADC at 180°
+const int numRead = 10;
+
+// const int potG = A0; 
+// const int potH = A1; 
+// const int potI = A2; 
+// const int potA = A3; 
+// const int potB = A4; 
+// const int potC = A5; 
+
+// const int adcMinA = 85;     // ADC at 0°
+// const int adcMaxA = 387;    // ADC at 180°
+// const int adcMinB = 81;     // ADC at 0°
+// const int adcMaxB = 390;    // ADC at 180°
+// const int adcMinC = 75;     // ADC at 0°
+// const int adcMaxC = 394;    // ADC at 180°
+// const int adcMinG = 78;     // ADC at 0°
+// const int adcMaxG = 377;    // ADC at 180°
+// const int adcMinH = 80;     // ADC at 0°
+// const int adcMaxH = 381;    // ADC at 180°
+// const int adcMinI = 80;     // ADC at 0°
+// const int adcMaxI = 389;    // ADC at 180°
+
+const int potR   = A0; 
+const int potQ   = A1; 
+const int potP   = A2; 
+const int potJ   = A3; 
+const int potK   = A4; 
+const int potL   = A5; 
+
+const int adcMinP = 73;     // ADC at 0°
+const int adcMaxP = 375;    // ADC at 180°
+const int adcMinQ = 78;     // ADC at 0°
+const int adcMaxQ = 380;    // ADC at 180°
+const int adcMinR = 78;     // ADC at 0°
+const int adcMaxR = 383;    // ADC at 180°
+const int adcMinJ = 75;     // ADC at 0°
+const int adcMaxJ = 381;    // ADC at 180°
+const int adcMinK = 83;     // ADC at 0°
+const int adcMaxK = 393;    // ADC at 180°
+const int adcMinL = 80;     // ADC at 0°
+const int adcMaxL = 388;    // ADC at 180°
 
 // MOTOR NAMES:
 // FR: ABC
@@ -15,8 +51,8 @@ const int adcMaxA = 387;    // ADC at 180°
 // PORT NAMES:
 // A: 0, B: 1, C: 2
 // G: 4, H: 5, I: 6
-// P: 20, Q: 21, R: 22
-// J: 24, K: 25, L: 26
+// P: 16, Q: 17, R: 18
+// J: 28, K: 29, L: 30
 
 // EVERY DISTANCE IS IN CENTIMETERS, IN CONTRAST TO MATLAB IN WHICH IT IS IN METERS
 // these work for all four legs, just need a different sign for y offset
@@ -25,10 +61,10 @@ const int y_offset = 5;
 // const int z_offset = 0;
 
 // link lengths
-const float L1 = 3.1;
-const float L2 = 4.5;
-const float L3 = 3.0;
-const float L4 = 9.0;
+const float L1 = 2.845;
+const float L2 = 5.439;
+const float L3 = 2.637;
+const float L4 = 9.265;
 
 // // x axis to the right of the robot, y axis to the front
 // float X_dist_fr = 5;
@@ -81,12 +117,13 @@ void linspace(float start, float end, int num, float* arr)
 void theta_to_pwm(float theta1, float theta2, float theta4, int* pwm, int leg_ind) 
 { 
   const int PERCENT_TO_MICROSECONDS = 200; // 1% duty cycle is 200 microseconds
-  const int hip_pwm_lower_bounds[4] = {4*PERCENT_TO_MICROSECONDS, 4*PERCENT_TO_MICROSECONDS, 4*PERCENT_TO_MICROSECONDS, 4*PERCENT_TO_MICROSECONDS};
-  const int hip_pwm_upper_bounds[4] = {11.5*PERCENT_TO_MICROSECONDS, 11.5*PERCENT_TO_MICROSECONDS, 11*PERCENT_TO_MICROSECONDS, 11*PERCENT_TO_MICROSECONDS};
-  const int knee_pwm_lower_bounds[4] = {3*PERCENT_TO_MICROSECONDS, 2.7*PERCENT_TO_MICROSECONDS, 2.5*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS};
-  const int knee_pwm_upper_bounds[4] = {12.8*PERCENT_TO_MICROSECONDS, 12.2*PERCENT_TO_MICROSECONDS, 12.2*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS};
-  const int ankle_pwm_lower_bounds[4] = {2.8*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 2.5*PERCENT_TO_MICROSECONDS, 2.5*PERCENT_TO_MICROSECONDS};
-  const int ankle_pwm_upper_bounds[4] = {13*PERCENT_TO_MICROSECONDS, 13*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS, 12*PERCENT_TO_MICROSECONDS};
+  // THIS CAN GIVE PWM TO THE HIP SERVOS WHICH IS NOT PHYSICALLY REACHABLE
+  const int hip_pwm_lower_bounds[4] = {3*PERCENT_TO_MICROSECONDS, 3.5*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 2.8*PERCENT_TO_MICROSECONDS};
+  const int hip_pwm_upper_bounds[4] = {12*PERCENT_TO_MICROSECONDS, 13*PERCENT_TO_MICROSECONDS, 12.2*PERCENT_TO_MICROSECONDS, 12.2*PERCENT_TO_MICROSECONDS};
+  const int knee_pwm_lower_bounds[4] = {3.5*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS};
+  const int knee_pwm_upper_bounds[4] = {12.8*PERCENT_TO_MICROSECONDS, 12*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS, 12.2*PERCENT_TO_MICROSECONDS};
+  const int ankle_pwm_lower_bounds[4] = {2.8*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS, 3*PERCENT_TO_MICROSECONDS};
+  const int ankle_pwm_upper_bounds[4] = {12.5*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS, 12.5*PERCENT_TO_MICROSECONDS};
 
   int hip_pwm_mid = (hip_pwm_lower_bounds[leg_ind] + hip_pwm_upper_bounds[leg_ind]) / 2;
   int knee_pwm_mid = (knee_pwm_lower_bounds[leg_ind] + knee_pwm_upper_bounds[leg_ind]) / 2;
@@ -121,17 +158,17 @@ void theta_to_pwm(float theta1, float theta2, float theta4, int* pwm, int leg_in
 
 }
 
-void theta_to_pwm_array(float* theta1, float* theta2, float* theta4, int pwm_array[NUM_DATA_POINTS + 2*T_STALL][3], int leg_ind) 
-{
-  for (int i = 0; i < NUM_DATA_POINTS + 2*T_STALL; i++) 
-  {
-    int pwm[3];
-    theta_to_pwm(theta1[i], theta2[i], theta4[i], pwm, leg_ind);
-    pwm_array[i][0] = pwm[0];
-    pwm_array[i][1] = pwm[1];
-    pwm_array[i][2] = pwm[2];
-  }
-}
+// void theta_to_pwm_array(float* theta1, float* theta2, float* theta4, int pwm_array[NUM_DATA_POINTS + 2*T_STALL][3], int leg_ind) 
+// {
+//   for (int i = 0; i < NUM_DATA_POINTS + 2*T_STALL; i++) 
+//   {
+//     int pwm[3];
+//     theta_to_pwm(theta1[i], theta2[i], theta4[i], pwm, leg_ind);
+//     pwm_array[i][0] = pwm[0];
+//     pwm_array[i][1] = pwm[1];
+//     pwm_array[i][2] = pwm[2];
+//   }
+// }
 
 void inv_kin(float x, float y, float z, float& theta1, float& theta2, float& theta4, int leg_ind) {
   
@@ -362,22 +399,22 @@ void stand()
   // Hips
   moveOne(0, pwmFR[0], 200);  // hip servo
   moveOne(4, pwmBR[0], 200);  // hip servo
-  moveOne(20, pwmBL[0], 200);  // hip servo
-  moveOne(24, pwmFL[0], 200);  // hip servo
+  moveOne(16, pwmBL[0], 200);  // hip servo
+  moveOne(28, pwmFL[0], 200);  // hip servo
   delay(1000);
   
   // Knees
   moveOne(1, pwmFR[1], 200);  // knee servo
   moveOne(5, pwmBR[1], 200);  // knee servo
-  moveOne(21, pwmBL[1], 200);  // knee servo
-  moveOne(25, pwmFL[1], 200);  // knee servo
+  moveOne(17, pwmBL[1], 200);  // knee servo
+  moveOne(29, pwmFL[1], 200);  // knee servo
   delay(1000);
   
   // Ankles
   moveOne(2, pwmFR[2], 1000);  // ankle servo
   moveOne(6, pwmBR[2], 1000);  // ankle servo
-  moveOne(22, pwmBL[2], 1000);  // ankle servo
-  moveOne(26, pwmFL[2], 1000);  // ankle servo
+  moveOne(18, pwmBL[2], 1000);  // ankle servo
+  moveOne(30, pwmFL[2], 1000);  // ankle servo
   delay(1000);
   
 }
@@ -387,7 +424,7 @@ void setup() {
   delay(3000);
   stand();
   delay(3000);
-  Serial.print("Setup done.");
+  Serial.print("Setup done");
 }
 
 void loop() 
@@ -411,25 +448,25 @@ void loop()
   // inv_kin(x, y, z, theta1, theta2, theta4, leg_ind); // leg index 0 for FR
   // theta_to_pwm(theta1, theta2, theta4, pwm, leg_ind); // leg index 0 for FR
   
-  // Serial.println("");
+  // Serial.print("");
   // Serial.print(": XYZ = ");
   // Serial.print(x);
   // Serial.print(", ");
   // Serial.print(y);
   // Serial.print(", ");
-  // Serial.println(z);
+  // Serial.print(z);
   // Serial.print(": Theta = ");
   // Serial.print(theta1 * 180 / PI);
   // Serial.print(", ");
   // Serial.print(theta2 * 180 / PI);
   // Serial.print(", ");
-  // Serial.println(theta4 * 180 / PI);
+  // Serial.print(theta4 * 180 / PI);
   // Serial.print(": PWM = ");
   // Serial.print(pwm[0]);
   // Serial.print(", ");
   // Serial.print(pwm[1]);
   // Serial.print(", ");
-  // Serial.println(pwm[2]);
+  // Serial.print(pwm[2]);
 
   // moveOne(0, pwm[0], 200);  // hip servo
   // moveOne(1, pwm[1], 200);  // knee servo
@@ -533,74 +570,52 @@ void loop()
     theta_to_pwm(thetaJ, thetaK, thetaL, pwmFL, 3); // FL
 
     // logging
-    Serial.print("\n\nFront Right Step ");
-    Serial.print(i);
-    Serial.print(": Thetas = ");
-    Serial.print(thetaA * 180.0 / PI);
-    Serial.print(", ");
-    Serial.print(thetaB * 180.0 / PI);
-    Serial.print(", ");
-    Serial.println(thetaC * 180.0 / PI);
-    Serial.print(": PWM = ");
-    Serial.print(pwmFR[0]);
-    Serial.print(", ");
-    Serial.print(pwmFR[1]);
-    Serial.print(", ");
-    Serial.println(pwmFR[2]);
-    Serial.print("Coordinates: ");
-    Serial.print(xyz0[i][0]);
-    Serial.print(", ");
-    Serial.print(xyz0[i][1]);
-    Serial.print(", ");
-    Serial.print(xyz0[i][2]);
-    Serial.print("\n");
 
-    Serial.print("\n\nBack Left Step ");
+    Serial.print("\n");
+    // Serial.print("Computed ABC: ");
+    // Serial.print(i);
+    // Serial.print("\n");
+    // Serial.print(thetaA * 180.0 / PI);
+    // Serial.print(", ");
+    // Serial.print(thetaB * 180.0 / PI);
+    // Serial.print(", ");
+    // Serial.print(thetaC * 180.0 / PI);    
+    // Serial.print("; \n");
+
+    // Serial.print("Computed GHI: ");
+    // Serial.print(i);
+    // Serial.print("\n");
+    // Serial.print(thetaG * 180.0 / PI);
+    // Serial.print(", ");
+    // Serial.print(thetaH * 180.0 / PI);
+    // Serial.print(", ");
+    // Serial.print(thetaI * 180.0 / PI);    
+    // Serial.print("; \n");
+
+    Serial.print("Computed PQR: ");
     Serial.print(i);
-    Serial.print(": Thetas = ");
+    Serial.print("\n");
     Serial.print(thetaP * 180.0 / PI);
     Serial.print(", ");
     Serial.print(thetaQ * 180.0 / PI);
     Serial.print(", ");
-    Serial.println(thetaR * 180.0 / PI);
-    Serial.print(": PWM = ");
-    Serial.print(pwmBL[0]);
-    Serial.print(", ");
-    Serial.print(pwmBL[1]);
-    Serial.print(", ");
-    Serial.println(pwmBL[2]);
-    Serial.print("Coordinates: ");
-    Serial.print(xyz2[i][0]);
-    Serial.print(", ");
-    Serial.print(xyz2[i][1]);
-    Serial.print(", ");
-    Serial.print(xyz2[i][2]);
+    Serial.print(thetaR * 180.0 / PI);    
+    Serial.print("; \n");
+
+    Serial.print("Computed JKL: ");
+    Serial.print(i);
     Serial.print("\n");
+    Serial.print(thetaJ * 180.0 / PI);
+    Serial.print(", ");
+    Serial.print(thetaK * 180.0 / PI);
+    Serial.print(", ");
+    Serial.print(thetaL * 180.0 / PI);    
+    Serial.print("; \n");
 
     // FR 
     moveOne(0, pwmFR[0], 200);  // hip servo
     moveOne(1, pwmFR[1], 200);  // knee servo
     moveOne(2, pwmFR[2], 200);  // ankle servo
-
-    // // read feedback
-    // int adcA = analogRead(potA);
-    // int adcB = analogRead(potB);
-    // int adcC = analogRead(potC);
-
-    // int angleMapA = map(adcA, adcMinA, adcMaxA, 0, 180);
-    // int angleMapB = map(adcB, adcMinA, adcMaxA, 0, 180); // all are using A's range, update later
-    // int angleMapC = map(adcC, adcMinA, adcMaxA, 0, 180);
-
-    // // logging feedback
-    // Serial.print("\nFeedback [SERVO A ANGLE]:");
-    // Serial.print(angleMapA-90); // because mapping between 0 to 180
-    // Serial.print("\n");
-    // Serial.print("Feedback [SERVO B ANGLE]:");
-    // Serial.print(angleMapB-90);
-    // Serial.print("\n");
-    // Serial.print("Feedback [SERVO C ANGLE]:");
-    // Serial.print(angleMapC-90);
-    // Serial.print("\n");
 
     // BR 
     moveOne(4, pwmBR[0], 200);  // hip servo
@@ -608,16 +623,157 @@ void loop()
     moveOne(6, pwmBR[2], 200);  // ankle servo
   
     // BL 
-    moveOne(20, pwmBL[0], 200);  // hip servo
-    moveOne(21, pwmBL[1], 200);  // knee servo
-    moveOne(22, pwmBL[2], 200);  // ankle servo
+    moveOne(16, pwmBL[0], 200);  // hip servo
+    moveOne(17, pwmBL[1], 200);  // knee servo
+    moveOne(18, pwmBL[2], 200);  // ankle servo
 
     // FL
-    moveOne(24, pwmFL[0], 200);  // hip servo
-    moveOne(25, pwmFL[1], 200);  // knee servo
-    moveOne(26, pwmFL[2], 200);  // ankle servo
+    moveOne(28, pwmFL[0], 200);  // hip servo
+    moveOne(29, pwmFL[1], 200);  // knee servo
+    moveOne(30, pwmFL[2], 200);  // ankle servo
 
-    delay(250);
+    delay(50);
+
+    // int potGtotal = 0; 
+    // int potHtotal = 0; 
+    // int potItotal = 0; 
+    // int potAtotal = 0; 
+    // int potBtotal = 0; 
+    // int potCtotal = 0; 
+
+    // int potGavg = 0; 
+    // int potHavg = 0; 
+    // int potIavg = 0; 
+    // int potAavg = 0; 
+    // int potBavg = 0; 
+    // int potCavg = 0; 
+
+    int potPtotal = 0; 
+    int potQtotal = 0; 
+    int potRtotal = 0; 
+    int potJtotal = 0; 
+    int potKtotal = 0; 
+    int potLtotal = 0; 
+
+    int potPavg = 0; 
+    int potQavg = 0; 
+    int potRavg = 0; 
+    int potJavg = 0; 
+    int potKavg = 0; 
+    int potLavg = 0; 
+
+    for (int k = 0; k < numRead; k++) {
+      // read feedback
+      // potGtotal += analogRead(potG); 
+      // potHtotal += analogRead(potH); 
+      // potItotal += analogRead(potI); 
+      // potAtotal += analogRead(potA); 
+      // potBtotal += analogRead(potB); 
+      // potCtotal += analogRead(potC); 
+
+      potPtotal += analogRead(potP); 
+      potQtotal += analogRead(potQ); 
+      potRtotal += analogRead(potR); 
+      potJtotal += analogRead(potJ); 
+      potKtotal += analogRead(potK); 
+      potLtotal += analogRead(potL); 
+
+      delay(2);
+      // potAtotal = potAtotal - readingsA[numRead];
+      // potAtotal = potAtotal - readingsA[numRead];
+      // potAtotal = potAtotal - readingsA[numRead];
+      // potAtotal = potAtotal - readingsA[numRead];
+      // potAtotal = potAtotal - readingsA[numRead];
+      // potAtotal = potAtotal - readingsA[numRead];
+      
+      // int adcA = analogRead(potA);
+      // int adcB = analogRead(potB);
+      // int adcC = analogRead(potC);
+      // int adcG = analogRead(potG);
+      // int adcH = analogRead(potH);
+      // int adcI = analogRead(potI);
+
+    }
+
+    // potGavg = potGtotal/numRead; 
+    // potHavg = potHtotal/numRead; 
+    // potIavg = potItotal/numRead; 
+    // potAavg = potAtotal/numRead; 
+    // potBavg = potBtotal/numRead; 
+    // potCavg = potCtotal/numRead; 
+
+    potPavg = potPtotal/numRead; 
+    potQavg = potQtotal/numRead; 
+    potRavg = potRtotal/numRead; 
+    potJavg = potJtotal/numRead; 
+    potKavg = potKtotal/numRead; 
+    potLavg = potLtotal/numRead; 
+
+    // int angleMapA = map(potAavg, adcMinA, adcMaxA, 0, 180);
+    // int angleMapB = map(potBavg, adcMinB, adcMaxB, 0, 180); 
+    // int angleMapC = map(potCavg, adcMinC, adcMaxC, 0, 180);
+    // int angleMapG = map(potGavg, adcMinG, adcMaxG, 0, 180);
+    // int angleMapH = map(potHavg, adcMinH, adcMaxH, 0, 180); 
+    // int angleMapI = map(potIavg, adcMinI, adcMaxI, 0, 180);
+
+    int angleMapP = map(potPavg, adcMinP, adcMaxP, 0, 180);
+    int angleMapQ = map(potQavg, adcMinQ, adcMaxQ, 0, 180); 
+    int angleMapR = map(potRavg, adcMinR, adcMaxR, 0, 180);
+    int angleMapJ = map(potJavg, adcMinJ, adcMaxJ, 0, 180);
+    int angleMapK = map(potKavg, adcMinK, adcMaxK, 0, 180); 
+    int angleMapL = map(potLavg, adcMinL, adcMaxL, 0, 180);
+
+
+    // int angleMapA = map(adcA, adcMinA, adcMaxA, 0, 180);
+    // int angleMapB = map(adcB, adcMinB, adcMaxB, 0, 180); 
+    // int angleMapC = map(adcC, adcMinC, adcMaxC, 0, 180);
+    // int angleMapG = map(adcG, adcMinG, adcMaxG, 0, 180);
+    // int angleMapH = map(adcH, adcMinH, adcMaxH, 0, 180); 
+    // int angleMapI = map(adcI, adcMinI, adcMaxI, 0, 180);
+
+    // int adcP = analogRead(potP);
+    // int adcQ = analogRead(potQ);
+    // int adcR = analogRead(potR);
+    // int adcJ = analogRead(potJ);
+    // int adcK = analogRead(potK);
+    // int adcL = analogRead(potL);
+    
+
+    // logging feedback
+    // Serial.print("\n");
+    // Serial.print("Feedback ABC ");
+    // Serial.print(angleMapA-90);
+    // Serial.print(", ");
+    // Serial.print(angleMapB-90);
+    // Serial.print(", ");
+    // Serial.print(angleMapC-90);    
+    // Serial.print("; \n");
+
+    // Serial.print("Feedback GHI ");
+    // Serial.print(angleMapG-90);
+    // Serial.print(", ");
+    // Serial.print(angleMapH-90);
+    // Serial.print(", ");
+    // Serial.print(angleMapI-90);    
+    // Serial.print("; \n");
+
+    Serial.print("\n");
+    Serial.print("Feedback PQR ");
+    Serial.print(angleMapP-90);
+    Serial.print(", ");
+    Serial.print(angleMapQ-90);
+    Serial.print(", ");
+    Serial.print(angleMapR-90);    
+    Serial.print("; \n");
+
+    Serial.print("Feedback JKL ");
+    Serial.print(angleMapJ-90);
+    Serial.print(", ");
+    Serial.print(angleMapK-90);
+    Serial.print(", ");
+    Serial.print(angleMapL-90);    
+    Serial.print("; \n");
+
   }
 
   // delay loop
