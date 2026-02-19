@@ -46,6 +46,11 @@ setup(
     entry_points={
         'console_scripts': [
             'kinematic_gait = sim_robot.kinematic_gait:main',
+            'teleop = sim_robot.teleop:main',
+            'rl_obs = sim_robot.rl_obs:main',
+            'rl_policy = sim_robot.rl_policy:main',
+            'rl_action = sim_robot.rl_action:main',
+            'flight_recorder = sim_robot.flight_recorder:main',
         ],
     },
 )

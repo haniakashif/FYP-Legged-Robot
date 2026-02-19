@@ -25,7 +25,9 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyri
 ENV GZ_VERSION=harmonic
 RUN apt-get update && apt-get install -y \
     ros-humble-ros-gzharmonic \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && pip3 install --no-cache-dir \
+    onnxruntime
 
 # 4. Create the 'ros' user
 ARG USERNAME=ros
