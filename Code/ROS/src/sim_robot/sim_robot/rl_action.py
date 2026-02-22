@@ -7,21 +7,16 @@ class RLAction(Node):
     def __init__(self):
         super().__init__('rl_action')
 
-        # --- 1. CONFIGURATION ---        
         self.joints = ["bl_hip", "br_hip", "fl_hip", "fr_hip",
                         "bl_knee", "br_knee", "fl_knee", "fr_knee",
                         "bl_foot", "br_foot", "fl_foot", "fr_foot"] 
         
-        # Default Pose (Nominal Configuration)
         self.default_pos = 0.0
 
-        # Action Scale (hard coded in training)
         self.action_scale = 0.15
 
-        # --- 2. SETUP PUBLISHERS ---
         self.pubs = {} 
         
-        # We create a mapping from Index (0-11) to the Publisher
         self.index_to_pub = []
 
         for joint in self.joints:
@@ -45,17 +40,12 @@ class RLAction(Node):
             self.get_logger().error(f"Received {len(actions)} actions, expected 12")
             return
 
-        # Iterate through the 12 actions (which are already sorted alphabetically)
         for i, action_delta in enumerate(actions):
             
-            # Calculate Target
-            # Target = Default + (Action * Scale)
             target_pos = self.default_pos + (action_delta * self.action_scale)
-            
-            # Optional: Safety Clip (Prevent robot from breaking itself)
-            # target_pos = np.clip(target_pos, -1.5, 1.5)
 
-            # Publish
+            # can possibly add a clipping here to limit target_pos within joint limits
+
             msg_out = Float64()
             msg_out.data = float(target_pos)
             self.index_to_pub[i].publish(msg_out)

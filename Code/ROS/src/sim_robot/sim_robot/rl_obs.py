@@ -77,9 +77,6 @@ class RLObs(Node):
 
     def teleop_cb(self, msg):
         self.command = [msg.linear.x, msg.linear.y, msg.angular.z]
-        
-        # for testing
-        # self.command = [0.3, 0.3, 0.0]
 
     def timer_callback(self):
         
@@ -94,14 +91,14 @@ class RLObs(Node):
         obs_list = []
         # observation format [ang_vel, projected_gravity, command, joint_pos, last_action]
 
-        scaled_ang_vel = [x * 0.25 for x in self.ang_vel] # scale down angular velocity for better learning
+        scaled_ang_vel = [x * 0.25 for x in self.ang_vel] # scale down angular velocity
         obs_list.extend(scaled_ang_vel)
 
         # obs_list.extend(self.ang_vel)
 
         obs_list.extend(self.projected_gravity)
 
-        scaled_command = [x * 2.0 for x in self.command] # scale up command for better learning
+        scaled_command = [x for x in self.command]
         obs_list.extend(scaled_command)
 
         # obs_list.extend(self.command)
@@ -113,9 +110,9 @@ class RLObs(Node):
         }
 
         for joint in self.joints:
-            joint_type = joint.split('_')[1] # extract joint type (hip/knee/foot) from joint name like "bl_hip"
+            joint_type = joint.split('_')[1] 
             val = self.joint_states[joint]
-            offset = val - default_pos[joint_type] # extract joint type (hip/knee/foot) from joint name like "bl_hip"
+            offset = val - default_pos[joint_type] 
             obs_list.append(offset)
 
         obs_list.extend(self.last_action)

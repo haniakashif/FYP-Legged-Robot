@@ -29,9 +29,8 @@ setup(
         # 2. Install Config Files
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         
-        # 3. Install World Files
-        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
-
+    # 3. Install World Files (Recursive)
+    ] + generate_data_files(os.path.join('share', package_name), 'worlds') + [
         
     # 4. Install Model Files (Recursive)
     ] + generate_data_files(os.path.join('share', package_name), 'models'),

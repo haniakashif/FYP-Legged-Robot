@@ -49,7 +49,6 @@ class RLPolicy(Node):
         for i, action in enumerate(raw_actions):
             self.get_logger().info(f"  Action {i}: {action:.4f}")
 
-        # 4. Publish
         out_msg = Float64MultiArray()
         out_msg.data = raw_actions.tolist()
         self.action_pub.publish(out_msg)

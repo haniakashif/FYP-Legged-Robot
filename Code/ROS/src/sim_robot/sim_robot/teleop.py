@@ -8,22 +8,21 @@ import select
 
 # --- SETTINGS ---
 MAX_LIN_VEL = 0.5  # m/s
-MAX_ANG_VEL = 1.0  # rad/s
-LIN_STEP = 0.05
-ANG_STEP = 0.1
+MAX_ANG_VEL = 0.5  # rad/s
 
 msg = """
 ---------------------------
-Reading from the keyboard!
+Reading from the keyboard
 ---------------------------
-Moving around:
-   u    i    o
-   j    k    l
-   m    ,    .
+Controls:
+   q    w    e
+   a         d
+   z    s    c
 
-q/z : increase/decrease max speeds by 10%
-w/x : increase/decrease only linear speed by 10%
-e/c : increase/decrease only angular speed by 10%
+W to increase linear velocity
+S to decrease linear velocity
+A to increase angular velocity (left)
+D to decrease angular velocity (right)
 
 CTRL-C to quit
 """
@@ -54,8 +53,8 @@ class Teleop(Node):
         super().__init__('teleop')
         self.pub_teleop = self.create_publisher(Twist, '/teleop', 1) 
         
-        self.speed = 0.2
-        self.turn = 0.5
+        self.speed = MAX_LIN_VEL/2
+        self.turn = MAX_ANG_VEL/2
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -77,6 +76,14 @@ class Teleop(Node):
             self.y = moveBindings[key][1]
             self.z = moveBindings[key][2]
             self.th = moveBindings[key][3]
+        elif key == "W":
+            self.speed = max(self.speed*1.1, MAX_LIN_VEL)
+        elif key == "S":
+            self.speed = max(self.speed*0.9, 0.0)
+        elif key == "A":
+            self.turn = max(self.turn*1.1, MAX_ANG_VEL)
+        elif key == "D":
+            self.turn = max(self.turn*0.9, 0.0)
         elif key == '\x03': # Ctrl+C
             self.destroy_node()
             rclpy.shutdown()
@@ -86,6 +93,7 @@ class Teleop(Node):
             self.y = 0.0
             self.z = 0.0
             self.th = 0.0
+            # pass # Keep last command until new key is pressed
 
         twist = Twist()
         twist.linear.x = self.x * self.speed
