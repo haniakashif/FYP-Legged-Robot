@@ -1,0 +1,9 @@
+<library path="quad_interface">
+  <class name="quad_interface/QuadHardwareInterface"
+         type="quad_interface::QuadHardwareInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Hardware interface for TQuad
+    </description>
+  </class>
+</library>
