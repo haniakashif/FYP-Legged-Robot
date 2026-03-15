@@ -32,7 +32,7 @@ def generate_launch_description():
     )
 
     # --- 5. SETUP ROBOT DESCRIPTION & INJECT PATH ---
-    urdf_file_path = os.path.join(pkg_share, 'models', 'THex_Quadruped', 'model.urdf')
+    urdf_file_path = os.path.join(pkg_share, 'models', 'THex_Quadruped', 'model_sim.urdf')
     with open(urdf_file_path, 'r') as infp:
         robot_desc = infp.read()
 

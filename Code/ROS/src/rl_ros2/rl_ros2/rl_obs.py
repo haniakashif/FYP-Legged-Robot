@@ -34,19 +34,19 @@ class RLObs(Node):
         self.joint_states = {} # for storing latest joint readings
         for joint in self.joints:
             self.joint_states[joint] = None 
-        self.ang_vel = None # NOTE: TBD
-        self.projected_gravity = None # NOTE: TBD
-        self.last_action = [0.0 for _ in range(12)] # NOTE: TBD
-        self.command = None # NOTE: TBD
+        self.ang_vel = None 
+        self.projected_gravity = None 
+        self.last_action = [0.0 for _ in range(12)] 
+        self.command = None 
 
         # subscribers
         self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
         self.create_subscription(Imu, '/imu/data', self.imu_cb, 1)
-        self.create_subscription(Float64MultiArray, '/rl/actions', self.actions_cb, 1) # NOTE: revisit after rl/actions defined
-        self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) # NOTE: revisit when teleop node defined
+        self.create_subscription(Float64MultiArray, '/rl/actions', self.actions_cb, 1) 
+        self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) 
 
         # publisher
-        self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) # NOTE: verify size of this
+        self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) 
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
@@ -98,7 +98,7 @@ class RLObs(Node):
 
         obs_list.extend(self.projected_gravity)
 
-        scaled_command = [x for x in self.command]
+        scaled_command = [x * 2 for x in self.command]
         obs_list.extend(scaled_command)
 
         # obs_list.extend(self.command)
