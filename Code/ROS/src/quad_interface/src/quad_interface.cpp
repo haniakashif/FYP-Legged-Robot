@@ -40,10 +40,23 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     options.c_cflag |= (CLOCAL | CREAD | CS8); // 8 data bits, no parity, 1 stop bit
     tcsetattr(serial_fd_, TCSANOW, &options);
 
-    i2c_fd_ = open("/dev/i2c-1", O_RDWR);
-    if (i2c_fd_ < 0) {
-        RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "Failed to open I2C bus!");
-        return hardware_interface::CallbackReturn::ERROR;
+    use_adcs_ = false; // Default to safe/blind mode
+    if (info_.hardware_parameters.count("use_adcs") > 0) {
+        std::string use_adcs_str = info_.hardware_parameters.at("use_adcs");
+        if (use_adcs_str == "true" || use_adcs_str == "True") {
+            use_adcs_ = true;
+        }
+    }
+
+    if (use_adcs_) {
+        i2c_fd_ = open("/dev/i2c-1", O_RDWR);
+        if (i2c_fd_ < 0) {
+            RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "Failed to open I2C bus!");
+            return hardware_interface::CallbackReturn::ERROR;
+        }
+        RCLCPP_INFO(rclcpp::get_logger("QuadHardwareInterface"), "ADCs enabled. I2C bus opened.");
+    } else {
+        RCLCPP_INFO(rclcpp::get_logger("QuadHardwareInterface"), "ADCs disabled via URDF. Running in open-loop mode.");
     }
 
     if (info_.hardware_parameters.count("calibration_file") == 0) {
@@ -109,6 +122,12 @@ std::vector<hardware_interface::CommandInterface> QuadHardwareInterface::export_
 
 hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+
+    if (!use_adcs_) // If ADCs are disabled, we skip reading and just return OK 
+    {
+        return hardware_interface::return_type::OK;
+    }
+
     int addresses[3] = {0x48, 0x49, 0x4A}; // The 3 ADS1015 boards
 
     // ADS1015 Config Register MSB for Single-Ended reads on A0, A1, A2, A3

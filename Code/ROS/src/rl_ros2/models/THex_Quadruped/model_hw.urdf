@@ -399,6 +399,7 @@
         <hardware>
             <plugin>quad_interface/QuadHardwareInterface</plugin>
             <param name="calibration_file">$(find_pkg_share quad_interface)/config/calibration.yaml</param>
+            <param name="use_adcs">true</param>
         </hardware>
 
         <joint name="fl_hip_joint">

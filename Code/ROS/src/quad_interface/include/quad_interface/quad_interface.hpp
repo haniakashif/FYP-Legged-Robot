@@ -52,6 +52,9 @@ private:
   // File descriptor for the Raspberry Pi's physical UART serial port
   int serial_fd_;
   int i2c_fd_;
+
+  // Flag to indicate if ADCs should be used for reading joint positions
+  bool use_adcs_;
 };
 
 }  // namespace quad_interface
