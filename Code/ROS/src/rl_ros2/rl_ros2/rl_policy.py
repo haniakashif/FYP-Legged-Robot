@@ -38,6 +38,11 @@ class RLPolicy(Node):
 
         self.get_logger().info("Received observation, running policy...")
 
+        if (obs[6:9] == 0.0).all(): # if user command is zero, publish zero actions to avoid unintended movement
+            self.get_logger().info("Zero command received, publishing zero actions.")
+            self.action_pub.publish(Float64MultiArray(data=[0.0 for _ in range(12)]))
+            return
+
         # ONNX expects a batch dimension: (1, 33)
         input_tensor = obs.reshape(1, -1)
         

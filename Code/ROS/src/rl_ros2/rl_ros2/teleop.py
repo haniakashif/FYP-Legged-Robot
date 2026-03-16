@@ -7,8 +7,8 @@ import tty
 import select
 
 # --- SETTINGS ---
-MAX_LIN_VEL = 0.5  # m/s
-MAX_ANG_VEL = 0.5  # rad/s
+MAX_LIN_VEL = 1  # m/s
+MAX_ANG_VEL = 1  # rad/s
 
 msg = """
 ---------------------------
@@ -77,13 +77,17 @@ class Teleop(Node):
             self.z = moveBindings[key][2]
             self.th = moveBindings[key][3]
         elif key == "W":
-            self.speed = max(self.speed*1.1, MAX_LIN_VEL)
+            self.speed = min(self.speed*1.1, MAX_LIN_VEL)
+            self.get_logger().info(f"Linear speed increased to {self.speed:.2f}")
         elif key == "S":
             self.speed = max(self.speed*0.9, 0.0)
+            self.get_logger().info(f"Linear speed decreased to {self.speed:.2f}")
         elif key == "A":
-            self.turn = max(self.turn*1.1, MAX_ANG_VEL)
+            self.turn = min(self.turn*1.1, MAX_ANG_VEL)
+            self.get_logger().info(f"Angular speed increased to {self.turn:.2f}")
         elif key == "D":
             self.turn = max(self.turn*0.9, 0.0)
+            self.get_logger().info(f"Angular speed decreased to {self.turn:.2f}")
         elif key == '\x03': # Ctrl+C
             self.destroy_node()
             rclpy.shutdown()
@@ -96,12 +100,12 @@ class Teleop(Node):
             # pass # Keep last command until new key is pressed
 
         twist = Twist()
-        twist.linear.x = self.x * self.speed
-        twist.linear.y = self.y * self.speed
-        twist.linear.z = self.z * self.speed
+        twist.linear.x = float(self.x * self.speed)
+        twist.linear.y = float(self.y * self.speed)
+        twist.linear.z = 0.0
         twist.angular.x = 0.0
         twist.angular.y = 0.0
-        twist.angular.z = self.th * self.turn
+        twist.angular.z = float(self.th * self.turn)
         
         self.pub_teleop.publish(twist)
 
