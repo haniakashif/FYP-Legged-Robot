@@ -11,8 +11,8 @@ L3 = 2.637
 L4 = 9.265
 
 # Trajectory Constants
-T_STALL = 2
-NUM_DATA_POINTS = 16
+T_STALL = 4
+NUM_DATA_POINTS = 32
 SWING_FACTOR = 1/4 # SWING_FACTOR of the points are for swing phase
 STANCE_FACTOR = 1 - SWING_FACTOR
 

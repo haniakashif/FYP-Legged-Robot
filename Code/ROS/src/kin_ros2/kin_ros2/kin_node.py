@@ -9,7 +9,7 @@ class KinNode(Node):
     def __init__(self):
         super().__init__('kin_node')
 
-        self.target_freq = 25 
+        self.target_freq = 10
         self.dt = 1.0 / self.target_freq
 
         self.cmd_pub = self.create_publisher(

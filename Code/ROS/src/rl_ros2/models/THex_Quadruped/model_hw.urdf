@@ -402,7 +402,28 @@
             <param name="use_adcs">true</param>
         </hardware>
 
+        <joint name="bl_hip_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+        <joint name="br_hip_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
         <joint name="fl_hip_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+        <joint name="fr_hip_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+
+        <joint name="bl_knee_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+        <joint name="br_knee_joint">
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
@@ -410,16 +431,20 @@
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
-        <joint name="fl_foot_joint">
+        <joint name="fr_knee_joint">
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
 
-        <joint name="fr_hip_joint">
+        <joint name="bl_foot_joint">
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
-        <joint name="fr_knee_joint">
+        <joint name="br_foot_joint">
+            <command_interface name="position"/>
+            <state_interface name="position"/>
+        </joint>
+        <joint name="fl_foot_joint">
             <command_interface name="position"/>
             <state_interface name="position"/>
         </joint>
@@ -428,30 +453,5 @@
             <state_interface name="position"/>
         </joint>
 
-        <joint name="bl_hip_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="bl_knee_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="bl_foot_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-
-        <joint name="br_hip_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="br_knee_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
-        <joint name="br_foot_joint">
-            <command_interface name="position"/>
-            <state_interface name="position"/>
-        </joint>
     </ros2_control>
 </robot>

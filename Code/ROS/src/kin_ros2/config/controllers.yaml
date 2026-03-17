@@ -1,7 +1,7 @@
 controller_manager:
   ros__parameters:
     # How fast the Controller Manager runs. 
-    update_rate: 250  
+    update_rate: 50  
 
     # 1. The Sensor Broadcaster
     joint_state_broadcaster:

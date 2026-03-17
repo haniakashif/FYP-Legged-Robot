@@ -185,21 +185,22 @@ hardware_interface::return_type QuadHardwareInterface::write(const rclcpp::Time 
 {
     std::stringstream ssc32_command;
 
+    // Index Order: bl_hip, br_hip, fl_hip, fr_hip, bl_knee, br_knee, fl_knee, fr_knee, bl_foot, br_foot, fl_foot, fr_foot
+    const int pin_map[12] = {16, 4, 28, 0,  17, 5, 29, 1,  18, 6, 30, 2};
+
     for (size_t i = 0; i < hw_commands_.size(); i++) {
         auto &cal = calibrations_[i];
         double target_rad = hw_commands_[i];
 
-        // 1. Clamp the target radians to the joint's physical limits
-        if (target_rad < cal.min_rad) target_rad = cal.min_rad;
-        if (target_rad > cal.max_rad) target_rad = cal.max_rad;
-
-        // 2. Linear Map to PWM
         double rad_range = cal.max_rad - cal.min_rad;
         int pwm_range = cal.max_pwm - cal.min_pwm;
 
-        int pwm_val = cal.min_pwm + static_cast<int>((target_rad - cal.min_rad) * pwm_range / rad_range);
+        int pwm_val = static_cast<int>((cal.min_pwm + cal.max_pwm)/2 + target_rad * pwm_range / rad_range);
 
-        ssc32_command << "#" << i << "P" << pwm_val;
+        if (pwm_val < cal.min_pwm) pwm_val = cal.min_pwm;
+        if (pwm_val > cal.max_pwm) pwm_val = cal.max_pwm;
+
+        ssc32_command << "#" << pin_map[i] << "P" << pwm_val << " ";
     }
 
     ssc32_command << "T20\r";
