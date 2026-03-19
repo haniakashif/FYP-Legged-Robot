@@ -29,9 +29,8 @@ setup(
         # 2. Install Config Files
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         
-        # 3. Install World Files
-        (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
-
+    # 3. Install World Files (Recursive)
+    ] + generate_data_files(os.path.join('share', package_name), 'worlds') + [
         
     # 4. Install Model Files (Recursive)
     ] + generate_data_files(os.path.join('share', package_name), 'models'),
@@ -46,6 +45,11 @@ setup(
     entry_points={
         'console_scripts': [
             'kinematic_gait = sim_robot.kinematic_gait:main',
+            'teleop = sim_robot.teleop:main',
+            'rl_obs = sim_robot.rl_obs:main',
+            'rl_policy = sim_robot.rl_policy:main',
+            'rl_action = sim_robot.rl_action:main',
+            'flight_recorder = sim_robot.flight_recorder:main',
         ],
     },
 )

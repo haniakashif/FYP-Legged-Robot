@@ -1,0 +1,173 @@
+# Clock Synchronization
+- ros_topic_name: "/clock"
+  gz_topic_name: "/clock"
+  ros_type_name: "rosgraph_msgs/msg/Clock"
+  gz_type_name: "gz.msgs.Clock"
+  direction: GZ_TO_ROS
+
+# Direction: ROS -> Gazebo (Commands)
+- ros_topic_name: "/fr_hip/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fr_hip_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/fr_knee/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fr_knee_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/fr_foot/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fr_foot_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+# BR Leg
+- ros_topic_name: "/br_hip/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/br_hip_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/br_knee/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/br_knee_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/br_foot/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/br_foot_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+# BL Leg
+- ros_topic_name: "/bl_hip/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/bl_hip_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/bl_knee/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/bl_knee_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/bl_foot/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/bl_foot_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+# FL Leg
+- ros_topic_name: "/fl_hip/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fl_hip_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/fl_knee/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fl_knee_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+- ros_topic_name: "/fl_foot/command"
+  gz_topic_name: "/model/THex_Quadruped/joint/fl_foot_joint/0/cmd_pos"
+  ros_type_name: "std_msgs/msg/Float64"
+  gz_type_name: "gz.msgs.Double"
+  direction: ROS_TO_GZ
+
+# Direction: Gazebo -> ROS (Joint States)
+# Encoders
+- ros_topic_name: "/joint_states"
+  gz_topic_name: "/world/cave_world/model/THex_Quadruped/joint_state"
+  ros_type_name: "sensor_msgs/msg/JointState"
+  gz_type_name: "gz.msgs.Model"
+  direction: GZ_TO_ROS
+
+# IMU
+- ros_topic_name: "/imu/data"
+  gz_topic_name: "/imu"
+  ros_type_name: "sensor_msgs/msg/Imu"
+  gz_type_name: "gz.msgs.IMU"
+  direction: GZ_TO_ROS
+
+# FR Leg
+- ros_topic_name: "/fr_hip/force_torque"
+  gz_topic_name: "/fr_hip_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/fr_knee/force_torque"
+  gz_topic_name: "/fr_knee_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/fr_foot/force_torque"
+  gz_topic_name: "/fr_foot_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+# BR Leg
+- ros_topic_name: "/br_hip/force_torque"
+  gz_topic_name: "/br_hip_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/br_knee/force_torque"
+  gz_topic_name: "/br_knee_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/br_foot/force_torque"
+  gz_topic_name: "/br_foot_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+# BL Leg
+- ros_topic_name: "/bl_hip/force_torque"
+  gz_topic_name: "/bl_hip_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/bl_knee/force_torque"
+  gz_topic_name: "/bl_knee_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/bl_foot/force_torque"
+  gz_topic_name: "/bl_foot_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+# FL Leg
+- ros_topic_name: "/fl_hip/force_torque"
+  gz_topic_name: "/fl_hip_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/fl_knee/force_torque"
+  gz_topic_name: "/fl_knee_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS
+
+- ros_topic_name: "/fl_foot/force_torque"
+  gz_topic_name: "/fl_foot_force_torque"
+  ros_type_name: "geometry_msgs/msg/WrenchStamped"
+  gz_type_name: "gz.msgs.Wrench"
+  direction: GZ_TO_ROS

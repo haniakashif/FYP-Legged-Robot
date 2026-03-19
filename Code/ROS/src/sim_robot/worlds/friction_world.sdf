@@ -23,6 +23,10 @@
       filename="gz-sim-forcetorque-system" 
       name="gz::sim::systems::ForceTorque">
     </plugin>
+    <plugin
+      filename="gz-sim-imu-system"
+      name="gz::sim::systems::Imu">
+    </plugin>
     <light type="directional" name="sun">
       <cast_shadows>true</cast_shadows>
       <pose>0 0 10 0 0 0</pose>

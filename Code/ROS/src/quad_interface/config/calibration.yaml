@@ -1,0 +1,97 @@
+joints:
+
+  - name: "bl_hip_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2440
+
+  - name: "br_hip_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 700
+    max_pwm: 2600
+
+  - name: "fl_hip_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 560
+    max_pwm: 2440
+
+  - name: "fr_hip_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2400
+
+  - name: "bl_knee_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2500
+
+  - name: "br_knee_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2400
+
+  - name: "fl_knee_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2440
+
+  - name: "fr_knee_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 700
+    max_pwm: 2560
+
+  - name: "bl_foot_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2500
+
+  - name: "br_foot_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2500
+
+  - name: "fl_foot_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 600
+    max_pwm: 2500
+
+  - name: "fr_foot_joint"
+    volt_slope: 1.0
+    volt_intercept: 0.0
+    min_rad: -1.5707
+    max_rad: 1.5707
+    min_pwm: 560
+    max_pwm: 2500

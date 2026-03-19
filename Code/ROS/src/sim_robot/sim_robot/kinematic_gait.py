@@ -12,7 +12,7 @@ from . import kinematics as kin
 
 class KinematicGait(Node):
     def __init__(self):
-        super().__init__('kinematic_gait_node')
+        super().__init__('kinematic_gait')
         
         # --- 1. SETUP PARAMETERS ---
         self.target_freq = 10

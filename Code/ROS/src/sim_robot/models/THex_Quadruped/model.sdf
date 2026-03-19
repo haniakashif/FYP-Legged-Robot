@@ -36,6 +36,12 @@
           <ambient>1 1 1 1</ambient>
         </material>
       </visual>
+      <sensor name="imu_sensor" type="imu">
+        <always_on>1</always_on>
+        <update_rate>50</update_rate>
+        <visualize>true</visualize>
+        <topic>imu</topic>
+      </sensor>
     </link>
     <joint name='bl_hip_joint' type='revolute'>
       <pose relative_to='base_link'>-0.053162000000000001 -0.12711 0 0 0 -2.3719999999999999</pose>
@@ -58,7 +64,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>bl_hip_force_torque</topic>
@@ -126,7 +132,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>bl_knee_force_torque</topic>
@@ -194,7 +200,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>bl_foot_force_torque</topic>
@@ -262,7 +268,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>br_hip_force_torque</topic>
@@ -330,7 +336,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>br_knee_force_torque</topic>
@@ -398,7 +404,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>br_foot_force_torque</topic>
@@ -466,7 +472,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fl_hip_force_torque</topic>
@@ -534,7 +540,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fl_knee_force_torque</topic>
@@ -602,7 +608,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fl_foot_force_torque</topic>
@@ -670,7 +676,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fr_hip_force_torque</topic>
@@ -738,7 +744,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fr_knee_force_torque</topic>
@@ -806,7 +812,7 @@
         <provide_feedback>true</provide_feedback>
       </physics>
       <sensor name="force_torque_sensor" type="force_torque">
-        <update_rate>100</update_rate>
+        <update_rate>50</update_rate>
         <always_on>true</always_on>
         <visualize>true</visualize>
         <topic>fr_foot_force_torque</topic>
