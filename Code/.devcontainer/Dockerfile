@@ -32,6 +32,7 @@ RUN apt-get update --fix-missing \
     && pip3 install --no-cache-dir \
     onnxruntime \
     "numpy<2.0.0" \
+    osqp \
     scipy \
     pin
 

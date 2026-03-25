@@ -3,7 +3,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, SetEnvironmentVariable
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution, Command
+from launch.substitutions import PathJoinSubstitution, Command, LaunchConfiguration
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
@@ -14,9 +14,9 @@ def generate_launch_description():
     pkg_share = FindPackageShare(pkg_name)
     ros_gz_sim_share = FindPackageShare('ros_gz_sim')
     
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
+    
     # CONFIGURE GAZEBO PATHS
-    # Use SetEnvironmentVariable to ensure Gazebo can find your custom meshes/models
-    # Ament prefix path is a safe fallback for the base install space
     gz_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=[
@@ -26,8 +26,6 @@ def generate_launch_description():
         ]
     )
     
-    # EXPORT THE CUSTOM COMPILED ROS2_CONTROL PLUGIN PATH
-    # Gazebo Harmonic needs this to find the libgz_ros2_control-system.so binary
     gz_plugin_path = SetEnvironmentVariable(
         name='GZ_SIM_SYSTEM_PLUGIN_PATH',
         value=[
@@ -37,10 +35,8 @@ def generate_launch_description():
         ]
     )
 
-    # Define paths using strictly PathJoinSubstitution
     sdf_file_path = PathJoinSubstitution([pkg_share, 'models', 'THex_Quadruped', 'model.sdf']) 
     world_file_path = PathJoinSubstitution([pkg_share, 'worlds', 'friction_world.sdf']) 
-    cube_sdf_path = PathJoinSubstitution([pkg_share, 'models', 'Cube', 'model.sdf'])
     urdf_file_path = PathJoinSubstitution([pkg_share, 'models', 'THex_Quadruped', 'model.urdf'])
 
     gazebo_sim = IncludeLaunchDescription(
@@ -50,26 +46,13 @@ def generate_launch_description():
         launch_arguments={'gz_args': ['-r ', world_file_path]}.items(),
     )
 
-    # SPAWN THE ROBOT
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=[
             '-name', 'THex_Quadruped',
             '-file', sdf_file_path,
-            '-x', '0.0', '-y', '0.0', '-z', '0.5' 
-        ],
-        output='screen'
-    )
-    
-    # SPAWN THE CUBE
-    spawn_cube = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-name', 'Cube',
-            '-file', cube_sdf_path,
-            '-x', '0.0', '-y', '0.0', '-z', '0.1'
+            '-x', '0.0', '-y', '0.0', '-z', '0.1' 
         ],
         output='screen'
     )
@@ -85,21 +68,20 @@ def generate_launch_description():
         name='robot_state_publisher',
         parameters=[{
             'robot_description': robot_desc,
-            'use_sim_time': True
+            'use_sim_time': use_sim_time
         }],
         output='both'
     )
-
+    
     # --- ROS-GZ Bridge ---
-    # clock_bridge = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
-    #     output='screen'
-    # )
+    clock_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
+        output='screen'
+    )
     
     # --- Contact Sensors Bridge (Gazebo -> ROS 2) ---
-    # Translates gz.msgs.Contacts into ros_gz_interfaces/msg/Contacts
     contact_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -150,7 +132,6 @@ def generate_launch_description():
         output='screen'
     )
 
-    # --- Event Handlers ---
     delay_leg_controller = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=load_joint_state_broadcaster,
@@ -158,16 +139,58 @@ def generate_launch_description():
         )
     )
 
+    # =========================================================
+    # --- CUSTOM CHEETAH ARCHITECTURE NODES ---
+    # =========================================================
+    
+    estimator_node = Node(
+        package=pkg_name, executable='estimator_node',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+    
+    gait_node = Node(
+        package=pkg_name, executable='gait_node',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+    
+    fsm_node = Node(
+        package=pkg_name, executable='fsm_node',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+    
+    stance_controller = Node(
+        package=pkg_name, executable='stance_controller',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+    
+    swing_controller = Node(
+        package=pkg_name, executable='swing_controller',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+    
+    effort_controller = Node(
+        package=pkg_name, executable='effort_controller',
+        parameters=[{'use_sim_time': use_sim_time}], output='screen'
+    )
+
     return LaunchDescription([
-        DeclareLaunchArgument('use_sim_time', default_value='true', description='Use simulation (Gazebo) clock if true'),
+        DeclareLaunchArgument('use_sim_time', default_value='true', description='Use simulation clock'),
         gz_resource_path,
         gz_plugin_path,
         gazebo_sim,
         spawn_robot,
-        spawn_cube,
         robot_state_publisher,
+        clock_bridge,
         contact_bridge,
         odom_bridge,
         load_joint_state_broadcaster,
-        delay_leg_controller
+        delay_leg_controller,
+        
+        # Add custom nodes to launch description
+        estimator_node,
+        gait_node,
+        fsm_node,
+        stance_controller,
+        swing_controller,
+        effort_controller
     ])

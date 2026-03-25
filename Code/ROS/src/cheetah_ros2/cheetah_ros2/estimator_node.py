@@ -42,10 +42,18 @@ class EstimatorNode(Node):
         self.last_contact_time = [0.0, 0.0, 0.0, 0.0]
         self.contact_timeout = 0.05  # 50 milliseconds timeout
         self.foot_positions = np.zeros(12)
+        self.foot_jacobians = np.zeros((4, 3, 12))
         
         # Ground Truth Tracking Variables
         self.p_com = np.zeros(3)
         self.v_com = np.zeros(3)
+        
+        self.joint_names = [
+            'fl_hip_joint', 'fl_knee_joint', 'fl_foot_joint',
+            'fr_hip_joint', 'fr_knee_joint', 'fr_foot_joint',
+            'bl_hip_joint', 'bl_knee_joint', 'bl_foot_joint',
+            'br_hip_joint', 'br_knee_joint', 'br_foot_joint'
+        ]
         
         self.pub_estimated_contacts = self.create_publisher(Float64MultiArray, '/estimated_contacts', 1)
         self.pub_robot_state = self.create_publisher(Float64MultiArray, '/estimated_robot_state', 1)
@@ -89,35 +97,52 @@ class EstimatorNode(Node):
 
     # --- Contact Callbacks (Update Timestamp on Event) ---
     def fl_cb(self, msg):
+        self.get_logger().info(f'FL Contact Callback: Detected {len(msg.contacts)} contacts.')
         if len(msg.contacts) > 0:
             self.physical_contacts[0] = 1.0
             self.last_contact_time[0] = self.get_clock().now().nanoseconds / 1e9
 
     def fr_cb(self, msg):
+        self.get_logger().info(f'FR Contact Callback: Detected {len(msg.contacts)} contacts.')
         if len(msg.contacts) > 0:
             self.physical_contacts[1] = 1.0
             self.last_contact_time[1] = self.get_clock().now().nanoseconds / 1e9
 
     def bl_cb(self, msg):
+        self.get_logger().info(f'BL Contact Callback: Detected {len(msg.contacts)} contacts.')
         if len(msg.contacts) > 0:
             self.physical_contacts[2] = 1.0
             self.last_contact_time[2] = self.get_clock().now().nanoseconds / 1e9
 
     def br_cb(self, msg):
+        self.get_logger().info(f'BR Contact Callback: Detected {len(msg.contacts)} contacts.')
         if len(msg.contacts) > 0:
             self.physical_contacts[3] = 1.0
             self.last_contact_time[3] = self.get_clock().now().nanoseconds / 1e9
     
     def joint_cb(self, msg):
-        self.q = np.array(msg.position)
-        self.qdot = np.array(msg.velocity)  # we need joint velocities in the paper
+        self.get_logger().info(f'Joint State Callback: Received positions for joints: {msg.name}') 
+        # self.q = np.array(msg.position)
+        # self.qdot = np.array(msg.velocity)  # we need joint velocities in the paper
+        
+        # Create a dictionary mapping the incoming joint name to its index in the msg
+        name_to_idx = {name: i for i, name in enumerate(msg.name)}
+        
+        # Extract positions and velocities in the STRICT Pinocchio order
+        for i, name in enumerate(self.joint_names):
+            if name in name_to_idx:
+                idx = name_to_idx[name]
+                self.q[i] = msg.position[idx]
+                self.qdot[i] = msg.velocity[idx]
 
     def imu_cb(self, msg):
+        self.get_logger().info(f'IMU Callback: Received IMU data. {msg}')
         self.quat = np.array([msg.orientation.w, msg.orientation.x, msg.orientation.y, msg.orientation.z])
         self.omega = np.array([msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z])
         self.accel = np.array([msg.linear_acceleration.x, msg.linear_acceleration.y, msg.linear_acceleration.z])
         
     def odom_cb(self, msg):
+        self.get_logger().info(f'Odometry Callback: Received odometry data. {msg}')
         # Extract perfect absolute position (Ground Truth)
         self.p_com[0] = msg.pose.pose.position.x
         self.p_com[1] = msg.pose.pose.position.y
@@ -143,6 +168,7 @@ class EstimatorNode(Node):
         self.omega[2] = msg.twist.twist.angular.z
 
     def timer_cb(self):
+        self.get_logger().info('Timer Callback: Evaluating estimator.')
         # NOTE: estimated_contacts is active, the entries for quat, omega and accel are all 0        
         
         # Evaluate Watchdog Timers
@@ -157,35 +183,42 @@ class EstimatorNode(Node):
         pin_quat = np.array([self.quat[1], self.quat[2], self.quat[3], self.quat[0]])
         q_gen = np.concatenate((self.p_com, pin_quat, self.q))
         
-        # Compute all Kinematics and Jacobians simultaneously
-        # NOTE: FK is being computed with pin so I have 2 ways of going about it, right now I am proceeding with this one
-        
+        # Compute all Kinematics and Jacobians simultaneously        
         # Calculates the global position and orientation of every joint 
         pin.forwardKinematics(self.pin_model, self.pin_data, q_gen)
         
-        # Calculates the global position and orientation of every operational frame (like the tips of the feet, which are usually fixed frames attached to the ankle joints).
-        pin.updateFramePlacements(self.pin_model, self.pin_data)
+        # # Calculates the global position and orientation of every operational frame (like the tips of the feet, which are usually fixed frames attached to the ankle joints).
+        # pin.updateFramePlacements(self.pin_model, self.pin_data)
         
-        # Pre-computes the spatial Jacobians for all joints in the local frame. Doing this once here is computationally much cheaper than calculating it individually for each foot inside the loop
+        # # Pre-computes the spatial Jacobians for all joints in the local frame. Doing this once here is computationally much cheaper than calculating it individually for each foot inside the loop
+        # pin.computeJointJacobians(self.pin_model, self.pin_data, q_gen)
+        
+        
+        # 1. Compute joint kinematics and spatial Jacobians in one highly optimized pass
         pin.computeJointJacobians(self.pin_model, self.pin_data, q_gen)
         
+        # 2. Update the fixed operational frames (feet) using the joint data from step 1
+        pin.updateFramePlacements(self.pin_model, self.pin_data)
+        
+        
         # Extract the 3x12 Foot Jacobians
-        self.foot_jacobians = []
+        # self.foot_jacobians = []
         
         for i, foot_id in enumerate(self.foot_ids):
             # reading the cached 3D position of the foot.
             self.foot_positions[i*3 : i*3+3] = self.pin_data.oMf[foot_id].translation
             
             # Extract the Jacobian (LOCAL_WORLD_ALIGNED aligns the forces to the global XYZ grid)
-            J_full = pin.computeFrameJacobian(self.pin_model, self.pin_data, q_gen, foot_id, pin.ReferenceFrame.LOCAL_WORLD_ALIGNED)
+            J_full = pin.getFrameJacobian(self.pin_model, self.pin_data, foot_id, pin.ReferenceFrame.LOCAL_WORLD_ALIGNED)
+            
+            self.foot_jacobians[i] = J_full[0:3, 6:18]
             
             # 3 for linear velocity ($v_x, v_y, v_z$) and 3 for angular velocity ($\omega_x, \omega_y, \omega_z$) Since your robot's feet are point contacts (they can't exert rotational torque on the ground, only linear pushing forces), we discard the bottom 3 rows.
             # Because it is a floating-base robot, the system has 18 Degrees of Freedom (DoF) for velocities (6 for the unactuated base + 12 for the motors). Columns 0 through 5 represent how moving the base moves the foot. We don't have motors on the base, so we discard them. Columns 6 through 17 represent the 12 actual actuated joints.
-            J_linear_joints = J_full[0:3, 6:18]
-            self.foot_jacobians.append(J_linear_joints)
             
         # Flatten the list of four 3x12 matrices into a single 1D array
-        flat_jacobians = np.concatenate([J.flatten() for J in self.foot_jacobians])
+        # flat_jacobians = np.concatenate([J.flatten() for J in self.foot_jacobians])
+        flat_jacobians = self.foot_jacobians.flatten()
         msg_jac = Float64MultiArray()
         msg_jac.data = flat_jacobians.tolist()
         self.pub_jacobians.publish(msg_jac)
@@ -200,12 +233,13 @@ class EstimatorNode(Node):
         msg_contacts.data = self.physical_contacts.tolist()
         self.pub_estimated_contacts.publish(msg_contacts)
         
+        # The publisher will publish regardless, the line below needs to be uncomented when using my own FK implementation
         # self.foot_positions = self.compute_forward_kinematics(self.q)
-        # msg_foot_pos = Float64MultiArray()
-        # msg_foot_pos.data = self.foot_positions.tolist()
-        # self.pub_foot_positions.publish(msg_foot_pos)
+        msg_foot_pos = Float64MultiArray()
+        msg_foot_pos.data = self.foot_positions.tolist()
+        self.pub_foot_positions.publish(msg_foot_pos)
         
-    # NOTE: pinnochio has given us better FK so this function is not necessary to work with    
+    # NOTE: using pinnochio for FK is another approach which gives the kinematics in the world frame. Using my own implementation gives the FK in the robot frame
     def compute_forward_kinematics(self, q: np.ndarray) -> np.ndarray:
         # q is a 12-element array: [FL_hip, FL_knee, FL_foot, FR_hip...]
         L1 = 0.02845  # in m

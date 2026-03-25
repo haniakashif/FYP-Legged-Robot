@@ -3,7 +3,7 @@ import rclpy
 from enum import Enum
 import numpy as np
 from rclpy.node import Node
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, Float64
 
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 
@@ -14,7 +14,7 @@ class Gait(Enum):
     # phase offset of each leg
     # 16 is length of one complete step cycle
     # each leg spends 16/4 = 4 segments in stance and 12 segments in swing, with different offsets for each leg
-    # gait pattern (FL,FR,RL,RR)
+    # gait pattern (FL,FR,BL,BR)
     CRAWL16 = 'crawl', 16, np.array([0, 8, 4, 12]), np.array([12, 12, 12, 12])
 
     # constructor function for each gait
@@ -56,7 +56,6 @@ class Gait(Enum):
     def swing_time(self) -> float: return self.get_total_swing_time(self.__dt_control * self.__iterations_between_mpc)
     @property
     def stance_time(self) -> float: return self.get_total_stance_time(self.__dt_control * self.__iterations_between_mpc)
-
 
 
     # cur_iteration is main clock iteration, and we need to evaluate mpc every 20 iterations of main clock
@@ -150,6 +149,8 @@ class GaitControllerNode(Node):
         self.pub_nominal = self.create_publisher(Float64MultiArray, '/nominal_schedule', 1)
         self.pub_swing_phase = self.create_publisher(Float64MultiArray, '/swing_phases', 1)
         self.pub_stance_phase = self.create_publisher(Float64MultiArray, '/stance_phases', 1)
+        self.pub_stance_time = self.create_publisher(Float64, '/gait/stance_time', 1)
+        self.pub_swing_time = self.create_publisher(Float64, '/gait/swing_time', 1)
         
         # Create a timer ticking at the control frequency, we dont use sleep since it would block the execution of other commands, so we create a hardware timer that calls the control loop at the specific freq
         self.timer = self.create_timer(self.dt_control, self.control_loop)
@@ -159,6 +160,7 @@ class GaitControllerNode(Node):
         self.get_logger().info(f'Gait Scheduler Active: Running {self.current_gait.name} gait at {hz} Hz.')
 
     def control_loop(self):
+        self.get_logger().info(f'Gait Controller Iteration: {self.iteration_counter}')
         # Update the internal phase of the gait
         self.current_gait.set_iteration(self.iterations_between_mpc, self.iteration_counter)
         
@@ -170,6 +172,14 @@ class GaitControllerNode(Node):
         stance_state = self.current_gait.get_stance_state()
         msg_stance = Float64MultiArray(data=stance_state.tolist())
         self.pub_stance_phase.publish(msg_stance)
+        
+        msg_stance_time = Float64()
+        msg_stance_time.data = float(self.current_gait.stance_time)
+        self.pub_stance_time.publish(msg_stance_time)
+        
+        msg_swing_time = Float64()
+        msg_swing_time.data = float(self.current_gait.swing_time)
+        self.pub_swing_time.publish(msg_swing_time)
         
         # The MPC algorithm only runs every 20 iterations (50 Hz)
         if self.iteration_counter % self.iterations_between_mpc == 0:

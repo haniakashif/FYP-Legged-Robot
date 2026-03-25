@@ -2,8 +2,8 @@ import numpy as np
 
 # base parameters for controller
 class LinearMpcConfig:
-    # main clock running at 1000hz
-    dt_control: float = 0.001 # swing leg control and gait scheduler frequency 1000Hz
+    # main clock running at 10hz
+    dt_control: float = 0.1
     
     # mpc is running at 1000/20 = 50Hz, which means mpc is being evaluated every 20 iterations of the main clock
     iteration_between_mpc: int = 20
@@ -26,7 +26,9 @@ class LinearMpcConfig:
     Q: np.ndarray = np.diag([5., 5., 10., 10., 10., 50., 0.01, 0.01, 0.2, 0.2, 0.2, 0.2, 0.])
     R: np.ndarray = np.diag([1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5, 1e-5])
 
-    # user commands used in: foot placement depending on how fast to move, passed directly in raibert heuristic
-    cmd_xvel: float = 0.0
-    cmd_yvel: float = 0.0
+    # user commands:
+    cmd_xvel: float = 0.5
+    cmd_yvel: float = 0.5
     cmd_yaw_turn_rate: float = 0.0
+    
+    # the user commands are such that the robot moves forward in x axis, but the sdf has +y as forward & +x as right so the commands need to be swapped when they are being used

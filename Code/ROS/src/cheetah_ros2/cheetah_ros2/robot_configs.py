@@ -52,8 +52,8 @@ class THexConfig(RobotConfig):
     swing_height = 0.05
     
     # PD Gains for the Swing Leg Controller
-    Kp_swing = np.diag([5.0, 5.0, 5.0])
-    Kd_swing = np.diag([0.1, 0.1, 0.1])
+    kp_Cartesian = np.diag([75.0, 75.0, 75.0])
+    kd_Cartesian = np.diag([3.5, 3.5, 3.5])
     
     # PD gains for balance controller
     Kp_balance_COM = np.diag([100.0, 100.0, 100.0])

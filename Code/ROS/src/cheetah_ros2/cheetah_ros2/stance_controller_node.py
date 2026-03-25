@@ -16,12 +16,13 @@ class StanceController(Node):
         super().__init__('stance_controller')
 
         self.horizon = LinearMpcConfig.horizon
-        self.dt_mpc = LinearMpcConfig.dt_mpc
+        self.dt_control = LinearMpcConfig.dt_control
+        self.base_inertia = np.array(THexConfig.base_inertia)
         
         self.cmd_xvel = LinearMpcConfig.cmd_xvel   # m/s
         self.cmd_yvel = LinearMpcConfig.cmd_yvel   # m/s
         self.cmd_yaw_turn_rate = LinearMpcConfig.cmd_yaw_turn_rate # rad/s
-        self.target_z = 0.3 # Desired ride height      
+        self.target_z = 0.3 # desired ride height      
         
         self.Kp_balance_COM = THexConfig.Kp_balance_COM
         self.Kd_balance_COM = THexConfig.Kd_balance_COM
@@ -33,32 +34,50 @@ class StanceController(Node):
         self.fz_min = THexConfig.fz_min
         self.mu = LinearMpcConfig.friction_coef
 
-        self.robot_state = np.zeros(34)
+        self.robot_state = np.zeros(40)
         self.foot_positions = np.zeros(12)
         self.stance_phases = np.zeros(4) 
         self.swing_phases = np.zeros(4)
         self.fsm_state = np.zeros(4)
+        self.foot_jacobians = np.zeros((4, 3, 12))
         
         self.S_weight = THexConfig.S
         self.alpha_W = THexConfig.alpha
         self.beta_W = THexConfig.beta
         self.f_prev = np.zeros(12)
 
+        self.pub_torques = self.create_publisher(Float64MultiArray, '/stance_torques', 1)
+        
         self.sub_state = self.create_subscription(Float64MultiArray, '/estimated_robot_state', self.state_cb, 1)
         self.sub_foot = self.create_subscription(Float64MultiArray, '/foot_positions', self.foot_cb, 1)
         self.sub_stance = self.create_subscription(Float64MultiArray, '/stance_phases', self.stance_cb, 1)
         self.sub_swing = self.create_subscription(Float64MultiArray, '/swing_phases', self.swing_cb, 1)
         self.sub_nom = self.create_subscription(Float64MultiArray, '/fsm_state', self.nom_cb, 1)
+        self.sub_jacobians = self.create_subscription(Float64MultiArray, '/foot_jacobians', self.jacobian_cb, 1)
         
-        self.timer = self.create_timer(self.dt_mpc, self.balance_controller)
+        
+        self.timer = self.create_timer(self.dt_control, self.control_loop)
 
     
-    def state_cb(self, msg): self.robot_state = np.array(msg.data)
-    def foot_cb(self, msg): self.foot_positions = np.array(msg.data)
-    def stance_cb(self, msg): self.stance_phases = np.array(msg.data)
-    def swing_cb(self, msg): self.swing_phases = np.array(msg.data)
-    def nom_cb(self, msg): self.fsm_state = np.array(msg.data)
-    
+    def state_cb(self, msg): 
+        self.get_logger().info(f'Robot State Callback: Received robot state data. {msg}')
+        self.robot_state = np.array(msg.data)
+    def foot_cb(self, msg): 
+        self.get_logger().info(f'Foot Position Callback: Received foot position data. {msg}')
+        self.foot_positions = np.array(msg.data)
+    def stance_cb(self, msg): 
+        self.get_logger().info(f'Stance Phase Callback: Received stance phase data. {msg}')
+        self.stance_phases = np.array(msg.data)
+    def swing_cb(self, msg): 
+        self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
+        self.swing_phases = np.array(msg.data)
+    def nom_cb(self, msg): 
+        self.get_logger().info(f'FSM State Callback: Received FSM state data. {msg}')
+        self.fsm_state = np.array(msg.data)
+    def jacobian_cb(self, msg): 
+        self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
+        self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
+
     def compute_desired_COM(self) -> np.ndarray:
         """
         Computes the predictive support polygon weights using Eq 10, 11, 12 
@@ -121,22 +140,14 @@ class StanceController(Node):
         # print("Virtual Points:\n", virtual_points)
         p_c_bar = np.mean(virtual_points, axis=0)
         
-        # NOTE: the foot position is in the robot frame and the target_z is a height in the world frame, so we need to transform the foot positions to the world frame. 
+        # NOTE: the foot position is in the robot frame (if I use my own FK function) or the world frame (when I use pinnochio's FK) and the target_z is a height in the world frame, so we need to transform the foot positions to the world frame if we're using my FK implementaion. 
+        
         # NOTE: we would need to project the foot positions on a plane fitted using least squares to determine what height it needs to be from the ground (check github implementations for this)
         p_c_d = np.array([p_c_bar[0], p_c_bar[1], self.target_z])
         
         return p_c_d
     # NOTE: THE PCD IS IN THE ROBOT FRAME AND WE NEED IT IN THE WORLD FRAME
     
-    
-    def mpc_loop(self):
-        desired_COM = self.compute_desired_COM()
-        
-        # 2. (Next Step) Generate Reference Trajectory matrix (check implementations)
-        # 3. (Next Step) Solve QP
-        pass
-    
-
         
         
     def balance_controller(self, p_c_d: np.ndarray) -> np.ndarray:
@@ -152,8 +163,8 @@ class StanceController(Node):
         omega = self.robot_state[34:37] # World frame angular velocity
         
         # Desired states
-        # v_des maintains commanded XY velocity, with 0.0 Z velocity to hold ride height
-        v_des = np.array([self.cmd_xvel, self.cmd_yvel, 0.0])
+        # v_des maintains commanded XY velocity, with 0.0 Z velocity to hold ride height, our robot frame is defined to move in +y direction
+        v_des = np.array([self.cmd_yvel, self.cmd_xvel, 0.0])
         omega_des = np.array([0.0, 0.0, self.cmd_yaw_turn_rate])
         
         Kp_p = np.array(self.Kp_balance_COM) 
@@ -161,11 +172,10 @@ class StanceController(Node):
         Kp_w = np.array(self.Kp_balance_ori)
         Kd_w = np.array(self.Kd_balance_ori)
         
-        I_body_local = np.array(LinearMpcConfig.inertia)
+        I_body_local = self.base_inertia
         S_weight = self.S_weight
         alpha_W = self.alpha_W
         beta_W = self.beta_W
-        # NOTE: where is beta_W (the weight for ensuring we dont deviate too much during timesteps)
 
         # Convert current quaternion [w, x, y, z] to Rotation Matrix (Rb_world)
         # https://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToMatrix/index.htm
@@ -188,7 +198,7 @@ class StanceController(Node):
         
         # Target yaw is current yaw + (commanded rate * timestep)
         # Roll and Pitch targets remain 0.0 to keep the chassis flat
-        yaw_des = current_yaw + (self.cmd_yaw_turn_rate * self.dt_mpc)
+        yaw_des = current_yaw + (self.cmd_yaw_turn_rate * self.dt_control)
         R_des = np.array([
             [math.cos(yaw_des), -math.sin(yaw_des), 0.0],
             [math.sin(yaw_des),  math.cos(yaw_des), 0.0],
@@ -200,8 +210,9 @@ class StanceController(Node):
         # this is the rotation error between current and desired orientation
         
         # Convert local desired CoM offset into an absolute world coordinate
-        p_c_d_world = p_com + (R_yaw @ p_c_d)
-        
+        # p_c_d_world = p_com + (R_yaw @ p_c_d)
+        p_c_d_world = p_c_d # if the pcd is already in the world frame
+               
         # rotating the error from world frame to yaw-aligned frame
         error_p_yaw = R_yaw.T @ (p_c_d_world - p_com)
         error_v_yaw = R_yaw.T @ (v_des - v_com)
@@ -282,9 +293,14 @@ class StanceController(Node):
         
         # NOTE: calculation in notebook
         P_mat = 2.0 * (A_mat.T @ S_weight @ A_mat + alpha_W + beta_W)
-        q_vec = -2.0 * (A_mat.T @ S_weight @ W_des_yaw + beta_W * self.f_prev)
+        q_vec = -2.0 * (A_mat.T @ S_weight @ W_des_yaw + beta_W @ self.f_prev)
         
         # --- Constraints Setup ---
+        # C_mat has 12 cols, which rep the x, y, z of all 4 legs
+        # C_mat has 5 rows of constraints:
+        # row 1: z constraints (between fz_max and fz_min)
+        # ros 2/3: friction cone constraints in x (+ve and -ve)
+        # row 4/5: friction cone constraints in y (+ve and -ve)
         C_mat = np.zeros((20, 12))
         l_bound = np.zeros(20)
         u_bound = np.zeros(20)
@@ -312,7 +328,7 @@ class StanceController(Node):
             l_bound[row+1:row+5] = -np.inf
             u_bound[row+1:row+5] = 0.0
             
-            # Zero out XY if swinging
+            # Zero out XY if swinging (forces are zeroed out when swinging)
             if contact_state == 0.0: 
                 # here we're only clamping row1 and row3, and the solver evalutes the constraints to be 0 clapmed for row2 and row4 so we dont explicity need to clamp it
                 C_mat[row+1, col] = 1.0; C_mat[row+1, col+2] = 0.0
@@ -323,6 +339,11 @@ class StanceController(Node):
         # Convert P and C to Scipy Sparse matrices as required by OSQP
         P_sparse = sparse.csc_matrix(P_mat)
         C_sparse = sparse.csc_matrix(C_mat)
+        
+        # Force 1D arrays for OSQP
+        q_vec = q_vec.flatten()
+        l_bound = l_bound.flatten()
+        u_bound = u_bound.flatten()
         
         prob = osqp.OSQP()
         prob.setup(P_sparse, q_vec, A=C_sparse, l=l_bound, u=u_bound, verbose=False)
@@ -338,59 +359,31 @@ class StanceController(Node):
         for i in range(4):
             f_world[i*3 : i*3+3] = R_yaw @ f_yaw[i*3 : i*3+3]
 
-        return f_world
+        # --- Map Forces to Joint Torques ---
+        tau = np.zeros(12)
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        for i in range(4):
+            f_i = f_world[i*3 : i*3+3]
+            J_i = self.foot_jacobians[i]
+            
+            # Accumulate the torques
+            # we are taking -ve because the solver calculates ground reaction forces, we apply opposite for the robot to move
+            tau += -J_i.T @ f_i
+
+        msg_tau = Float64MultiArray()
+        msg_tau.data = tau.tolist()
+        self.pub_torques.publish(msg_tau)
         
         
     
-    
-    
+    def control_loop(self):
+        # 1. Compute the desired Center of Mass position (Predictive Raibert step)
+        p_c_d = self.compute_desired_COM()
+        
+        # 2. Pass it into the Balance Controller to solve the OSQP forces
+        self.balance_controller(p_c_d)
+
+
     
 def main(args=None):
     rclpy.init(args=args)
