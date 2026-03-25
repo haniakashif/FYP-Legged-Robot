@@ -23,7 +23,7 @@ class SwingController(Node):
         self.cmd_xvel = LinearMpcConfig.cmd_xvel   # m/s
         self.cmd_yvel = LinearMpcConfig.cmd_yvel   # m/s
         self.cmd_yaw_turn_rate = LinearMpcConfig.cmd_yaw_turn_rate # rad/s
-        self.target_z = 0.3 # desired ride height 
+        self.target_z = THexConfig.base_height_des # desired ride height 
         self.g = LinearMpcConfig.gravity
         self.kp_Cartesian = THexConfig.kp_Cartesian
         self.kd_Cartesian = THexConfig.kd_Cartesian
@@ -52,23 +52,27 @@ class SwingController(Node):
         
 
     def state_cb(self, msg): 
-        self.get_logger().info(f'State Callback: Received robot state data. {msg}')
+        # self.get_logger().info(f'State Callback: Received robot state data. {msg}')
         self.robot_state = np.array(msg.data)
+    
     def stance_time_cb(self, msg): 
-        self.get_logger().info(f'Stance Time Callback: Received stance time data. {msg}')
+        # self.get_logger().info(f'Stance Time Callback: Received stance time data. {msg}')
         self.stance_time = msg.data
+    
     def swing_time_cb(self, msg): 
-        self.get_logger().info(f'Swing Time Callback: Received swing time data. {msg}')
+        # self.get_logger().info(f'Swing Time Callback: Received swing time data. {msg}')
         self.swing_time = msg.data
+    
     def foot_pos_cb(self, msg): 
-        self.get_logger().info(f'Foot Position Callback: Received foot position data. {msg}')
+        # self.get_logger().info(f'Foot Position Callback: Received foot position data. {msg}')
         self.foot_positions = np.array(msg.data)
+    
     def jacobian_cb(self, msg): 
-        self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
+        # self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
         self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
         
     def swing_phase_cb(self, msg):
-        self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
+        # self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
         self.swing_phases = np.array(msg.data)
         # This logic captures the exact liftoff position the moment the phase > 0
         for i in range(4):
@@ -117,7 +121,7 @@ class SwingController(Node):
         p_step_rel = raibert_term + capture_term
         
         # NOTE: i need to set the bounding box experimentally
-        p_rel_max = 0.1 
+        p_rel_max = 0.06
         p_step_rel[0] = np.clip(p_step_rel[0], -p_rel_max, p_rel_max)
         p_step_rel[1] = np.clip(p_step_rel[1], -p_rel_max, p_rel_max)
         
@@ -159,7 +163,7 @@ class SwingController(Node):
         p0 = self.p0[leg_idx]
         pf = self.compute_foot_placement(leg_idx, stance_time)
         
-        h_clearance = 0.03
+        h_clearance = THexConfig.swing_height
         
         p_des = np.zeros(3)
         v_des = np.zeros(3)
@@ -199,7 +203,7 @@ class SwingController(Node):
     
     
     def control_loop(self):
-        self.get_logger().info('Control Loop: Computing swing leg torques.')
+        # self.get_logger().info('Control Loop: Computing swing leg torques.')
         tau_swing = np.zeros(12)        
         p_com = self.robot_state[0:3]
         v_com = self.robot_state[3:6]

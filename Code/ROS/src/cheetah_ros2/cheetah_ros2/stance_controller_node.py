@@ -22,7 +22,7 @@ class StanceController(Node):
         self.cmd_xvel = LinearMpcConfig.cmd_xvel   # m/s
         self.cmd_yvel = LinearMpcConfig.cmd_yvel   # m/s
         self.cmd_yaw_turn_rate = LinearMpcConfig.cmd_yaw_turn_rate # rad/s
-        self.target_z = 0.3 # desired ride height      
+        self.target_z = THexConfig.base_height_des # desired ride height      
         
         self.Kp_balance_COM = THexConfig.Kp_balance_COM
         self.Kd_balance_COM = THexConfig.Kd_balance_COM
@@ -60,22 +60,27 @@ class StanceController(Node):
 
     
     def state_cb(self, msg): 
-        self.get_logger().info(f'Robot State Callback: Received robot state data. {msg}')
+        # self.get_logger().info(f'Robot State Callback: Received robot state data. {msg}')
         self.robot_state = np.array(msg.data)
+    
     def foot_cb(self, msg): 
-        self.get_logger().info(f'Foot Position Callback: Received foot position data. {msg}')
+        # self.get_logger().info(f'Foot Position Callback: Received foot position data. {msg}')
         self.foot_positions = np.array(msg.data)
+    
     def stance_cb(self, msg): 
-        self.get_logger().info(f'Stance Phase Callback: Received stance phase data. {msg}')
+        # self.get_logger().info(f'Stance Phase Callback: Received stance phase data. {msg}')
         self.stance_phases = np.array(msg.data)
+    
     def swing_cb(self, msg): 
-        self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
+        # self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
         self.swing_phases = np.array(msg.data)
+    
     def nom_cb(self, msg): 
-        self.get_logger().info(f'FSM State Callback: Received FSM state data. {msg}')
+        # self.get_logger().info(f'FSM State Callback: Received FSM state data. {msg}')
         self.fsm_state = np.array(msg.data)
+    
     def jacobian_cb(self, msg): 
-        self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
+        # self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
         self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
 
     def compute_desired_COM(self) -> np.ndarray:
@@ -254,8 +259,8 @@ class StanceController(Node):
             error_ori_yaw /= 2.0
 
         # calculating desired accelerations in the yaw-aligned frame using PD control
-        p_des_acc_yaw = Kp_p * error_p_yaw + Kd_p * error_v_yaw
-        omega_des_acc_yaw = Kp_w * error_ori_yaw + Kd_w * error_omega_yaw
+        p_des_acc_yaw = Kp_p @ error_p_yaw + Kd_p @ error_v_yaw
+        omega_des_acc_yaw = Kp_w @ error_ori_yaw + Kd_w @ error_omega_yaw
 
 
 
@@ -381,7 +386,9 @@ class StanceController(Node):
         p_c_d = self.compute_desired_COM()
         
         # 2. Pass it into the Balance Controller to solve the OSQP forces
+        # self.get_logger().info(f'Beginning balance control loop. Desired CoM: {p_c_d}')
         self.balance_controller(p_c_d)
+        # self.get_logger().info(f'Finished balance control loop. Published torques to /stance_torques.')
 
 
     

@@ -32,18 +32,18 @@ class EffortController(Node):
 
 
     def fsm_state_cb(self, msg): 
-        self.get_logger().info(f'FSM State Callback: Received FSM state data. {msg}')
+        # self.get_logger().info(f'FSM State Callback: Received FSM state data. {msg}')
         self.modified_contacts = np.array(msg.data)
     def stance_cb(self, msg): 
-        self.get_logger().info(f'Stance Torques Callback: Received stance torques data. {msg}')
+        # self.get_logger().info(f'Stance Torques Callback: Received stance torques data. {msg}')
         self.stance_torques = np.array(msg.data)      
     def swing_cb(self, msg): 
-        self.get_logger().info(f'Swing Torques Callback: Received swing torques data. {msg}')
+        # self.get_logger().info(f'Swing Torques Callback: Received swing torques data. {msg}')
         self.swing_torques = np.array(msg.data)
         
         
     def control_loop(self):
-        self.get_logger().info('Control Loop: Computing swing leg torques.')
+        # self.get_logger().info('Control Loop: Computing swing leg torques.')
         final_torques = np.zeros(12)
         
         for i in range(4):

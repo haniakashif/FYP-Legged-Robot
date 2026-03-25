@@ -25,19 +25,19 @@ class FSMNode(Node):
         self.timer = self.create_timer(0.001, self.fsm_loop) 
 
     def contact_cb(self, msg):
-        self.get_logger().info(f'Contact Callback: Received contact data. {msg}')
+        # self.get_logger().info(f'Contact Callback: Received contact data. {msg}')
         self.physical_contacts = np.array(msg.data)
 
     def nominal_cb(self, msg):
-        self.get_logger().info(f'Nominal Schedule Callback: Received nominal schedule data. {msg}')
+        # self.get_logger().info(f'Nominal Schedule Callback: Received nominal schedule data. {msg}')
         self.nominal_schedule = np.array(msg.data)
         
     def swing_phase_cb(self, msg):
-        self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
+        # self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
         self.swing_phases = np.array(msg.data)
 
     def fsm_loop(self):
-        self.get_logger().info('FSM Loop: Evaluating FSM logic.')
+        # self.get_logger().info('FSM Loop: Evaluating FSM logic.')
         fsm_output = np.zeros(4)
         
         for i in range(4):

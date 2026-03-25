@@ -40,8 +40,8 @@ class TeleopNode(Node):
         self.ang_step = 0.2
         
         # Current commanded velocities
-        self.cmd_xvel = 0.0
-        self.cmd_yvel = 0.0
+        self.cmd_xvel = 0.5
+        self.cmd_yvel = 0.5
         self.cmd_yaw_rate = 0.0
         
         # Save terminal settings to restore them on exit

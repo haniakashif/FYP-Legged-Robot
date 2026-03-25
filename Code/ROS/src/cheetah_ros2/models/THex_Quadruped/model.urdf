@@ -33,18 +33,21 @@
 
         <joint name="fl_hip_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="fl_knee_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="fl_foot_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
@@ -52,18 +55,21 @@
 
         <joint name="fr_hip_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="fr_knee_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="fr_foot_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
@@ -71,18 +77,21 @@
 
         <joint name="bl_hip_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="bl_knee_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="bl_foot_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
@@ -90,18 +99,21 @@
 
         <joint name="br_hip_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="br_knee_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>
         </joint>
         <joint name="br_foot_joint">
             <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
             <state_interface name="position"/>
             <state_interface name="velocity"/>
             <state_interface name="effort"/>

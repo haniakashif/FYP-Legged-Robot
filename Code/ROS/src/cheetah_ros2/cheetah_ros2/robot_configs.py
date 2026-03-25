@@ -23,7 +23,7 @@ class THexConfig(RobotConfig):
     # <izz>0.00225</izz>
     
     mass_robot: float = 1.3984710000000002  # kg
-    base_height_des: float = 0.10  # meters
+    base_height_des: float = 0.04  # meters
     
     # symmetric intertial matirx from sdf
     # NOTE: this is inertia matrix for base only, not for whole robot
@@ -46,20 +46,20 @@ class THexConfig(RobotConfig):
     # NOTE: the following parameters are somewhat hardcoded
     # choosing arbitrary value by considering moment arm to be straight and without intermediate angles (0.94140000000000001 * 3) / (0.02845 + 0.05439 + 0.02637 + 0.09265)
     fz_max = 13.9908847716239
-    fz_min = 1.0
+    fz_min = 0.5
 
     # How high the foot lifts during a step (meters)
-    swing_height = 0.05
+    swing_height = 0.03
     
     # PD Gains for the Swing Leg Controller
-    kp_Cartesian = np.diag([75.0, 75.0, 75.0])
-    kd_Cartesian = np.diag([3.5, 3.5, 3.5])
+    kp_Cartesian = np.diag([80.0, 80.0, 80.0])
+    kd_Cartesian = np.diag([5.0, 5.0, 5.0])
     
     # PD gains for balance controller
     Kp_balance_COM = np.diag([100.0, 100.0, 100.0])
-    Kd_balance_COM = np.diag([1.0, 1.0, 1.0])
+    Kd_balance_COM = np.diag([5.0, 5.0, 5.0])
     Kp_balance_ori = np.diag([100.0, 100.0, 100.0])
-    Kd_balance_ori = np.diag([1.0, 1.0, 1.0])
+    Kd_balance_ori = np.diag([5.0, 5.0, 5.0])
     
     # NEED TO ADD BODY INERTIA MATRIX AS WELL AS S WEIGHT MATRIX
     S = np.diag([1.0, 1.0, 1.0, 10.0, 10.0, 10.0])

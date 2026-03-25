@@ -58,7 +58,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -126,7 +126,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -194,7 +194,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -272,7 +272,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -340,7 +340,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -408,7 +408,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -486,7 +486,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -554,7 +554,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -622,7 +622,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -700,7 +700,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -768,7 +768,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
@@ -836,7 +836,7 @@
         </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
-          <spring_stiffness>5</spring_stiffness> <damping>0.1</damping>
+          <spring_stiffness>0</spring_stiffness>
         </dynamics>
       </axis>
       <physics>
