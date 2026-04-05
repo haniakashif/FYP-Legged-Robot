@@ -165,29 +165,40 @@ class EstimatorNode(Node):
         
     def odom_cb(self, msg):
         # self.get_logger().info(f'Odometry Callback: Received odometry data. {msg}')
-        # Extract perfect absolute position (Ground Truth)
+        # Position (world frame)
         self.p_com[0] = msg.pose.pose.position.x
         self.p_com[1] = msg.pose.pose.position.y
         self.p_com[2] = msg.pose.pose.position.z
         
-        # Extract perfect linear velocity (Ground Truth)
-        self.v_com[0] = msg.twist.twist.linear.x
-        self.v_com[1] = msg.twist.twist.linear.y
-        self.v_com[2] = msg.twist.twist.linear.z
-        
-        # Optional: You can also extract the ground-truth quaternion and angular velocity 
-        # from here and completely ignore your simulated IMU sensor if you want!
-        # NOTE: as suggested above, I am ignoring IMU readings and using perfect ones. I have commented out IMU stuff before
-        # Perfect orientation (Mapping to your [w, x, y, z] format)
+        # Orientation (world frame)
         self.quat[0] = msg.pose.pose.orientation.w
         self.quat[1] = msg.pose.pose.orientation.x
         self.quat[2] = msg.pose.pose.orientation.y
         self.quat[3] = msg.pose.pose.orientation.z
 
-        # Perfect angular velocity
-        self.omega[0] = msg.twist.twist.angular.x
-        self.omega[1] = msg.twist.twist.angular.y
-        self.omega[2] = msg.twist.twist.angular.z
+        v_local = np.array([
+            msg.twist.twist.linear.x,
+            msg.twist.twist.linear.y,
+            msg.twist.twist.linear.z
+        ])
+        
+        # Convert Quaternion to Rotation Matrix
+        w, x, y, z = self.quat
+        R_mat = np.array([
+            [1 - 2*(y**2 + z**2), 2*(x*y - z*w),     2*(x*z + y*w)],
+            [2*(x*y + z*w),       1 - 2*(x**2 + z**2), 2*(y*z - x*w)],
+            [2*(x*z - y*w),       2*(y*z + x*w),       1 - 2*(x**2 + y**2)]
+        ])
+
+        self.v_com = R_mat @ v_local
+
+        omega_local = np.array([
+            msg.twist.twist.angular.x,
+            msg.twist.twist.angular.y,
+            msg.twist.twist.angular.z
+        ])
+
+        self.omega = R_mat @ omega_local
 
     def timer_cb(self):
         # self.get_logger().info('Timer Callback: Evaluating estimator.')

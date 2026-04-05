@@ -19,7 +19,7 @@ Once the forces are obtained, the torque at each joint is computed using the equ
 
 PI = math.pi
 
-WEIGHT = (1.394 + 0.170) * 9.81 # mass of robot and camera in kg, acceleration in m/s^2
+WEIGHT = (1.394 + 0.7) * 9.81 # mass of robot and camera in kg, acceleration in m/s^2
 
 L1 = kin.L1/100  # convert cm to m
 L2 = kin.L2/100
