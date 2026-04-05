@@ -28,6 +28,7 @@ def generate_launch_description():
     )
 
     load_jsb = Node(package="controller_manager", executable="spawner", arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"], output="screen")
+    load_imu = Node(package="controller_manager", executable="spawner", arguments=["imu_sensor_broadcaster", "--controller-manager", "/controller_manager"],output="screen")
     load_jgpc = Node(package="controller_manager", executable="spawner", arguments=["joint_group_position_controller", "--controller-manager", "/controller_manager"], output="screen")
 
     kin_node = Node(
@@ -37,5 +38,5 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        rsp_node, controller_manager_node, load_jsb, load_jgpc, kin_node
+        rsp_node, controller_manager_node, load_jsb, load_imu, load_jgpc, kin_node
     ])

@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include <cmath>
 #include <sstream>
+#include <cstring>
 #include <yaml-cpp/yaml.h>
 
 namespace quad_interface
@@ -25,10 +26,16 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     hw_states_.resize(info_.joints.size(), 0.0);
     hw_commands_.resize(info_.joints.size(), 0.0);
 
-    // 2. Open the physical UART serial port on the Raspberry Pi (/dev/serial0)
+    // 2. Open the physical UART serial port (/dev/serial0) and the USB port (/dev/ttyUSB0) on the Raspberry Pi 
     serial_fd_ = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY);
     if (serial_fd_ < 0) {
         RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "Failed to open serial port!");
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    imu_fd_ = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY | O_NONBLOCK);
+    if (imu_fd_ < 0) {
+        RCLCPP_WARN(rclcpp::get_logger("QuadHardwareInterface"), "Failed to open IMU on /dev/ttyUSB0!");
         return hardware_interface::CallbackReturn::ERROR;
     }
 
@@ -40,6 +47,15 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     options.c_cflag |= (CLOCAL | CREAD | CS8); // 8 data bits, no parity, 1 stop bit
     tcsetattr(serial_fd_, TCSANOW, &options);
 
+    // 4. Configure the IMU port (115200 baud, 8N1, no flow control)
+    struct termios imu_options;
+    tcgetattr(imu_fd_, &imu_options);
+    cfsetispeed(&imu_options, B115200);
+    cfsetospeed(&imu_options, B115200);
+    imu_options.c_cflag |= (CLOCAL | CREAD | CS8);
+    cfmakeraw(&imu_options);
+    tcsetattr(imu_fd_, TCSANOW, &imu_options);
+
     use_adcs_ = false; // Default to safe/blind mode
     if (info_.hardware_parameters.count("use_adcs") > 0) {
         std::string use_adcs_str = info_.hardware_parameters.at("use_adcs");
@@ -47,6 +63,18 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
             use_adcs_ = true;
         }
     }
+
+    // Parse IMU Flags (Default to false if not found)
+    use_orientation_ = false;
+    use_angular_velocity_ = false;
+    use_linear_acceleration_ = false;
+
+    if (info_.hardware_parameters.count("use_orientation"))
+        use_orientation_ = (info_.hardware_parameters.at("use_orientation") == "true" || info_.hardware_parameters.at("use_orientation") == "True");
+    if (info_.hardware_parameters.count("use_angular_velocity"))
+        use_angular_velocity_ = (info_.hardware_parameters.at("use_angular_velocity") == "true" || info_.hardware_parameters.at("use_angular_velocity") == "True");
+    if (info_.hardware_parameters.count("use_linear_acceleration"))
+        use_linear_acceleration_ = (info_.hardware_parameters.at("use_linear_acceleration") == "true" || info_.hardware_parameters.at("use_linear_acceleration") == "True");
 
     if (use_adcs_) {
         i2c_fd_ = open("/dev/i2c-1", O_RDWR);
@@ -66,7 +94,8 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
 
     std::string calib_filepath = info_.hardware_parameters.at("calibration_file");
     
-    try {
+    try 
+    {
         YAML::Node config = YAML::LoadFile(calib_filepath);
         YAML::Node joints_node = config["joints"];
 
@@ -107,6 +136,19 @@ std::vector<hardware_interface::StateInterface> QuadHardwareInterface::export_st
         // for each joint's state, look at hw_states
         state_interfaces.emplace_back(hardware_interface::StateInterface(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
     }
+
+    // Export IMU States mapped specifically to "um7_imu"
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.x", &imu_quat_x_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.y", &imu_quat_y_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.z", &imu_quat_z_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.w", &imu_quat_w_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "angular_velocity.x", &imu_gyro_x_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "angular_velocity.y", &imu_gyro_y_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "angular_velocity.z", &imu_gyro_z_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "linear_acceleration.x", &imu_accel_x_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "linear_acceleration.y", &imu_accel_y_));
+    state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "linear_acceleration.z", &imu_accel_z_));
+
     return state_interfaces;
 }
 
@@ -120,8 +162,93 @@ std::vector<hardware_interface::CommandInterface> QuadHardwareInterface::export_
     return command_interfaces;
 }
 
+// --- IMU BYTE PARSER ---
+void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
+{
+    for (int i = 0; i < bytes_read; i++) {
+        uint8_t byte = buffer[i];
+
+        switch (imu_sync_state_) {
+            case 0: if (byte == 's') imu_sync_state_ = 1; break;
+            case 1: imu_sync_state_ = (byte == 'n') ? 2 : 0; break;
+            case 2: imu_sync_state_ = (byte == 'p') ? 3 : 0; break;
+            case 3: // Packet Type
+                imu_pt_ = byte;
+                imu_data_len_ = ((imu_pt_ & 0x40) ? ((imu_pt_ >> 2) & 0x0F) * 4 : 4);
+                imu_sync_state_ = 4;
+                break;
+            case 4: // Address
+                imu_addr_ = byte;
+                imu_data_idx_ = 0;
+                imu_calc_chksum_ = 's' + 'n' + 'p' + imu_pt_ + imu_addr_;
+                imu_sync_state_ = (imu_pt_ & 0x80) ? 5 : 0; // Check has_data flag
+                break;
+            case 5: // Data Payload
+                imu_data_buf_[imu_data_idx_++] = byte;
+                imu_calc_chksum_ += byte;
+                if (imu_data_idx_ >= imu_data_len_) imu_sync_state_ = 6;
+                break;
+            case 6: // Checksum MSB
+                imu_chksum_buf_[0] = byte;
+                imu_sync_state_ = 7;
+                break;
+            case 7: // Checksum LSB & Execute
+                imu_chksum_buf_[1] = byte;
+                uint16_t rx_chksum = (imu_chksum_buf_[0] << 8) | imu_chksum_buf_[1];
+                
+                if (rx_chksum == imu_calc_chksum_) {
+                    bool is_batch = (imu_pt_ & 0x40);
+                    int batch_len = (imu_pt_ >> 2) & 0x0F;
+
+                    // Address 109: Quaternions (16-bit ints)
+                    if (use_orientation_ && imu_addr_ == 109 && is_batch && batch_len >= 2) {
+                        int16_t w = (imu_data_buf_[0] << 8) | imu_data_buf_[1];
+                        int16_t x = (imu_data_buf_[2] << 8) | imu_data_buf_[3];
+                        int16_t y = (imu_data_buf_[4] << 8) | imu_data_buf_[5];
+                        int16_t z = (imu_data_buf_[6] << 8) | imu_data_buf_[7];
+                        imu_quat_w_ = w / 29789.09;
+                        imu_quat_x_ = x / 29789.09;
+                        imu_quat_y_ = y / 29789.09;
+                        imu_quat_z_ = z / 29789.09;
+                    }
+                    // Address 97: Processed Gyro (32-bit IEEE floats, Big-Endian)
+                    else if (use_angular_velocity_ && imu_addr_ == 97 && is_batch && batch_len >= 3) {
+                        uint32_t raw_x = (imu_data_buf_[0] << 24) | (imu_data_buf_[1] << 16) | (imu_data_buf_[2] << 8) | imu_data_buf_[3];
+                        uint32_t raw_y = (imu_data_buf_[4] << 24) | (imu_data_buf_[5] << 16) | (imu_data_buf_[6] << 8) | imu_data_buf_[7];
+                        uint32_t raw_z = (imu_data_buf_[8] << 24) | (imu_data_buf_[9] << 16) | (imu_data_buf_[10] << 8) | imu_data_buf_[11];
+                        float gx, gy, gz;
+                        std::memcpy(&gx, &raw_x, sizeof(float));
+                        std::memcpy(&gy, &raw_y, sizeof(float));
+                        std::memcpy(&gz, &raw_z, sizeof(float));
+                        imu_gyro_x_ = gx; imu_gyro_y_ = gy; imu_gyro_z_ = gz;
+                    }
+                    // Address 101 (0x65): Processed Linear Acceleration (32-bit IEEE floats, Big-Endian)
+                    else if (use_linear_acceleration_ && imu_addr_ == 101 && is_batch && batch_len >= 3) {
+                        uint32_t raw_x = (imu_data_buf_[0] << 24) | (imu_data_buf_[1] << 16) | (imu_data_buf_[2] << 8) | imu_data_buf_[3];
+                        uint32_t raw_y = (imu_data_buf_[4] << 24) | (imu_data_buf_[5] << 16) | (imu_data_buf_[6] << 8) | imu_data_buf_[7];
+                        uint32_t raw_z = (imu_data_buf_[8] << 24) | (imu_data_buf_[9] << 16) | (imu_data_buf_[10] << 8) | imu_data_buf_[11];
+                        float ax, ay, az;
+                        std::memcpy(&ax, &raw_x, sizeof(float));
+                        std::memcpy(&ay, &raw_y, sizeof(float));
+                        std::memcpy(&az, &raw_z, sizeof(float));
+                        imu_accel_x_ = ax; imu_accel_y_ = ay; imu_accel_z_ = az;
+                    }
+                }
+                imu_sync_state_ = 0;
+                break;
+        }
+    }
+}
+
 hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+    if (imu_fd_ >= 0) {
+        uint8_t buffer[256];
+        int bytes_read = ::read(imu_fd_, buffer, sizeof(buffer));
+        if (bytes_read > 0) {
+            parse_imu_buffer(buffer, bytes_read);
+        }
+    }
 
     if (!use_adcs_) // If ADCs are disabled, we skip reading and just return OK 
     {

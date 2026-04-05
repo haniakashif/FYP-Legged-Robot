@@ -9,7 +9,7 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "/workspaces/FYP-Legged-Robot/Code/Policies/2026-03-15_15-03-58_v1.onnx"
+        self.onnx_path = "/workspaces/FYP-Legged-Robot/Code/Policies/2026-03-27_02-44-09_v1.onnx"
 
         self.obs_dim = 33 # hardcoded in training
 

@@ -3,13 +3,22 @@ controller_manager:
     # How fast the Controller Manager runs. 
     update_rate: 50  
 
-    # 1. The Sensor Broadcaster
+    # 1. The Sensor Broadcasters
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
+
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
 
     # 2. The Joint Commander
     joint_group_position_controller:
       type: position_controllers/JointGroupPositionController
+
+# Configuration for the IMU Broadcaster
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: "um7_imu"
+    frame_id: "base_link"
 
 # Configuration for the Joint Commander
 joint_group_position_controller:

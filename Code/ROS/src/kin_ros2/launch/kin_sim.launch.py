@@ -49,6 +49,7 @@ def generate_launch_description():
     )
 
     load_jsb = Node(package="controller_manager", executable="spawner", arguments=["joint_state_broadcaster"], output="screen")
+    load_imu = Node(package="controller_manager", executable="spawner", arguments=["imu_sensor_broadcaster"],output="screen")
     load_jgpc = Node(package="controller_manager", executable="spawner", arguments=["joint_group_position_controller"], output="screen")
 
     kin_node = Node(
@@ -59,5 +60,5 @@ def generate_launch_description():
 
     return LaunchDescription([
         gz_resource_path, gazebo, spawn_robot, rsp_node, bridge,
-        load_jsb, load_jgpc, kin_node
+        load_jsb, load_imu, load_jgpc, kin_node
     ])
