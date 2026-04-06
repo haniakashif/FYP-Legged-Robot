@@ -59,8 +59,8 @@ def generate_launch_description():
         arguments=[
             '-name', 'THex_Quadruped',
             '-topic', 'robot_description',
-            '-x', '5.79', '-y', '9.38', '-z', '-0.53',
-            '-R', '-0.29', '-P', '0.01', '-Y', '-1.56'  
+            '-x', '12.76', '-y', '3.53', '-z', '-2.47',
+            '-R', '0.12', '-P', '0.04', '-Y', '0.09'  
         ],
         output='screen'
     )
@@ -83,6 +83,13 @@ def generate_launch_description():
         package="controller_manager",
         executable="spawner",
         arguments=["joint_state_broadcaster"],
+        output="screen",
+    )
+
+    load_imu_sensor_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["imu_sensor_broadcaster"],
         output="screen",
     )
 
@@ -133,7 +140,8 @@ def generate_launch_description():
         spawn_robot,
         rsp_node,                             
         bridge,
-        load_joint_state_broadcaster,          
+        load_joint_state_broadcaster,     
+        load_imu_sensor_broadcaster,     
         load_joint_group_position_controller,  
         rl_obs,
         rl_policy,

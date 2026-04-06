@@ -17,7 +17,9 @@ class Gait(Enum):
     # gait pattern (FL,FR,BL,BR)
     CRAWL16 = 'crawl', 16, np.array([0, 8, 4, 12]), np.array([12, 12, 12, 12])
     CRAWL64 = 'crawl', 64, np.array([0, 32, 16, 48]), np.array([48, 48, 48, 48])
+    CRAWL100 = 'crawl', 100, np.array([0, 50, 25, 75]), np.array([75, 75, 75, 75])
     CRAWL128 = 'crawl', 128, np.array([0, 64, 32, 96]), np.array([96, 96, 96, 96])
+    CRAWL1000 = 'crawl', 1000, np.array([0, 500, 250, 750]), np.array([750, 750, 750, 750])
 
     # constructor function for each gait
     def __init__(self, name: str, num_segment: int, stance_offsets: np.ndarray, stance_durations: np.ndarray) -> None:
@@ -142,7 +144,7 @@ class GaitControllerNode(Node):
     def __init__(self):
         super().__init__('gait_controller') # every node is a child of the Node class
         
-        self.current_gait = Gait.CRAWL64
+        self.current_gait = Gait.CRAWL1000
         self.iterations_between_mpc = LinearMpcConfig.iteration_between_mpc
         
         self.dt_control = LinearMpcConfig.dt_control

@@ -9,7 +9,7 @@ from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from cheetah_ros2.robot_configs import THexConfig
 
 class SwingController(Node):
-    # ... (Initialization and ROS 2 subscriptions) ...
+
     def __init__(self):
         super().__init__('swing_controller')
         
@@ -32,10 +32,17 @@ class SwingController(Node):
         
         # Hip offsets [FL, FR, BL, BR]
         self.hip_offsets_local = np.array([
-            [-0.059512,  0.078854,  0.000000],  # (fl_hip_joint)
-            [ 0.059512,  0.078854,  0.000533],  # (fr_hip_joint)
-            [-0.053162, -0.127110,  0.000000],  # (bl_hip_joint)
-            [ 0.053162, -0.127110,  0.000533]   # (br_hip_joint)
+            [-0.059512,  0.078854,  self.target_z],  # (fl_hip_joint)
+            [ 0.059512,  0.078854,  self.target_z],  # (fr_hip_joint)
+            [-0.053162, -0.127110,  self.target_z],  # (bl_hip_joint)
+            [ 0.053162, -0.127110,  self.target_z]   # (br_hip_joint)
+        ])
+
+        self.sprawl_offsets_local = np.array([
+            [-0.08,  0.00,  0.0],  # FL: Forward and Left
+            [0.08,  0.00,  0.0],  # FR: Forward and Right
+            [-0.08, -0.00,  0.0],  # BL: Backward and Left
+            [0.08, -0.00,  0.0]   # BR: Backward and Right
         ])
         
         self.pub_torques = self.create_publisher(Float64MultiArray, '/swing_torques', 1)
@@ -106,24 +113,30 @@ class SwingController(Node):
         ])
         
         hip_local = self.hip_offsets_local[leg_idx] 
-        p_h_global = p_com + (R_mat @ hip_local)
+        sprawl_local = self.sprawl_offsets_local[leg_idx]
+        
+        p_resting_local = hip_local + sprawl_local
+        p_h_global = p_com + (R_mat @ p_resting_local)
+        # self.get_logger().info(f'leg_idx={leg_idx}, robot_com={p_com}, hip_computed_global={p_h_global}')
         
         # --- Raibert Heuristic Term ---
         raibert_term = (stance_time / 2.0) * v_des[0:2]
-        z_0 = p_com[2]
-        if z_0 < 0.01:
-            z_0 = 0.01 
+        z_0 = self.target_z
+        # if z_0 < 0.01:
+        #     z_0 = 0.01 
             
         time_constant = math.sqrt(z_0 / self.g)
         capture_term = time_constant * (v_com[0:2] - v_des[0:2])
-        
+
         # --- Combine and Clamp (Bounding Box) ---
         p_step_rel = raibert_term + capture_term
+        # self.get_logger().info(f'raibert_term={raibert_term}, capture_term={capture_term}, p_step_rel(before clamp)={p_step_rel}')
         
         # NOTE: i need to set the bounding box experimentally
         p_rel_max = 0.06
         p_step_rel[0] = np.clip(p_step_rel[0], -p_rel_max, p_rel_max)
         p_step_rel[1] = np.clip(p_step_rel[1], -p_rel_max, p_rel_max)
+        # self.get_logger().info(f'Foot Placement Debug: p_step_rel(after clamp)={p_step_rel}')
         
         p_step_global = np.zeros(3)
         p_step_global[0] = p_h_global[0] + p_step_rel[0]

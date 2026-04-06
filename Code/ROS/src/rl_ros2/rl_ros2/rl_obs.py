@@ -41,7 +41,7 @@ class RLObs(Node):
 
         # subscribers
         self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
-        self.create_subscription(Imu, '/imu/data', self.imu_cb, 1)
+        self.create_subscription(Imu, '/imu_sensor_broadcaster/imu', self.imu_cb, 1)
         self.create_subscription(Float64MultiArray, '/rl/actions', self.actions_cb, 1) 
         self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) 
 

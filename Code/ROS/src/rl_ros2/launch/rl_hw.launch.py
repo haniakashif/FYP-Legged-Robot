@@ -52,6 +52,13 @@ def generate_launch_description():
         output="screen",
     )
 
+    load_imu_sensor_broadcaster = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["imu_sensor_broadcaster", "--controller-manager", "/controller_manager"],
+        output="screen",
+    )
+
     load_joint_group_position_controller = Node(
         package="controller_manager",
         executable="spawner",
@@ -95,7 +102,8 @@ def generate_launch_description():
     return LaunchDescription([
         rsp_node,                             
         controller_manager_node,
-        load_joint_state_broadcaster,          
+        load_joint_state_broadcaster,   
+        load_imu_sensor_broadcaster,       
         load_joint_group_position_controller,  
         rl_obs,
         rl_policy,

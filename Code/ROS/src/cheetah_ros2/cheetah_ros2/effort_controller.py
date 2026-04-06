@@ -19,7 +19,7 @@ class EffortController(Node):
         self.sub_stance = self.create_subscription(Float64MultiArray, '/stance_torques', self.stance_cb, 1)
         self.sub_swing = self.create_subscription(Float64MultiArray, '/swing_torques', self.swing_cb, 1)
         
-        # we are nesting this topic due to the specific structure of ros2_control library. for that, I have configured JointGroupEffortController as forward_efort_controller, that basically makes a folder of the controller running (we might have multiple controllers so the library has a standrad structure)
+        # we are nesting this topic due to the specific structure of ros2_control library. for that, I have configured JointGroupEffortController as forward_efort_controller, that basically makes a folder of the controller running (we might have multiple controllers so the library has a standard structure)
         
         # for that controller, Gazebo reads the .yaml file and opens up a listener topic at /<controller_name>/commands
         self.pub_torques = self.create_publisher(Float64MultiArray, '/forward_effort_controller/commands', 1)
@@ -70,16 +70,19 @@ class EffortController(Node):
         
         # for leg_idx in range(4):
         #     # Calculate the starting index for this specific leg's joints (0, 3, 6, 9)
-        #     joint_offset = leg_idx * 3 
+        #     joint_offset = leg_idx * 3
+        #     joint_offset_hip = joint_offset + 0
+        #     joint_offset_knee = joint_offset + 1
+        #     joint_offset_foot = joint_offset + 2 
             
         #     # Check the FSM state for this leg
         #     if self.modified_contacts[leg_idx] == 0.0:
         #         # STATE: SWING. Apply the wiggle torque to the Knee joint.
-        #         torques[joint_offset + 1] = swing_torque
+        #         torques[joint_offset_foot] = swing_torque
                 
         #     else:
         #         # STATE: STANCE. Lock the leg (0.0 torque).
-        #         torques[joint_offset + 1] = 0.0 
+        #         torques[joint_offset_foot] = 0.8
                 
         # msg_torques.data = torques
         # self.pub_torques.publish(msg_torques)
