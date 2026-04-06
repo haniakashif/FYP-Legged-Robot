@@ -45,6 +45,13 @@ class StanceController(Node):
         self.alpha_W = THexConfig.alpha
         self.beta_W = THexConfig.beta
         self.f_prev = np.zeros(12)
+        
+        # Variances for stance (c) and swing (c_bar) transitions
+        # These dictate how "steep" the erf curve is at touchdown and liftoff
+        self.sigma_c0 = THexConfig.sigma_c0
+        self.sigma_c1 = THexConfig.sigma_c1
+        self.sigma_cbar0 = THexConfig.sigma_cbar0
+        self.sigma_cbar1 = THexConfig.sigma_cbar1
 
         self.pub_torques = self.create_publisher(Float64MultiArray, '/stance_torques', 1)
         
@@ -94,11 +101,11 @@ class StanceController(Node):
         
         # Variances for stance (c) and swing (c_bar) transitions
         # These dictate how "steep" the erf curve is at touchdown and liftoff
-        sigma_c0 = 0.05
-        sigma_c1 = 0.05
-        sigma_cbar0 = 0.05
-        sigma_cbar1 = 0.05
-        
+        sigma_c0 = self.sigma_c0
+        sigma_c1 = self.sigma_c1
+        sigma_cbar0 = self.sigma_cbar0
+        sigma_cbar1 = self.sigma_cbar1
+
         for i in range(4):
             # Check if leg is in Stance (s_phi = 1.0) or Swing (s_phi = 0.0)
             if self.fsm_state[i] == 1.0: 

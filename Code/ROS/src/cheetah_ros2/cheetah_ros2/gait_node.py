@@ -79,7 +79,7 @@ class Gait(Enum):
         
         # 4 legs with 1 step horizon
         gait_table = np.zeros(4 * self.__mpc_horizon, dtype=np.float32)
-        # flattens the 2D table into 1D and determines if leg closer to stance then it shuld be in stance and same for swing.
+        # flattens the 2D table into 1D and determines if leg closer to stance then it should be in stance and same for swing.
         for i in range(self.__mpc_horizon):
             # i_horizon is the gait segment for the ith step of horizon
             i_horizon = (i + 1 + self.iteration) % self.num_segment # looking ahead to determine phase

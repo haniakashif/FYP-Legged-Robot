@@ -45,7 +45,7 @@ class THexConfig(RobotConfig):
     
     # NOTE: the following parameters are somewhat hardcoded
     # choosing arbitrary value by considering moment arm to be straight and without intermediate angles (0.94140000000000001 * 3) / (0.02845 + 0.05439 + 0.02637 + 0.09265)
-    fz_max = 13.9908847716239
+    fz_max = 14
     fz_min = 0.5
 
     # How high the foot lifts during a step (meters)
@@ -65,3 +65,10 @@ class THexConfig(RobotConfig):
     S = np.diag([1.0, 1.0, 1.0, 10.0, 10.0, 10.0])
     alpha = 1e-4 * np.eye(12) 
     beta = 1e-3 * np.eye(12)
+    
+    # Variances for stance (c) and swing (c_bar) transitions
+    # These dictate how "steep" the erf curve is at touchdown and liftoff
+    sigma_c0 = 0.05
+    sigma_c1 = 0.05
+    sigma_cbar0 = 0.05
+    sigma_cbar1 = 0.05
