@@ -145,5 +145,5 @@ def generate_launch_description():
         rl_obs,
         rl_policy,
         rl_action,
-        flight_recorder
+        # flight_recorder
     ])

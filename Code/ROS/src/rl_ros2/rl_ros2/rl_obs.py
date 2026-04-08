@@ -86,7 +86,7 @@ class RLObs(Node):
         if any(v is None for v in self.joint_states.values()):
             return
 
-        self.get_logger().info("Publishing observation...")
+        # self.get_logger().info("Publishing observation...")
     
         obs_list = []
         # observation format [ang_vel, projected_gravity, command, joint_pos, last_action]

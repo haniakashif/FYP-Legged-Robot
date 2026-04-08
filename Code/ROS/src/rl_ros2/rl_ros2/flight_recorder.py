@@ -73,7 +73,7 @@ class FlightRecorder(Node):
             return
 
         # Create directory
-        save_dir = "/workspaces/FYP-Legged-Robot/Code/logs"
+        save_dir = "../logs"
         os.makedirs(save_dir, exist_ok=True)
         
         # Filename with timestamp

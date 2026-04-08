@@ -9,7 +9,7 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "/workspaces/FYP-Legged-Robot/Code/Policies/2026-03-27_02-44-09_v1.onnx"
+        self.onnx_path = "../Policies/2026-03-27_02-44-09_v1.onnx"
 
         self.obs_dim = 33 # hardcoded in training
 
@@ -36,10 +36,10 @@ class RLPolicy(Node):
             self.get_logger().warn(f"Obs dimension mismatch! Expected {self.obs_dim}, got {len(obs)}")
             return
 
-        self.get_logger().info("Received observation, running policy...")
+        # self.get_logger().info("Received observation, running policy...")
 
         if (obs[6:9] == 0.0).all(): # if user command is zero, publish zero actions to avoid unintended movement
-            self.get_logger().info("Zero command received, publishing zero actions.")
+            # self.get_logger().info("Zero command received, publishing zero actions.")
             self.action_pub.publish(Float64MultiArray(data=[0.0 for _ in range(12)]))
             return
 
@@ -50,9 +50,9 @@ class RLPolicy(Node):
         outputs = self.ort_session.run(None, {self.input_name: input_tensor})
         raw_actions = outputs[0][0] # Remove batch dim
 
-        self.get_logger().info(f"Actions:")
-        for i, action in enumerate(raw_actions):
-            self.get_logger().info(f"  Action {i}: {action:.4f}")
+        # self.get_logger().info(f"Actions:")
+        # for i, action in enumerate(raw_actions):
+        #     self.get_logger().info(f"  Action {i}: {action:.4f}")
 
         out_msg = Float64MultiArray()
         out_msg.data = raw_actions.tolist()

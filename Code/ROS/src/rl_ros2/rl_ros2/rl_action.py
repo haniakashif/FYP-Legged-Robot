@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+import math
 
 class RLAction(Node):
     def __init__(self):
@@ -29,6 +30,11 @@ class RLAction(Node):
         target_positions = [(a * self.action_scale) + self.default_pos for a in actions]
 
         # can possibly add a clipping here to limit target_pos within joint limits
+        for i in range(len(target_positions)):
+            if i < 4: # hip joints
+                target_positions[i] = max(-math.pi/4, min(math.pi/4, target_positions[i]))
+            else:
+                target_positions[i] = max(-math.pi/2, min(math.pi/2, target_positions[i]))
 
         # Publish the single array to ros2_control
         msg_out = Float64MultiArray()
