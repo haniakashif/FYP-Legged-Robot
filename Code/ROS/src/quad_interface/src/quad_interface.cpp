@@ -26,6 +26,17 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     hw_states_.resize(info_.joints.size(), 0.0);
     hw_commands_.resize(info_.joints.size(), 0.0);
 
+    if (fir_coeffs_.empty()) {
+        RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "fir_coeffs_ must contain at least one tap.");
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+
+    state_history_.clear();
+    state_history_.resize(info_.joints.size());
+    for (auto & history : state_history_) {
+        history.assign(fir_coeffs_.size(), 0.0);
+    }
+
     // 2. Open the physical UART serial port (/dev/serial0) and the USB port (/dev/ttyUSB0) on the Raspberry Pi 
     serial_fd_ = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY);
     if (serial_fd_ < 0) {
@@ -298,8 +309,20 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
             // 4.096V range / 2047 steps = 0.002V per step
             double voltage = raw_adc * 0.002;
 
-            // TODO for Point 2: Convert 'voltage' to 'radians' using your custom motor bounds!
-            hw_states_[joint_index] = calibrations_[joint_index].volt_slope * voltage + calibrations_[joint_index].volt_intercept;
+            double raw_state = calibrations_[joint_index].volt_slope * voltage + calibrations_[joint_index].volt_intercept;
+
+            // FIR filter: push newest state, drop oldest, then compute dot product.
+            auto & history = state_history_[joint_index];
+            if (history.size() >= fir_coeffs_.size()) {
+                history.pop_back();
+            }
+            history.push_front(raw_state);
+
+            double filtered_state = 0.0;
+            for (size_t tap = 0; tap < fir_coeffs_.size() && tap < history.size(); ++tap) {
+                filtered_state += fir_coeffs_[tap] * history[tap];
+            }
+            hw_states_[joint_index] = filtered_state;
             
             joint_index++;
         }

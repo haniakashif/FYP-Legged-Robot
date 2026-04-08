@@ -1,6 +1,7 @@
 #ifndef QUAD_INTERFACE__QUAD_INTERFACE_HPP_
 #define QUAD_INTERFACE__QUAD_INTERFACE_HPP_
 
+#include <deque>
 #include <vector>
 #include <string>
 
@@ -42,6 +43,9 @@ public:
   hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
+  std::vector<double> fir_coeffs_ = {0.035445281711098,-0.139943584023538,0.609060988977394,0.609060988977394,-0.139943584023538,0.035445281711098};
+  std::vector<std::deque<double>> state_history_;
+
   // Memory arrays to hold the 12 joint positions
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_;
