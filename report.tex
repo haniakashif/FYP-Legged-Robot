@@ -1,0 +1,133 @@
+% adapted by WS from SSR's Word document and from the 5-part series at
+% https://www.overleaf.com/learn/latex/How_to_Write_a_Thesis_in_LaTeX_(Part_1):_Basic_Structure
+% reviewed by MAM
+
+\documentclass[12pt,twoside]{report}
+
+\usepackage[titletoc]{appendix} % for adding appendix to TOC
+\usepackage[backend=biber]{biblatex}  % reference management
+\usepackage{geometry}  % better margins and margin control
+\usepackage{graphicx}  % to include figures
+\usepackage{hyperref}  % internal and external links
+\usepackage[utf8]{inputenc}  % support for non-ASCII characters
+\usepackage[T1]{fontenc}  % proper encoding for special characters
+\usepackage{listings}  % typset code
+\usepackage{outlines}  % easy nesting of lists
+\usepackage{tabularx}  % more control over table column width
+\usepackage{titlesec}  % customize chapter title 
+\usepackage{upquote}  % prevent mishandling of single quotes in listings
+\usepackage{amsmath}
+\usepackage{amssymb}  % for \mathbb
+\usepackage{float}
+\usepackage{xcolor}  % for colors
+\usepackage{colortbl}  % for \cellcolor in tables
+\usepackage{booktabs}  % for \addlinespace in tables
+% TODO: Customize the appearance of hyperref links using \hypersetup
+% See https://en.wikibooks.org/wiki/LaTeX/Hyperlinks#Customization
+
+% Custom format of chapter title.
+\titleformat{\chapter}[hang]{\bf\huge}{\thechapter.}{2pc}{}
+
+
+% Reduce spacing around sections
+\titlespacing*{\chapter}{0pt}{-30pt}{20pt}
+\titlespacing*{\section}{0pt}{12pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+
+% Separate folder for images named 'images'.
+\graphicspath{ {images/} }
+
+% Separate file for references
+\addbibresource{references.bib}
+
+% Replace with your title
+\title{Quadruped Locomotion in Rough Terrain and Confined Environments}
+
+% Allow recalling document title
+% from https://tex.stackexchange.com/a/15806/44301
+\makeatletter\let\Title\@title\makeatother  
+
+\begin{document}
+
+\include{titlepage}  % title page.
+\include{approval}  % approval page.
+
+\chapter*{Dedication}
+Our work is dedicated to those that don’t bend, don’t water it down, don’t try to make it logical, don’t edit their own souls according to the fashion; rather, they follow their most intense obsessions mercilessly.
+
+(Quote taken from Franz Kafka)
+
+\chapter*{Acknowledgements}
+There are far too many wonderful people to thank here that made this project not just possible but victorious. Some of these, however, deserve special mention, so here they are.
+
+We begin with the titular protagonist: the \textit{Leegit Robot}, also known as the Lynxmotion T-Hex 3DoF Hexapod. Our gratitude is insurmountable towards it for existing in the first place to set our FYP into motion. Its resilience throughout our countless experiments, failed and successful, will be remembered dearly. We hope that whoever inherits it for future work will take it to grander heights.
+
+Next, we would like to thank our supervisors Dr. Saleha Raza and Dr. Basit Memon for their unwavering support and guidance, amid uncountable difficulties particularly during inception, throughout Kaavish. It was because of their insights and feedback that we stayed focused as we journeyed through the trials and tribulations of our capstone. Additionally, we are also grateful to our co-supervisor Mr. Tabsheer Ali Askari for his devotion to planning and assessing progress as well as managing the testbed developments. 
+
+Beyond that, we must mention our university friends for sticking around and being fun to talk to about their own capstones, wonderful and not-so-wonderful coursework, plans after graduation, and sundries. Similarly, we extend our gratitude towards the many brilliant faculty from DSSE and AHSS both that, with their teachings within and outside the classroom from algorithms to art, inspired us to become who we are. Furthermore, we cannot forget the patience and moral support of our families during times of distress, discombobulation, and disenchantment. And, to all the lovely folk of the world who produced art, music, film, games, and literature that remind us of what it means to live life for beyond university and work, thank you.  
+
+Lastly, to the reader, who may be a student looking for inspiration on their own FYP, know that the capstone will be, quite literally, an experience to remember for the rest of your \textbf{life.}  
+
+\chapter*{Abstract}
+Mobile robots are widely used for inspection, exploration, and search and rescue missions. Legged robots, in contrast to wheeled robots, have the added benefit of legged locomotion which allows them to tackle a wide variety of different terrains that a wheeled robot cannot. Caves, abandoned tunnels, and collapsed buildings are examples of environments that consist of such terrain. Using an existing hobby-grade quadruped robot kit, we sought to make it capable of traversing rough terrain and navigate through confined spaces. We created a complete simulation package for the robot, which was previously missing. We augmented the hardware kit with mounts for our compute modules and sensors to obtain feedback required for robust locomotion. For locomotion in rough terrain, we tested classical control techniques, learning-based approaches, and evolutionary algorithms. To allow the robot to navigate through confined spaces, like crawling under an obstacle or squeezing through a narrow gap, we used a depth camera for perceiving the immediate terrain and deciding on a posture that was used to constrain the locomotion algorithms to ensure the robot moved with a height and width that did not collide with the environment. Thanks to our simulation package, we were able to rapidly test our algorithms, without the added hassle and risk of testing on hardware. 
+
+% The following are automatically populated by LaTeX \chapter, \section and related, \figure, and \table.
+\tableofcontents
+\listoffigures
+\listoftables
+
+\chapter{Introduction}
+\label{chap:intro}
+\input{chapters/introduction}
+
+\chapter{Literature Review}
+\label{chap:lit}
+\input{chapters/review}
+
+\chapter{Software Requirement Specification (SRS)}
+\label{chap:srs}
+\input{chapters/srs}
+
+\chapter{Software Design Specification (SDS)}
+\label{chap:sds}
+\input{chapters/sds}
+
+\chapter{Methodology, Experiments and Results}
+\label{chap:results}
+\input{chapters/results}
+
+\chapter{Conclusion and Future Work}
+\label{chap:outro}
+\input{chapters/conclusion}
+
+\chapter{Reflection}
+\label{chap:Reflection}
+\input{chapters/reflection}
+
+% \begin{appendices}
+
+% \titleformat{\chapter}[hang]{\bf\huge}{Appendix \thechapter.}{2pc}{}
+  
+% % This appendix is optional.
+% \chapter{More Math}
+% \input{chapters/appendix-math}
+
+% % This appendix is required if the data set is not fully described in the main text.
+% \chapter{Data}
+% \input{chapters/appendix-data}
+
+% % This appendix is required if the code is not fully described in the main text.
+% \chapter{Code}
+% \input{chapters/appendix-code}
+% \end{appendices}
+
+% Print the bibliography with a ToC entry and titled, "References".
+\printbibliography[heading=bibintoc,title={References}]
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
