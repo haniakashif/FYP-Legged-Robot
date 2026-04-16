@@ -12,10 +12,9 @@ SETTLING_TIME = 1.0 # Seconds to ignore after a command change
 YAML_FILENAME = 'joint_calibration.yaml'
 
 JOINTS = [
-    "fr_hip", "fr_knee", "fr_foot",
-    "br_hip", "br_knee", "br_foot",
-    "fl_hip", "fl_knee", "fl_foot",
-    "bl_hip", "bl_knee", "bl_foot"
+    "bl_hip", "br_hip", "fl_hip", "fr_hip",
+    "bl_knee", "br_knee", "fl_knee", "fr_knee",
+    "bl_foot", "br_foot", "fl_foot", "fr_foot"
 ]
 
 def main():
