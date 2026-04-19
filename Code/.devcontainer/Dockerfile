@@ -75,7 +75,16 @@ RUN groupadd --gid $USER_GID $USERNAME \
 RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USERNAME/.bashrc \
     && echo "source /opt/gz_control_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
     
-    
+# 8. Install RViz and visualization dependencies (for debugging and visualization purposes)
+RUN apt-get update && apt-get install -y \
+    ros-humble-rviz2 \
+    ros-humble-visualization-msgs \
+    ros-humble-geometry-msgs \
+    mesa-utils \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    x11-apps \
+    && rm -rf /var/lib/apt/lists/*
     
 # Switch user
 USER $USERNAME

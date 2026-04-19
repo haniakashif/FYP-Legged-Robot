@@ -9,6 +9,10 @@ from scipy import sparse
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from cheetah_ros2.robot_configs import THexConfig
 
+# for debugging
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point
+
 class StanceController(Node):
     def __init__(self):
         super().__init__('stance_controller')
@@ -51,6 +55,8 @@ class StanceController(Node):
         self.sigma_cbar1 = THexConfig.sigma_cbar1
 
         self.pub_torques = self.create_publisher(Float64MultiArray, '/stance_torques', 1)
+        self.pub_markers = self.create_publisher(Marker, '/com_target_markers', 1) # for debugging
+        self.pub_support_polygon = self.create_publisher(Marker, '/support_polygon_markers', 1) # for debugging
         
         self.sub_state = self.create_subscription(Float64MultiArray, '/estimated_robot_state', self.state_cb, 1)
         self.sub_foot = self.create_subscription(Float64MultiArray, '/foot_positions', self.foot_cb, 1)
@@ -85,69 +91,222 @@ class StanceController(Node):
         # self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
         self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
 
+    # for debugging
+    def publish_target_marker(self, p_target: np.ndarray):
+
+        marker = Marker()
+        # 'odom' is your global fixed frame from the Gazebo bridge
+        marker.header.frame_id = 'odom' 
+        marker.header.stamp = self.get_clock().now().to_msg()
+        
+        # Give each leg its own namespace and ID so they don't overwrite each other
+        marker.ns = 'desired_com'
+        marker.id = 4
+        
+        marker.type = Marker.SPHERE
+        marker.action = Marker.ADD
+        
+        # Set the position
+        marker.pose.position.x = float(p_target[0])
+        marker.pose.position.y = float(p_target[1])
+        marker.pose.position.z = float(p_target[2])
+        
+        # Set orientation to default
+        marker.pose.orientation.w = 1.0
+        
+        # Scale: A 4cm diameter sphere
+        marker.scale.x = 0.04
+        marker.scale.y = 0.04
+        marker.scale.z = 0.04
+        
+        # Color: Bright Blue (RGBA)
+        marker.color.r = 1.0
+        marker.color.g = 0.5
+        marker.color.b = 0.0
+        marker.color.a = 0.8  # Slightly transparent
+        
+        self.pub_markers.publish(marker)
+
+    def publish_support_polygon_marker(self, virtual_points: np.ndarray):
+
+        marker = Marker()
+        marker.header.frame_id = 'odom'
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = 'predictive_support_polygon'
+        marker.id = 0
+        marker.type = Marker.LINE_STRIP
+        marker.action = Marker.ADD
+
+        marker.scale.x = 0.012
+
+        marker.color.r = 0.1
+        marker.color.g = 0.9
+        marker.color.b = 0.2
+        marker.color.a = 0.9
+
+        center_xy = np.mean(virtual_points[:, :2], axis=0)
+        angles = np.arctan2(virtual_points[:, 1] - center_xy[1], virtual_points[:, 0] - center_xy[0])
+        ordered_indices = np.argsort(angles)
+        ordered_points = virtual_points[ordered_indices]
+
+        for point_xyz in ordered_points:
+            point = Point()
+            point.x = float(point_xyz[0])
+            point.y = float(point_xyz[1])
+            point.z = float(point_xyz[2])
+            marker.points.append(point)
+
+        if len(marker.points) > 0:
+            marker.points.append(marker.points[0])
+
+        self.pub_support_polygon.publish(marker)
+
+    def publish_command_velocity_marker(self, p_com: np.ndarray, v_des_world: np.ndarray):
+        marker = Marker()
+        marker.header.frame_id = 'odom'
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = 'commanded_velocity'
+        marker.id = 0
+        marker.type = Marker.ARROW
+
+        speed = np.linalg.norm(v_des_world)
+        if speed < 1e-6:
+            marker.action = Marker.DELETE
+            self.pub_markers.publish(marker)
+            return
+
+        marker.action = Marker.ADD
+        marker.pose.orientation.w = 1.0
+
+        # Arrow length scales with speed while keeping a visible minimum.
+        arrow_length = max(0.08, 0.6 * speed)
+        direction = v_des_world / speed
+
+        start = Point()
+        start.x = float(p_com[0])
+        start.y = float(p_com[1])
+        start.z = float(p_com[2] + 0.05)
+
+        end = Point()
+        end.x = float(start.x + arrow_length * direction[0])
+        end.y = float(start.y + arrow_length * direction[1])
+        end.z = float(start.z)
+
+        marker.points = [start, end]
+
+        marker.scale.x = 0.01  # shaft diameter
+        marker.scale.y = 0.02  # head diameter
+        marker.scale.z = 0.03  # head length
+
+        marker.color.r = 0.95
+        marker.color.g = 0.2
+        marker.color.b = 0.2
+        marker.color.a = 0.95
+
+        self.pub_markers.publish(marker)
+
+    # def compute_desired_COM(self) -> np.ndarray:
+
+    #     weights = np.zeros(4)
+    #     sqrt_2 = math.sqrt(2.0)
+    #     virtual_points = np.zeros((4, 3))
+        
+    #     # Variances for stance (c) and swing (c_bar) transitions
+    #     # These dictate how "steep" the erf curve is at touchdown and liftoff
+    #     sigma_c0 = self.sigma_c0
+    #     sigma_c1 = self.sigma_c1
+    #     sigma_cbar0 = self.sigma_cbar0
+    #     sigma_cbar1 = self.sigma_cbar1
+
+    #     for i in range(4):
+    #         # check if leg is in stance (s_phi = 1.0) or swing (s_phi = 0.0)
+    #         if self.fsm_state[i] == 1.0: 
+    #             phi = self.stance_phases[i]
+    #             weights[i] = 0.5 * (math.erf(phi / (sigma_c0 * sqrt_2)) + 
+    #                                 math.erf((1.0 - phi) / (sigma_c1 * sqrt_2)))
+    #         else: 
+    #             phi = self.swing_phases[i]
+    #             # during swing, weight drops to 0 in the middle, but rises to 0.5 at the edges
+    #             weights[i] = 0.5 * (2.0 + 
+    #                                 math.erf(-phi / (sigma_cbar0 * sqrt_2)) + 
+    #                                 math.erf((phi - 1.0) / (sigma_cbar1 * sqrt_2)))
+                    
+    #     # rows: [FL, FR, BL, BR], cols: [x, y, z], in world frame
+    #     p_foot = self.foot_positions.reshape(4, 3)  
+    #     # print(p_foot)
+        
+    #     # (current foot position, adjacent clockwise foot, adjacent counter-clockwise foot)
+    #     foot_pos = [
+    #         (p_foot[0], p_foot[1], p_foot[2]),
+    #         (p_foot[1], p_foot[3], p_foot[0]),
+    #         (p_foot[2], p_foot[0], p_foot[3]),
+    #         (p_foot[3], p_foot[2], p_foot[1])
+    #     ]
+        
+    #     foot_weights = [
+    #         (weights[0], weights[1], weights[2]),
+    #         (weights[1], weights[3], weights[0]),
+    #         (weights[2], weights[0], weights[3]),
+    #         (weights[3], weights[2], weights[1])
+    #     ]
+        
+    #     for i in range(4):
+    #         neg_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][2]
+    #         pos_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][1]
+            
+    #         numer = foot_weights[i][0]*foot_pos[i][0] + neg_vp*foot_weights[i][2] + pos_vp*foot_weights[i][1]
+    #         denom = foot_weights[i][0] + foot_weights[i][2] + foot_weights[i][1]
+    #         v_point = numer / denom
+    #         virtual_points[i] = v_point
+        
+    #     self.publish_support_polygon_marker(virtual_points)
+    #     p_c_bar = np.mean(virtual_points, axis=0)
+          
+    #     avg_foot_z = np.mean([
+    #         p_foot[0][2], 
+    #         p_foot[1][2], 
+    #         p_foot[2][2], 
+    #         p_foot[3][2]
+    #     ])
+
+    #     desired_z = avg_foot_z + self.target_z
+
+    #     # NOTE: this won't entirely work for sloped terrain
+    #     p_c_d = np.array([p_c_bar[0], p_c_bar[1], desired_z])
+        
+    #     # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}')
+    #     self.publish_target_marker(p_c_d) # for debugging
+
+    #     return p_c_d
+
+    # # for testing, just compute the centroid of the stance foot positions for x and y
     def compute_desired_COM(self) -> np.ndarray:
 
-        weights = np.zeros(4)
-        sqrt_2 = math.sqrt(2.0)
-        virtual_points = np.zeros((4, 3))
-        
-        # Variances for stance (c) and swing (c_bar) transitions
-        # These dictate how "steep" the erf curve is at touchdown and liftoff
-        sigma_c0 = self.sigma_c0
-        sigma_c1 = self.sigma_c1
-        sigma_cbar0 = self.sigma_cbar0
-        sigma_cbar1 = self.sigma_cbar1
+        p_foot = self.foot_positions.reshape(4, 3)
 
+        stance_foot_positions = []
         for i in range(4):
-            # check if leg is in stance (s_phi = 1.0) or swing (s_phi = 0.0)
             if self.fsm_state[i] == 1.0: 
-                phi = self.stance_phases[i]
-                weights[i] = 0.5 * (math.erf(phi / (sigma_c0 * sqrt_2)) + 
-                                    math.erf((1.0 - phi) / (sigma_c1 * sqrt_2)))
-            else: 
-                phi = self.swing_phases[i]
-                # during swing, weight drops to 0 in the middle, but rises to 0.5 at the edges
-                weights[i] = 0.5 * (2.0 + 
-                                    math.erf(-phi / (sigma_cbar0 * sqrt_2)) + 
-                                    math.erf((phi - 1.0) / (sigma_cbar1 * sqrt_2)))
-                    
-        # rows: [FL, FR, BL, BR], cols: [x, y, z], in world frame
-        p_foot = self.foot_positions.reshape(4, 3)  
-        # print(p_foot)
-        
-        # (current foot position, adjacent clockwise foot, adjacent counter-clockwise foot)
-        foot_pos = [
-            (p_foot[0], p_foot[1], p_foot[2]),
-            (p_foot[1], p_foot[3], p_foot[0]),
-            (p_foot[2], p_foot[0], p_foot[3]),
-            (p_foot[3], p_foot[2], p_foot[1])
-        ]
-        
-        foot_weights = [
-            (weights[0], weights[1], weights[2]),
-            (weights[1], weights[3], weights[0]),
-            (weights[2], weights[0], weights[3]),
-            (weights[3], weights[2], weights[1])
-        ]
-        
-        for i in range(4):
-            neg_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][2]
-            pos_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][1]
-            
-            numer = foot_weights[i][0]*foot_pos[i][0] + neg_vp*foot_weights[i][2] + pos_vp*foot_weights[i][1]
-            denom = foot_weights[i][0] + foot_weights[i][2] + foot_weights[i][1]
-            v_point = numer / denom
-            virtual_points[i] = v_point
-        
-        # print("Virtual Points:\n", virtual_points)
-        p_c_bar = np.mean(virtual_points, axis=0)
-          
+                stance_foot_positions.append(p_foot[i])
+
+        if len(stance_foot_positions) > 0:
+            desired_x = np.mean([pos[0] for pos in stance_foot_positions])
+            desired_y = np.mean([pos[1] for pos in stance_foot_positions])
+        else:
+            desired_x = self.robot_state[0]
+            desired_y = self.robot_state[1]
+
+        avg_foot_z = np.mean(p_foot[:, 2])
+        desired_z = avg_foot_z + self.target_z
+
         # NOTE: this won't entirely work for sloped terrain
-        p_c_d = np.array([p_c_bar[0], p_c_bar[1], self.target_z])
+        # p_c_d = np.array([desired_x, desired_y, desired_z])
+        p_c_d = np.array([self.robot_state[0], self.robot_state[1], desired_z]) 
         
+        # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}'))
+        self.publish_target_marker(p_c_d) # for debugging
+
         return p_c_d
-    
-        
         
     def balance_controller(self, p_c_d: np.ndarray) -> np.ndarray:
         
@@ -188,6 +347,9 @@ class StanceController(Node):
             [math.sin(current_yaw),  math.cos(current_yaw), 0.0],
             [0.0,                    0.0,                   1.0]
         ])
+
+        v_des_world = R_yaw @ v_des
+        self.publish_command_velocity_marker(p_com, v_des_world)
         
         # target yaw is current yaw + (commanded rate * timestep)
         yaw_des = current_yaw + (self.cmd_yaw_turn_rate * self.dt_control)
@@ -351,6 +513,7 @@ class StanceController(Node):
             tau += -J_i.T @ f_i
 
         msg_tau = Float64MultiArray()
+        tau = np.clip(tau, -0.9414, 0.9414) 
         msg_tau.data = tau.tolist()
         self.pub_torques.publish(msg_tau)
         

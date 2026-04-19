@@ -8,6 +8,10 @@ from std_msgs.msg import Float64MultiArray, Float64
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from cheetah_ros2.robot_configs import THexConfig
 
+# for debugging
+from visualization_msgs.msg import Marker
+from geometry_msgs.msg import Point
+
 class SwingController(Node):
 
     def __init__(self):
@@ -32,10 +36,10 @@ class SwingController(Node):
         
         # Hip offsets [FL, FR, BL, BR]
         self.hip_offsets_local = np.array([
-            [-0.059512,  0.078854,  self.target_z],  # (fl_hip_joint)
-            [ 0.059512,  0.078854,  self.target_z],  # (fr_hip_joint)
-            [-0.053162, -0.127110,  self.target_z],  # (bl_hip_joint)
-            [ 0.053162, -0.127110,  self.target_z]   # (br_hip_joint)
+            [-0.059512,  0.078854,  0],  # (fl_hip_joint)
+            [ 0.059512,  0.078854,  0],  # (fr_hip_joint)
+            [-0.053162, -0.127110,  0],  # (bl_hip_joint)
+            [ 0.053162, -0.127110,  0]   # (br_hip_joint)
         ])
 
         self.sprawl_offsets_local = np.array([
@@ -46,6 +50,9 @@ class SwingController(Node):
         ])
         
         self.pub_torques = self.create_publisher(Float64MultiArray, '/swing_torques', 1)
+
+        # for debugging
+        self.pub_markers = self.create_publisher(Marker, '/swing_foot_markers', 1)
         
         self.sub_state = self.create_subscription(Float64MultiArray, '/estimated_robot_state', self.state_cb, 1)
         self.sub_stance_time = self.create_subscription(Float64, '/gait/stance_time', self.stance_time_cb, 1)
@@ -56,7 +63,58 @@ class SwingController(Node):
         
         self.dt_control = LinearMpcConfig.dt_control
         self.timer = self.create_timer(self.dt_control, self.control_loop)
+    
+    # for debugging
+    def publish_trajectory_marker(self, leg_idx: int, stance_time: float, num_samples: int = 25):
+        marker = Marker()
+        # 'odom' is your global fixed frame from the Gazebo bridge
+        marker.header.frame_id = 'odom' 
+        marker.header.stamp = self.get_clock().now().to_msg()
         
+        # Give each leg its own namespace and ID so they don't overwrite each other
+        marker.ns = f'foot_target_{leg_idx}'
+        marker.id = leg_idx
+        
+        marker.type = Marker.LINE_STRIP
+        marker.action = Marker.ADD
+
+        marker.pose.orientation.w = 1.0
+        marker.scale.x = 0.01
+        
+        # Color: Bright Blue (RGBA)
+        marker.color.r = 0.0
+        marker.color.g = 0.5
+        marker.color.b = 1.0
+        marker.color.a = 0.8  # Slightly transparent
+
+        p0 = self.p0[leg_idx]
+        pf = self.compute_foot_placement(leg_idx, stance_time)
+        h_clearance = THexConfig.swing_height
+
+        for phase in np.linspace(0.0, 1.0, num_samples):
+            point = Point()
+            point.x = float(self._bezier_curve(phase, p0[0], pf[0])[0])
+            point.y = float(self._bezier_curve(phase, p0[1], pf[1])[0])
+
+            if phase < 0.5:
+                s_z = phase * 2.0
+                point.z = float(self._bezier_curve(s_z, p0[2], p0[2] + h_clearance)[0])
+            else:
+                s_z = (phase * 2.0) - 1.0
+                point.z = float(self._bezier_curve(s_z, p0[2] + h_clearance, pf[2])[0])
+
+            marker.points.append(point)
+        
+        self.pub_markers.publish(marker)
+
+    def clear_trajectory_marker(self, leg_idx: int):
+        marker = Marker()
+        marker.header.frame_id = 'odom'
+        marker.header.stamp = self.get_clock().now().to_msg()
+        marker.ns = f'foot_target_{leg_idx}'
+        marker.id = leg_idx
+        marker.action = Marker.DELETE
+        self.pub_markers.publish(marker)
 
     def state_cb(self, msg): 
         # self.get_logger().info(f'State Callback: Received robot state data. {msg}')
@@ -111,6 +169,7 @@ class SwingController(Node):
             [2*(x*y + z*w),       1 - 2*(x**2 + z**2), 2*(y*z - x*w)],
             [2*(x*z - y*w),       2*(y*z + x*w),       1 - 2*(x**2 + y**2)]
         ])
+        v_des_global = R_mat @ v_des
         
         hip_local = self.hip_offsets_local[leg_idx] 
         sprawl_local = self.sprawl_offsets_local[leg_idx]
@@ -119,29 +178,42 @@ class SwingController(Node):
         p_h_global = p_com + (R_mat @ p_resting_local)
         # self.get_logger().info(f'leg_idx={leg_idx}, robot_com={p_com}, hip_computed_global={p_h_global}')
         
-        # --- Raibert Heuristic Term ---
-        raibert_term = (stance_time / 2.0) * v_des[0:2]
-        z_0 = self.target_z
-        # if z_0 < 0.01:
-        #     z_0 = 0.01 
-            
-        time_constant = math.sqrt(z_0 / self.g)
-        capture_term = time_constant * (v_com[0:2] - v_des[0:2])
-
-        # --- Combine and Clamp (Bounding Box) ---
-        p_step_rel = raibert_term + capture_term
-        # self.get_logger().info(f'raibert_term={raibert_term}, capture_term={capture_term}, p_step_rel(before clamp)={p_step_rel}')
+        raibert_term = (stance_time / 2.0) * v_des_global[0:2]
         
-        # NOTE: i need to set the bounding box experimentally
+        z_0 = self.target_z
+        time_constant = math.sqrt(abs(z_0) / self.g)
+        capture_term = time_constant * (v_com[0:2] - v_des_global[0:2])
+
+        p_step_rel = raibert_term + capture_term
         p_rel_max = 0.06
         p_step_rel[0] = np.clip(p_step_rel[0], -p_rel_max, p_rel_max)
         p_step_rel[1] = np.clip(p_step_rel[1], -p_rel_max, p_rel_max)
-        # self.get_logger().info(f'Foot Placement Debug: p_step_rel(after clamp)={p_step_rel}')
         
         p_step_global = np.zeros(3)
         p_step_global[0] = p_h_global[0] + p_step_rel[0]
         p_step_global[1] = p_h_global[1] + p_step_rel[1]
-        p_step_global[2] = -0.001  # Penetrate the floor slightly to trigger the contact sensor to flip the FSM to stance mode.
+
+        # p_rel_max_y = 0.06
+        # p_step_rel[1] = np.clip(p_step_rel[1], -p_rel_max_y, p_rel_max_y)
+
+        # min_sprawl = 0.06 
+        # max_sprawl = 0.12
+
+        # p_step_global = np.zeros(3)
+        # p_step_global[0] = p_h_global[0] + p_step_rel[0]
+        # p_step_global[1] = p_h_global[1] + p_step_rel[1]
+        
+        # if leg_idx in [1, 3]:
+        #     inner_bound = p_com[0] + min_sprawl
+        #     outer_bound = p_com[0] + max_sprawl
+        #     p_step_global[0] = np.clip(p_step_global[0], inner_bound, outer_bound)
+            
+        # else: # LEFT LEGS (FL, BL)
+        #     inner_bound = p_com[0] - min_sprawl
+        #     outer_bound = p_com[0] - max_sprawl
+        #     p_step_global[0] = np.clip(p_step_global[0], outer_bound, inner_bound)
+
+        p_step_global[2] = self.p0[leg_idx][2] - 0.001  # Penetrate the floor slightly to trigger the contact sensor to flip the FSM to stance mode.
         
         return p_step_global
     
@@ -230,6 +302,8 @@ class SwingController(Node):
                 
                 p_des, v_des, a_des = self.swing_traj_gen(i, self.swing_phases[i], self.stance_time, swing_time)
                 
+                self.publish_trajectory_marker(i, self.stance_time)
+
                 p_act = self.foot_positions[i*3 : i*3+3]
                 J_i = self.foot_jacobians[i]
                 
@@ -245,8 +319,11 @@ class SwingController(Node):
                 
                 # accumulate the torques for this specific leg
                 tau_swing += tau_i
+            else:
+                self.clear_trajectory_marker(i)
                 
         msg_tau = Float64MultiArray()
+        tau_swing = np.clip(tau_swing, -0.9414, 0.9414) 
         msg_tau.data = tau_swing.tolist()
         self.pub_torques.publish(msg_tau)
     

@@ -3,7 +3,7 @@ import numpy as np
 # base parameters for controller
 class LinearMpcConfig:
     # main clock running at 1/dt_control hz
-    dt_control: float = 0.002
+    dt_control: float = 0.02
     
     iteration_between_mpc: int = 1
     dt_mpc: float = dt_control * iteration_between_mpc
@@ -23,6 +23,6 @@ class LinearMpcConfig:
 
     # user commands:
     # the user commands are such that the robot moves forward in x axis, but the sdf has +y as forward & +x as right so the commands are swapped when they are being used
-    cmd_xvel: float = 0.04
+    cmd_xvel: float = 0.08                                                                                                                                                                                                                                                                                                                                                               
     cmd_yvel: float = 0.0
     cmd_yaw_turn_rate: float = 0.0

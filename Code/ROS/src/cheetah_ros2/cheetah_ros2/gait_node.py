@@ -144,7 +144,7 @@ class GaitControllerNode(Node):
     def __init__(self):
         super().__init__('gait_controller') # every node is a child of the Node class
         
-        self.current_gait = Gait.CRAWL1000
+        self.current_gait = Gait.CRAWL100
         self.iterations_between_mpc = LinearMpcConfig.iteration_between_mpc
         
         self.dt_control = LinearMpcConfig.dt_control

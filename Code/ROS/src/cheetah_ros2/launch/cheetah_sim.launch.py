@@ -173,6 +173,20 @@ def generate_launch_description():
         parameters=[{'use_sim_time': use_sim_time}], output='screen'
     )
 
+    # =========================================================
+    # --- RVIZ VISUALIZATION (OPTIONAL) ---
+    # =========================================================
+    
+    rviz_config_file = PathJoinSubstitution([pkg_share, 'rviz', 'rviz_config.rviz'])
+    rviz_visualization = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}],
+        output='screen'
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument('use_sim_time', default_value='true', description='Use simulation clock'),
         gz_resource_path,
@@ -192,5 +206,7 @@ def generate_launch_description():
         fsm_node,
         stance_controller,
         swing_controller,
-        effort_controller
+        effort_controller,
+
+        rviz_visualization
     ])

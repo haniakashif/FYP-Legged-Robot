@@ -18,9 +18,7 @@ class EffortController(Node):
         self.sub_modified = self.create_subscription(Float64MultiArray, '/fsm_state', self.fsm_state_cb, 1)
         self.sub_stance = self.create_subscription(Float64MultiArray, '/stance_torques', self.stance_cb, 1)
         self.sub_swing = self.create_subscription(Float64MultiArray, '/swing_torques', self.swing_cb, 1)
-        
-        # we are nesting this topic due to the specific structure of ros2_control library. for that, I have configured JointGroupEffortController as forward_efort_controller, that basically makes a folder of the controller running (we might have multiple controllers so the library has a standard structure)
-        
+
         # for that controller, Gazebo reads the .yaml file and opens up a listener topic at /<controller_name>/commands
         self.pub_torques = self.create_publisher(Float64MultiArray, '/forward_effort_controller/commands', 1)
         

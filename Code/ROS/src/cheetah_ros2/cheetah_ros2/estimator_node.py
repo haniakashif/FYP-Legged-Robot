@@ -10,6 +10,10 @@ import pinocchio as pin
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from nav_msgs.msg import Odometry
 
+# for debugging
+from tf2_ros import TransformBroadcaster
+from geometry_msgs.msg import TransformStamped
+
 PI = math.pi
 
 '''
@@ -20,7 +24,7 @@ class EstimatorNode(Node):
     def __init__(self):
         super().__init__('state_estimator_node')
         
-        urdf_path = "/workspaces/FYP-Legged-Robot/Code/ROS/src/cheetah_ros2/models/THex_Quadruped/model_pin.urdf"
+        urdf_path = "/workspaces/FYP-Legged-Robot/Code/ROS/src/cheetah_ros2/models/THex_Quadruped/model.urdf"
         self.pin_model = pin.buildModelFromUrdf(urdf_path, pin.JointModelFreeFlyer())
         self.pin_data = self.pin_model.createData()
         
@@ -83,6 +87,8 @@ class EstimatorNode(Node):
         # Publisher for the flattened 4x3x12 Jacobians (144 elements)
         self.pub_jacobians = self.create_publisher(Float64MultiArray, '/foot_jacobians', 1)
         
+        self.tf_broadcaster = TransformBroadcaster(self)
+
         '''
         order of getting joint_states:
         fl_hip_joint
@@ -144,13 +150,10 @@ class EstimatorNode(Node):
     
     def joint_cb(self, msg):
         # self.get_logger().info(f'Joint State Callback: Received positions for joints: {msg.name}') 
-        # self.q = np.array(msg.position)
-        # self.qdot = np.array(msg.velocity)  # we need joint velocities in the paper
         
-        # Create a dictionary mapping the incoming joint name to its index in the msg
+        # necessary for pinnochio
         name_to_idx = {name: i for i, name in enumerate(msg.name)}
         
-        # Extract positions and velocities in the STRICT Pinocchio order
         for i, name in enumerate(self.controller_joint_names):
             if name in name_to_idx:
                 idx = name_to_idx[name]
@@ -165,17 +168,19 @@ class EstimatorNode(Node):
         
     def odom_cb(self, msg):
         # self.get_logger().info(f'Odometry Callback: Received odometry data. {msg}')
-        # Position (world frame)
+
+        # world frame
         self.p_com[0] = msg.pose.pose.position.x
         self.p_com[1] = msg.pose.pose.position.y
         self.p_com[2] = msg.pose.pose.position.z
         
-        # Orientation (world frame)
+        # world frame
         self.quat[0] = msg.pose.pose.orientation.w
         self.quat[1] = msg.pose.pose.orientation.x
         self.quat[2] = msg.pose.pose.orientation.y
         self.quat[3] = msg.pose.pose.orientation.z
 
+        # body frame
         v_local = np.array([
             msg.twist.twist.linear.x,
             msg.twist.twist.linear.y,
@@ -190,15 +195,35 @@ class EstimatorNode(Node):
             [2*(x*z - y*w),       2*(y*z + x*w),       1 - 2*(x**2 + y**2)]
         ])
 
+        # world frame
         self.v_com = R_mat @ v_local
 
+        # body frame
         omega_local = np.array([
             msg.twist.twist.angular.x,
             msg.twist.twist.angular.y,
             msg.twist.twist.angular.z
         ])
 
+        # world frame
         self.omega = R_mat @ omega_local
+
+        # for debugging
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = 'odom'
+        t.child_frame_id = 'base_link'
+        
+        t.transform.translation.x = self.p_com[0]
+        t.transform.translation.y = self.p_com[1]
+        t.transform.translation.z = self.p_com[2]
+        
+        t.transform.rotation.w = self.quat[0]
+        t.transform.rotation.x = self.quat[1]
+        t.transform.rotation.y = self.quat[2]
+        t.transform.rotation.z = self.quat[3]
+        
+        self.tf_broadcaster.sendTransform(t)
 
     def timer_cb(self):
         # self.get_logger().info('Timer Callback: Evaluating estimator.')

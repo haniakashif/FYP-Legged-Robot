@@ -1,0 +1,136 @@
+<?xml version="1.0" ?>
+<robot name="THex_Quadruped">
+
+    <link name="base_link"/>
+    <link name="fl_hip"/> <link name="fl_knee"/> <link name="fl_foot"/>
+    <link name="fr_hip"/> <link name="fr_knee"/> <link name="fr_foot"/>
+    <link name="bl_hip"/> <link name="bl_knee"/> <link name="bl_foot"/>
+    <link name="br_hip"/> <link name="br_knee"/> <link name="br_foot"/>
+
+    <joint name="fl_hip_joint" type="revolute"><parent link="base_link"/><child link="fl_hip"/><limit lower="-0.7853" upper="0.7853" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="fl_knee_joint" type="revolute"><parent link="fl_hip"/><child link="fl_knee"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="fl_foot_joint" type="revolute"><parent link="fl_knee"/><child link="fl_foot"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="fr_hip_joint" type="revolute"><parent link="base_link"/><child link="fr_hip"/><limit lower="-0.7853" upper="0.7853" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="fr_knee_joint" type="revolute"><parent link="fr_hip"/><child link="fr_knee"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="fr_foot_joint" type="revolute"><parent link="fr_knee"/><child link="fr_foot"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="bl_hip_joint" type="revolute"><parent link="base_link"/><child link="bl_hip"/><limit lower="-0.7853" upper="0.7853" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="bl_knee_joint" type="revolute"><parent link="bl_hip"/><child link="bl_knee"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="bl_foot_joint" type="revolute"><parent link="bl_knee"/><child link="bl_foot"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="br_hip_joint" type="revolute"><parent link="base_link"/><child link="br_hip"/><limit lower="-0.7853" upper="0.7853" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="br_knee_joint" type="revolute"><parent link="br_hip"/><child link="br_knee"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+    <joint name="br_foot_joint" type="revolute"><parent link="br_knee"/><child link="br_foot"/><limit lower="-1.5707" upper="1.5707" effort="0.94140000000000001" velocity="5.2300000000000004"/></joint>
+
+    <gazebo>
+        <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <parameters>$(find cheetah_ros2)/config/cheetah_controllers.yaml</parameters>
+        </plugin>
+    </gazebo>
+
+    <ros2_control name="GazeboSimROS2ControlPlugin" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+
+        <joint name="fl_hip_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="fl_knee_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="fl_foot_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="fr_hip_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="fr_knee_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="fr_foot_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="bl_hip_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="bl_knee_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="bl_foot_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="br_hip_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="br_knee_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="br_foot_joint">
+            <command_interface name="effort"/>
+            <param name="p">0.0</param><param name="i">0.0</param><param name="d">0.0</param>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <sensor name="imu_sensor">
+            <state_interface name="orientation.x"/>
+            <state_interface name="orientation.y"/>
+            <state_interface name="orientation.z"/>
+            <state_interface name="orientation.w"/>
+            <state_interface name="angular_velocity.x"/>
+            <state_interface name="angular_velocity.y"/>
+            <state_interface name="angular_velocity.z"/>
+            <state_interface name="linear_acceleration.x"/>
+            <state_interface name="linear_acceleration.y"/>
+            <state_interface name="linear_acceleration.z"/>
+        </sensor>
+
+    </ros2_control>
+</robot>
