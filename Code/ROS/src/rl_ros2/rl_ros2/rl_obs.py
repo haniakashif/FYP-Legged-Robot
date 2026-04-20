@@ -32,8 +32,10 @@ class RLObs(Node):
 
         # observation variables
         self.joint_states = {} # for storing latest joint readings
+        self.joint_velocities = {}
         for joint in self.joints:
             self.joint_states[joint] = None 
+            self.joint_velocities[joint] = None
         self.ang_vel = None 
         self.projected_gravity = None 
         self.last_action = [0.0 for _ in range(12)] 
@@ -46,12 +48,14 @@ class RLObs(Node):
         self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) 
 
         # publisher
-        self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) 
+        self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) # the 33 here is just an artifact from when we mistook the buffer size for the array size - still, its fine as is
 
         self.timer = self.create_timer(self.dt, self.timer_callback)
 
     def joint_state_cb(self, msg): 
         
+        alpha = 0.5
+
         for i, full_name in enumerate(msg.name):
             parts = full_name.split('_')
             base_name = full_name.replace('_joint', '')
@@ -59,8 +63,20 @@ class RLObs(Node):
             if len(parts) < 2:
                 print("Incorrect joint name format:", full_name)
                 continue 
+            
+            new_pos = msg.position[i]
+            old_pos = self.joint_states[base_name]
 
-            self.joint_states[base_name] = msg.position[i]
+            if old_pos is not None:
+                raw_vel = (new_pos - old_pos) / self.dt
+                if self.joint_velocities[base_name] is not None:
+                    self.joint_velocities[base_name] = alpha * raw_vel + (1 - alpha) * self.joint_velocities[base_name]
+                else:
+                    self.joint_velocities[base_name] = raw_vel
+            else:
+                self.joint_velocities[base_name] = 0.0
+            
+            self.joint_states[base_name] = new_pos
         
     def imu_cb(self, msg):
         self.ang_vel = [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
@@ -89,7 +105,7 @@ class RLObs(Node):
         # self.get_logger().info("Publishing observation...")
     
         obs_list = []
-        # observation format [ang_vel, projected_gravity, command, joint_pos, last_action]
+        # observation format [ang_vel, projected_gravity, command, joint_pos, joint_vel, last_action]
 
         scaled_ang_vel = [x * 0.25 for x in self.ang_vel] # scale down angular velocity
         obs_list.extend(scaled_ang_vel)
@@ -114,6 +130,12 @@ class RLObs(Node):
             val = self.joint_states[joint]
             offset = val - default_pos[joint_type] 
             obs_list.append(offset)
+
+        for joint in self.joints:
+            joint_type = joint.split('_')[1] 
+            val = self.joint_velocities[joint]
+            scaled_val = val * 0.1
+            obs_list.append(scaled_val)
 
         obs_list.extend(self.last_action)
         obs_list = [float(x) for x in obs_list]

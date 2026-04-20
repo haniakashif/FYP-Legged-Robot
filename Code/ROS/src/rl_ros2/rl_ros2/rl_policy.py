@@ -9,7 +9,7 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "../Policies/2026-03-27_02-44-09_v1.onnx"
+        self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx"
 
         self.obs_dim = 33 # hardcoded in training
 
@@ -21,6 +21,15 @@ class RLPolicy(Node):
             self.get_logger().error(f"Failed to load ONNX: {e}")
             raise
 
+        self.expected_input_dim = self.ort_session.get_inputs()[0].shape[1]
+
+        if self.expected_input_dim not in [33, 45]:
+            self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
+            raise ValueError("ONNX model must have input dimension of either 33 or 45")
+
+        if self.expected_input_dim == 33:
+            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities from observations.")
+
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
         
         # event-driven instead of internal timer
@@ -31,10 +40,6 @@ class RLPolicy(Node):
     def obs_cb(self, msg):
         
         obs = np.array(msg.data, dtype=np.float32)
-        
-        if len(obs) != self.obs_dim:
-            self.get_logger().warn(f"Obs dimension mismatch! Expected {self.obs_dim}, got {len(obs)}")
-            return
 
         # self.get_logger().info("Received observation, running policy...")
 
@@ -43,9 +48,17 @@ class RLPolicy(Node):
             self.action_pub.publish(Float64MultiArray(data=[0.0 for _ in range(12)]))
             return
 
-        # ONNX expects a batch dimension: (1, 33)
+        # ONNX expects a batch dimension: (1, 36)
         input_tensor = obs.reshape(1, -1)
-        
+
+        # can I add a test here to see what is the input dimension in the ONNX file and exclude joint_velocities (indices 21 to 32) if it is 33 and keep it if 45
+        if self.expected_input_dim == 33:
+            input_tensor = np.delete(input_tensor, np.s_[21:33], axis=1)
+
+        if input_tensor.shape[1] != self.expected_input_dim:
+            self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")
+            return
+
         # Run inference
         outputs = self.ort_session.run(None, {self.input_name: input_tensor})
         raw_actions = outputs[0][0] # Remove batch dim

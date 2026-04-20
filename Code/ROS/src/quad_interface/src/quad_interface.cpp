@@ -273,6 +273,8 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
     uint8_t mux_configs[4] = {0xC3, 0xD3, 0xE3, 0xF3}; 
     uint8_t config_lsb = 0xE3; // Disables comparator, sets data rate
 
+    // mapping between the order of ADC reads (A0-A3 for each board) and the URDF joint order in the ros2_control block/calibration.yaml/controllers,yaml
+    const int adc_to_urdf_map[12] = {5, 3, 10, 9, 7, 0, 2, 11, 4, 6, 1, 8};
     int joint_index = 0;
 
     // Loop through the 4 channels (A0 to A3)
@@ -309,10 +311,12 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
             // 4.096V range / 2047 steps = 0.002V per step
             double voltage = raw_adc * 0.002;
 
-            double raw_state = calibrations_[joint_index].volt_slope * voltage + calibrations_[joint_index].volt_intercept;
+            int urdf_idx = adc_to_urdf_map[joint_index];
 
-            // FIR filter: push newest state, drop oldest, then compute dot product.
-            auto & history = state_history_[joint_index];
+            double raw_state = calibrations_[urdf_idx].volt_slope * voltage + calibrations_[urdf_idx].volt_intercept;
+
+            // FIR filter
+            auto & history = state_history_[urdf_idx];
             if (history.size() >= fir_coeffs_.size()) {
                 history.pop_back();
             }
@@ -322,7 +326,7 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
             for (size_t tap = 0; tap < fir_coeffs_.size() && tap < history.size(); ++tap) {
                 filtered_state += fir_coeffs_[tap] * history[tap];
             }
-            hw_states_[joint_index] = filtered_state;
+            hw_states_[urdf_idx] = filtered_state;
             
             joint_index++;
         }
