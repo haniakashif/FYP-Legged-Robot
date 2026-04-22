@@ -2,6 +2,7 @@ import rclpy
 import numpy as np
 import math
 import osqp
+import pinocchio as pin
 
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
@@ -53,6 +54,28 @@ class StanceController(Node):
         self.sigma_c1 = THexConfig.sigma_c1
         self.sigma_cbar0 = THexConfig.sigma_cbar0
         self.sigma_cbar1 = THexConfig.sigma_cbar1
+
+        # Pinocchio stuff
+        urdf_path = "/workspaces/FYP-Legged-Robot/Code/ROS/src/cheetah_ros2/models/THex_Quadruped/model.urdf"
+        self.pin_model = pin.buildModelFromUrdf(urdf_path, pin.JointModelFreeFlyer())
+        self.pin_data = self.pin_model.createData()
+
+        self.controller_joint_names = [
+            'fl_hip_joint','fl_knee_joint','fl_foot_joint',
+            'fr_hip_joint','fr_knee_joint','fr_foot_joint',
+            'bl_hip_joint','bl_knee_joint','bl_foot_joint',
+            'br_hip_joint','br_knee_joint','br_foot_joint'
+        ]
+        
+        # --- THE FIX: Using the working loop from your estimator ---
+        self.pin_joint_names = []
+        for jid, jname in enumerate(self.pin_model.names):
+            jmodel = self.pin_model.joints[jid]
+            if jmodel.nq == 1 and jname in self.controller_joint_names:
+                self.pin_joint_names.append(jname)
+
+        self.ctrl_to_pin = np.array([self.pin_joint_names.index(n) for n in self.controller_joint_names], dtype=int)
+        self.pin_to_ctrl = np.argsort(self.ctrl_to_pin)
 
         self.pub_torques = self.create_publisher(Float64MultiArray, '/stance_torques', 1)
         self.pub_markers = self.create_publisher(Marker, '/com_target_markers', 1) # for debugging
@@ -205,116 +228,136 @@ class StanceController(Node):
 
         self.pub_markers.publish(marker)
 
-    # def compute_desired_COM(self) -> np.ndarray:
-
-    #     weights = np.zeros(4)
-    #     sqrt_2 = math.sqrt(2.0)
-    #     virtual_points = np.zeros((4, 3))
-        
-    #     # Variances for stance (c) and swing (c_bar) transitions
-    #     # These dictate how "steep" the erf curve is at touchdown and liftoff
-    #     sigma_c0 = self.sigma_c0
-    #     sigma_c1 = self.sigma_c1
-    #     sigma_cbar0 = self.sigma_cbar0
-    #     sigma_cbar1 = self.sigma_cbar1
-
-    #     for i in range(4):
-    #         # check if leg is in stance (s_phi = 1.0) or swing (s_phi = 0.0)
-    #         if self.fsm_state[i] == 1.0: 
-    #             phi = self.stance_phases[i]
-    #             weights[i] = 0.5 * (math.erf(phi / (sigma_c0 * sqrt_2)) + 
-    #                                 math.erf((1.0 - phi) / (sigma_c1 * sqrt_2)))
-    #         else: 
-    #             phi = self.swing_phases[i]
-    #             # during swing, weight drops to 0 in the middle, but rises to 0.5 at the edges
-    #             weights[i] = 0.5 * (2.0 + 
-    #                                 math.erf(-phi / (sigma_cbar0 * sqrt_2)) + 
-    #                                 math.erf((phi - 1.0) / (sigma_cbar1 * sqrt_2)))
-                    
-    #     # rows: [FL, FR, BL, BR], cols: [x, y, z], in world frame
-    #     p_foot = self.foot_positions.reshape(4, 3)  
-    #     # print(p_foot)
-        
-    #     # (current foot position, adjacent clockwise foot, adjacent counter-clockwise foot)
-    #     foot_pos = [
-    #         (p_foot[0], p_foot[1], p_foot[2]),
-    #         (p_foot[1], p_foot[3], p_foot[0]),
-    #         (p_foot[2], p_foot[0], p_foot[3]),
-    #         (p_foot[3], p_foot[2], p_foot[1])
-    #     ]
-        
-    #     foot_weights = [
-    #         (weights[0], weights[1], weights[2]),
-    #         (weights[1], weights[3], weights[0]),
-    #         (weights[2], weights[0], weights[3]),
-    #         (weights[3], weights[2], weights[1])
-    #     ]
-        
-    #     for i in range(4):
-    #         neg_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][2]
-    #         pos_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][1]
-            
-    #         numer = foot_weights[i][0]*foot_pos[i][0] + neg_vp*foot_weights[i][2] + pos_vp*foot_weights[i][1]
-    #         denom = foot_weights[i][0] + foot_weights[i][2] + foot_weights[i][1]
-    #         v_point = numer / denom
-    #         virtual_points[i] = v_point
-        
-    #     self.publish_support_polygon_marker(virtual_points)
-    #     p_c_bar = np.mean(virtual_points, axis=0)
-          
-    #     avg_foot_z = np.mean([
-    #         p_foot[0][2], 
-    #         p_foot[1][2], 
-    #         p_foot[2][2], 
-    #         p_foot[3][2]
-    #     ])
-
-    #     desired_z = avg_foot_z + self.target_z
-
-    #     # NOTE: this won't entirely work for sloped terrain
-    #     p_c_d = np.array([p_c_bar[0], p_c_bar[1], desired_z])
-        
-    #     # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}')
-    #     self.publish_target_marker(p_c_d) # for debugging
-
-    #     return p_c_d
-
-    # # for testing, just compute the centroid of the stance foot positions for x and y
     def compute_desired_COM(self) -> np.ndarray:
 
-        p_foot = self.foot_positions.reshape(4, 3)
+        weights = np.zeros(4)
+        sqrt_2 = math.sqrt(2.0)
+        virtual_points = np.zeros((4, 3))
+        
+        # Variances for stance (c) and swing (c_bar) transitions
+        # These dictate how "steep" the erf curve is at touchdown and liftoff
+        sigma_c0 = self.sigma_c0
+        sigma_c1 = self.sigma_c1
+        sigma_cbar0 = self.sigma_cbar0
+        sigma_cbar1 = self.sigma_cbar1
 
-        stance_foot_positions = []
         for i in range(4):
+            # check if leg is in stance (s_phi = 1.0) or swing (s_phi = 0.0)
             if self.fsm_state[i] == 1.0: 
-                stance_foot_positions.append(p_foot[i])
+                phi = self.stance_phases[i]
+                weights[i] = 0.5 * (math.erf(phi / (sigma_c0 * sqrt_2)) + 
+                                    math.erf((1.0 - phi) / (sigma_c1 * sqrt_2)))
+            else: 
+                phi = self.swing_phases[i]
+                # during swing, weight drops to 0 in the middle, but rises to 0.5 at the edges
+                weights[i] = 0.5 * (2.0 + 
+                                    math.erf(-phi / (sigma_cbar0 * sqrt_2)) + 
+                                    math.erf((phi - 1.0) / (sigma_cbar1 * sqrt_2)))
+                    
+        # rows: [FL, FR, BL, BR], cols: [x, y, z], in world frame
+        p_foot = self.foot_positions.reshape(4, 3)  
+        # print(p_foot)
+        
+        # (current foot position, adjacent clockwise foot, adjacent counter-clockwise foot)
+        foot_pos = [
+            (p_foot[0], p_foot[1], p_foot[2]),
+            (p_foot[1], p_foot[3], p_foot[0]),
+            (p_foot[2], p_foot[0], p_foot[3]),
+            (p_foot[3], p_foot[2], p_foot[1])
+        ]
+        
+        foot_weights = [
+            (weights[0], weights[1], weights[2]),
+            (weights[1], weights[3], weights[0]),
+            (weights[2], weights[0], weights[3]),
+            (weights[3], weights[2], weights[1])
+        ]
+        
+        for i in range(4):
+            neg_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][2]
+            pos_vp = foot_weights[i][0]*foot_pos[i][0] + (1-foot_weights[i][0])*foot_pos[i][1]
+            
+            numer = foot_weights[i][0]*foot_pos[i][0] + neg_vp*foot_weights[i][2] + pos_vp*foot_weights[i][1]
+            denom = foot_weights[i][0] + foot_weights[i][2] + foot_weights[i][1]
+            v_point = numer / denom
+            virtual_points[i] = v_point
+        
+        self.publish_support_polygon_marker(virtual_points)
+        p_c_bar = np.mean(virtual_points, axis=0)
+          
+        # calculate avg_foot_z froms stance feet
+        avg_foot_z = 0.0
+        count = 0
+        for i in range(4):
+            if self.fsm_state[i] == 1.0:
+                avg_foot_z += p_foot[i][2]
+                count += 1
+        avg_foot_z = avg_foot_z / count if count > 0 else p_c_bar[2]
 
-        if len(stance_foot_positions) > 0:
-            desired_x = np.mean([pos[0] for pos in stance_foot_positions])
-            desired_y = np.mean([pos[1] for pos in stance_foot_positions])
-        else:
-            desired_x = self.robot_state[0]
-            desired_y = self.robot_state[1]
-
-        avg_foot_z = np.mean(p_foot[:, 2])
         desired_z = avg_foot_z + self.target_z
 
         # NOTE: this won't entirely work for sloped terrain
-        # p_c_d = np.array([desired_x, desired_y, desired_z])
-        p_c_d = np.array([self.robot_state[0], self.robot_state[1], desired_z]) 
+        p_c_d = np.array([p_c_bar[0], p_c_bar[1], desired_z])
         
-        # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}'))
+        # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}')
         self.publish_target_marker(p_c_d) # for debugging
 
         return p_c_d
+
+    # # for testing, just compute the centroid of the stance foot positions for x and y
+    # def compute_desired_COM(self) -> np.ndarray:
+
+    #     p_foot = self.foot_positions.reshape(4, 3)
+
+    #     stance_foot_positions = []
+    #     for i in range(4):
+    #         if self.fsm_state[i] == 1.0: 
+    #             stance_foot_positions.append(p_foot[i])
+
+    #     if len(stance_foot_positions) > 0:
+    #         desired_x = np.mean([pos[0] for pos in stance_foot_positions])
+    #         desired_y = np.mean([pos[1] for pos in stance_foot_positions])
+    #     else:
+    #         desired_x = self.robot_state[0]
+    #         desired_y = self.robot_state[1]
+
+    #     avg_foot_z = 0.0
+    #     count = 0
+    #     for i in range(4):
+    #         if self.fsm_state[i] == 1.0:
+    #             avg_foot_z += p_foot[i][2]
+    #             count += 1
+    #     avg_foot_z = avg_foot_z / count if count > 0 else -8
+    #     desired_z = avg_foot_z + self.target_z
+
+    #     # NOTE: this won't entirely work for sloped terrain
+    #     # p_c_d = np.array([desired_x, desired_y, desired_z])
+    #     p_c_d = np.array([self.robot_state[0], self.robot_state[1], desired_z]) 
+        
+    #     # self.get_logger().info(f'DEBUG: Computed desired CoM position: {p_c_d}'))
+    #     self.publish_target_marker(p_c_d) # for debugging
+
+    #     return p_c_d
         
     def balance_controller(self, p_c_d: np.ndarray) -> np.ndarray:
         
         # [p_com(3), v_com(3), q(12), qdot(12), quat(4), omega(3), accel(3)]
         p_com = self.robot_state[0:3] # world frame
         v_com = self.robot_state[3:6] # world frame
+        q_joints = self.robot_state[6:18]
         w, x, y, z = self.robot_state[30:34]
         omega = self.robot_state[34:37] # world frame
+
+        pin_quat = np.array([x, y, z, w])
+        q_pin = q_joints[self.pin_to_ctrl]
+        q_gen = np.concatenate((p_com, pin_quat, q_pin))
+
+        pin.centerOfMass(self.pin_model, self.pin_data, q_gen)
+        true_com = self.pin_data.com[0] 
+        p_com = true_com
+        
+        pin.computeGeneralizedGravity(self.pin_model, self.pin_data, q_gen)
+        g_vector_ctrl = self.pin_data.g[6:18][self.ctrl_to_pin]
         
         v_des = np.array([self.cmd_yvel, self.cmd_xvel, 0.0]) # robot frame, z velocity 0
         omega_des = np.array([0.0, 0.0, self.cmd_yaw_turn_rate]) # robot frame, roll and pitch velocity 0
@@ -491,26 +534,27 @@ class StanceController(Node):
         prob.setup(P_sparse, q_vec, A=C_sparse, l=l_bound, u=u_bound, verbose=False)
         res = prob.solve()
         
-        # The solver returns forces in the Yaw-Aligned frame (res.x means solve for the variable x)
+        # The solver returns forces in the Yaw-Aligned frame
         f_yaw = res.x 
         self.f_prev = f_yaw
         
-        # --- Rotate Forces Back to World Frame ---
-        # Pinocchio's LOCAL_WORLD_ALIGNED Jacobian expects forces mapped to the absolute global axes.
+        # rotate forces back to World Frame as Pinocchio's LOCAL_WORLD_ALIGNED Jacobian expects forces mapped to the absolute global axes.
         f_world = np.zeros(12)
         for i in range(4):
             f_world[i*3 : i*3+3] = R_yaw @ f_yaw[i*3 : i*3+3]
 
-        # --- Map Forces to Joint Torques ---
         tau = np.zeros(12)
         
         for i in range(4):
             f_i = f_world[i*3 : i*3+3]
             J_i = self.foot_jacobians[i]
+
+            idx = slice(i*3, i*3+3)
+            J_leg = J_i[:, idx]
             
-            # Accumulate the torques
-            # we are taking -ve because the solver calculates ground reaction forces, we apply opposite for the robot to move
-            tau += -J_i.T @ f_i
+            g_leg = g_vector_ctrl[idx]
+            # tau (3x1) = -J_leg^T (3x3) * F_grf (3x1) + G(q) (3x1)
+            tau[idx] = -J_leg.T @ f_i + g_leg
 
         msg_tau = Float64MultiArray()
         tau = np.clip(tau, -0.9414, 0.9414) 

@@ -3,7 +3,7 @@ import numpy as np
 # base parameters for controller
 class LinearMpcConfig:
     # main clock running at 1/dt_control hz
-    dt_control: float = 0.02
+    dt_control: float = 0.002
     
     iteration_between_mpc: int = 1
     dt_mpc: float = dt_control * iteration_between_mpc

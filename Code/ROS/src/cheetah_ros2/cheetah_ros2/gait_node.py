@@ -20,6 +20,9 @@ class Gait(Enum):
     CRAWL100 = 'crawl', 100, np.array([0, 50, 25, 75]), np.array([75, 75, 75, 75])
     CRAWL128 = 'crawl', 128, np.array([0, 64, 32, 96]), np.array([96, 96, 96, 96])
     CRAWL1000 = 'crawl', 1000, np.array([0, 500, 250, 750]), np.array([750, 750, 750, 750])
+    CRAWL2000 = 'crawl', 2000, np.array([0, 1000, 500, 1500]), np.array([1500, 1500, 1500, 1500])
+    CRAWL5000 = 'crawl', 5000, np.array([0, 2500, 1250, 3750]), np.array([3750, 3750, 3750, 3750])
+    CRAWL10000 = 'crawl', 10000, np.array([0, 5000, 2500, 7500]), np.array([7500, 7500, 7500, 7500])
 
     # constructor function for each gait
     def __init__(self, name: str, num_segment: int, stance_offsets: np.ndarray, stance_durations: np.ndarray) -> None:
@@ -144,7 +147,7 @@ class GaitControllerNode(Node):
     def __init__(self):
         super().__init__('gait_controller') # every node is a child of the Node class
         
-        self.current_gait = Gait.CRAWL100
+        self.current_gait = Gait.CRAWL2000
         self.iterations_between_mpc = LinearMpcConfig.iteration_between_mpc
         
         self.dt_control = LinearMpcConfig.dt_control

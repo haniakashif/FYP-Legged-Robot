@@ -3,6 +3,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 import numpy as np
+from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 
 class FSMNode(Node):
     def __init__(self):
@@ -22,7 +23,7 @@ class FSMNode(Node):
         
         self.get_logger().info("Contact-Conditioned FSM Active: Running Shuo Yang logic.")
         
-        self.timer = self.create_timer(0.001, self.fsm_loop) 
+        self.timer = self.create_timer(LinearMpcConfig.dt_control, self.fsm_loop) 
 
     def contact_cb(self, msg):
         # self.get_logger().info(f'Contact Callback: Received contact data. {msg}')

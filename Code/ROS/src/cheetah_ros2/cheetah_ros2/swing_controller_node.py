@@ -2,11 +2,13 @@
 import rclpy
 import numpy as np
 import math
+import pinocchio as pin
 
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray, Float64
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from cheetah_ros2.robot_configs import THexConfig
+from cheetah_ros2.kinematics import inv_kin
 
 # for debugging
 from visualization_msgs.msg import Marker
@@ -22,15 +24,47 @@ class SwingController(Node):
         self.swing_phases = np.zeros(4)
         self.p0 = np.zeros((4, 3)) # To store the liftoff position of each foot
         self.foot_jacobians = np.zeros((4, 3, 12))
+        self.stance_time = 0.001
         self.swing_time = 0.001
+        self.fsm_state = np.zeros(4)
         
         self.cmd_xvel = LinearMpcConfig.cmd_xvel   # m/s
         self.cmd_yvel = LinearMpcConfig.cmd_yvel   # m/s
         self.cmd_yaw_turn_rate = LinearMpcConfig.cmd_yaw_turn_rate # rad/s
         self.target_z = THexConfig.base_height_des # desired ride height 
         self.g = LinearMpcConfig.gravity
-        self.kp_Cartesian = THexConfig.kp_Cartesian
-        self.kd_Cartesian = THexConfig.kd_Cartesian
+        # self.kp_Cartesian = THexConfig.kp_Cartesian
+        # self.kd_Cartesian = THexConfig.kd_Cartesian
+        self.Kp_joint = THexConfig.Kp_joint
+        self.Kd_joint = THexConfig.Kd_joint
+
+        self.ros_to_ik_map = [3, 0, 2, 1]
+        
+        # To calculate qdot_des via finite difference
+        self.q_des_prev = np.zeros((4, 3))
+
+        urdf_path = "/workspaces/FYP-Legged-Robot/Code/ROS/src/cheetah_ros2/models/THex_Quadruped/model.urdf"
+        self.pin_model = pin.buildModelFromUrdf(urdf_path, pin.JointModelFreeFlyer())
+        self.pin_data = self.pin_model.createData()
+
+        self.controller_joint_names = [
+            'fl_hip_joint','fl_knee_joint','fl_foot_joint',
+            'fr_hip_joint','fr_knee_joint','fr_foot_joint',
+            'bl_hip_joint','bl_knee_joint','bl_foot_joint',
+            'br_hip_joint','br_knee_joint','br_foot_joint'
+        ]
+
+        self.pin_joint_names = []
+        for jid, jname in enumerate(self.pin_model.names):
+            jmodel = self.pin_model.joints[jid]
+            if jmodel.nq == 1 and jname in self.controller_joint_names:
+                self.pin_joint_names.append(jname)
+
+        self.ctrl_to_pin = np.array(
+            [self.pin_joint_names.index(n) for n in self.controller_joint_names],
+            dtype=int
+        )
+        self.pin_to_ctrl = np.argsort(self.ctrl_to_pin)
         
         self.first_swing = np.array([True, True, True, True])
         
@@ -42,12 +76,21 @@ class SwingController(Node):
             [ 0.053162, -0.127110,  0]   # (br_hip_joint)
         ])
 
-        self.sprawl_offsets_local = np.array([
-            [-0.08,  0.00,  0.0],  # FL: Forward and Left
-            [0.08,  0.00,  0.0],  # FR: Forward and Right
-            [-0.08, -0.00,  0.0],  # BL: Backward and Left
-            [0.08, -0.00,  0.0]   # BR: Backward and Right
+        self.hip_yaws_local = np.array([
+             2.3666,   # fl_hip_joint
+             0.76931,  # fr_hip_joint
+            -2.372,    # bl_hip_joint
+            -0.77529   # br_hip_joint
         ])
+
+        self.sprawl_offsets_local = np.array([
+            [-THexConfig.x_sprawl,  THexConfig.y_sprawl,  0.0],  # FL: Forward and Left
+            [THexConfig.x_sprawl,  THexConfig.y_sprawl,  0.0],  # FR: Forward and Right
+            [-THexConfig.x_sprawl, -THexConfig.y_sprawl,  0.0],  # BL: Backward and Left
+            [THexConfig.x_sprawl, -THexConfig.y_sprawl,  0.0]   # BR: Backward and Right
+        ])
+
+        self.max_reach_cm = THexConfig.max_reach_cm
         
         self.pub_torques = self.create_publisher(Float64MultiArray, '/swing_torques', 1)
 
@@ -60,6 +103,7 @@ class SwingController(Node):
         self.sub_foot_pos = self.create_subscription(Float64MultiArray, '/foot_positions', self.foot_pos_cb, 1)
         self.sub_swing_phase = self.create_subscription(Float64MultiArray, '/swing_phases', self.swing_phase_cb, 1)
         self.sub_jacobians = self.create_subscription(Float64MultiArray, '/foot_jacobians', self.jacobian_cb, 1)
+        self.sub_fsm = self.create_subscription(Float64MultiArray, '/fsm_state', self.fsm_state_cb, 1)
         
         self.dt_control = LinearMpcConfig.dt_control
         self.timer = self.create_timer(self.dt_control, self.control_loop)
@@ -103,6 +147,9 @@ class SwingController(Node):
                 s_z = (phase * 2.0) - 1.0
                 point.z = float(self._bezier_curve(s_z, p0[2] + h_clearance, pf[2])[0])
 
+            # for cube debugging, add offset in z
+            point.z += 0.0
+
             marker.points.append(point)
         
         self.pub_markers.publish(marker)
@@ -136,6 +183,10 @@ class SwingController(Node):
         # self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
         self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
         
+    def fsm_state_cb(self, msg):
+        self.fsm_state = np.array(msg.data)
+
+
     def swing_phase_cb(self, msg):
         # self.get_logger().info(f'Swing Phase Callback: Received swing phase data. {msg}')
         self.swing_phases = np.array(msg.data)
@@ -192,26 +243,6 @@ class SwingController(Node):
         p_step_global = np.zeros(3)
         p_step_global[0] = p_h_global[0] + p_step_rel[0]
         p_step_global[1] = p_h_global[1] + p_step_rel[1]
-
-        # p_rel_max_y = 0.06
-        # p_step_rel[1] = np.clip(p_step_rel[1], -p_rel_max_y, p_rel_max_y)
-
-        # min_sprawl = 0.06 
-        # max_sprawl = 0.12
-
-        # p_step_global = np.zeros(3)
-        # p_step_global[0] = p_h_global[0] + p_step_rel[0]
-        # p_step_global[1] = p_h_global[1] + p_step_rel[1]
-        
-        # if leg_idx in [1, 3]:
-        #     inner_bound = p_com[0] + min_sprawl
-        #     outer_bound = p_com[0] + max_sprawl
-        #     p_step_global[0] = np.clip(p_step_global[0], inner_bound, outer_bound)
-            
-        # else: # LEFT LEGS (FL, BL)
-        #     inner_bound = p_com[0] - min_sprawl
-        #     outer_bound = p_com[0] - max_sprawl
-        #     p_step_global[0] = np.clip(p_step_global[0], outer_bound, inner_bound)
 
         p_step_global[2] = self.p0[leg_idx][2] - 0.001  # Penetrate the floor slightly to trigger the contact sensor to flip the FSM to stance mode.
         
@@ -283,6 +314,9 @@ class SwingController(Node):
             # Chain Rule for 2x phase speed
             v_des[2] = v_phase * 2.0 / swing_time
             a_des[2] = a_phase * 4.0 / (swing_time**2)
+
+        # for cube debugging, add offset in z
+        p_des[2] += 0.0
             
         return p_des, v_des, a_des
     
@@ -292,33 +326,127 @@ class SwingController(Node):
         tau_swing = np.zeros(12)        
         p_com = self.robot_state[0:3]
         v_com = self.robot_state[3:6]
+        q_joints = self.robot_state[6:18]
         qdot = self.robot_state[18:30]
+        w, x, y, z = self.robot_state[30:34]
+        R_mat = np.array([
+            [1 - 2*(y**2 + z**2), 2*(x*y - z*w),     2*(x*z + y*w)],
+            [2*(x*y + z*w),       1 - 2*(x**2 + z**2), 2*(y*z - x*w)],
+            [2*(x*z - y*w),       2*(y*z + x*w),       1 - 2*(x**2 + y**2)]
+        ])
         omega = self.robot_state[34:37]
         swing_time = self.swing_time 
+
+        # Pinocchio uses [x, y, z, w] for quaternions
+        pin_quat = np.array([x, y, z, w])
+        
+        # Reorder joints from Controller order to Pinocchio order
+        q_pin = q_joints[self.pin_to_ctrl]
+        
+        # Construct the 19-element configuration vector for the FreeFlyer model
+        q_gen = np.concatenate((p_com, pin_quat, q_pin))
+        
+        # Compute G(q)
+        pin.computeGeneralizedGravity(self.pin_model, self.pin_data, q_gen)
+        
+        # The result is an 18-element vector. Indices 6-17 are the 12 motors.
+        g_vector_pin = self.pin_data.g[6:18] 
+        
+        # Reorder back to your controller's joint order
+        g_vector_ctrl = g_vector_pin[self.ctrl_to_pin]
+        # ----------------------------------------
         
         for i in range(4):
-            # Only calculate trajectory and torques if the leg is in the air
-            if self.swing_phases[i] > 0.0:
-                
-                p_des, v_des, a_des = self.swing_traj_gen(i, self.swing_phases[i], self.stance_time, swing_time)
-                
-                self.publish_trajectory_marker(i, self.stance_time)
 
-                p_act = self.foot_positions[i*3 : i*3+3]
-                J_i = self.foot_jacobians[i]
+            # if self.swing_phases[i] > 0.0:
+            #     # Operational Space Control
+            #     p_des, v_des, a_des = self.swing_traj_gen(i, self.swing_phases[i], self.stance_time, swing_time)
+
+            #     self.publish_trajectory_marker(i, self.stance_time)
+
+            #     p_act = self.foot_positions[i*3 : i*3+3]
+            #     J_i = self.foot_jacobians[i]
                 
-                # absolute foot velocity: v_base + (omega x r) + J*qdot
-                r_foot = p_act - p_com
-                v_act = v_com + np.cross(omega, r_foot) + (J_i @ qdot)
+            #     # absolute foot velocity: v_base + (omega x r) + J*qdot
+            #     r_foot = p_act - p_com
+            #     v_act = v_com + np.cross(omega, r_foot) + (J_i @ qdot)
                 
-                # F = Kp(p_des - p_act) + Kd(v_des - v_act)
-                F_pd = self.kp_Cartesian @ (p_des - p_act) + self.kd_Cartesian @ (v_des - v_act)
+            #     # F = Kp(p_des - p_act) + Kd(v_des - v_act)
+            #     F_pd = self.kp_Cartesian @ (p_des - p_act) + self.kd_Cartesian @ (v_des - v_act)
                 
-                # tau = J^T * F
-                tau_i = J_i.T @ F_pd
+            #     idx = slice(i*3, i*3+3)
                 
-                # accumulate the torques for this specific leg
-                tau_swing += tau_i
+            #     # Extract the 3x3 Jacobian for just this leg
+            #     J_leg = J_i[:, idx]
+                
+            #     # Extract the 3 gravity compensation torques for this leg
+            #     g_leg = g_vector_ctrl[idx]
+                
+            #     # tau (3x1) = J_leg^T (3x3) * F_pd (3x1) + g_leg (3x1)
+            #     tau_i = J_leg.T @ F_pd + g_leg
+                
+            #     # accumulate the torques for this specific leg
+            #     tau_swing[idx] = tau_i
+            # else:
+            #     self.clear_trajectory_marker(i)
+
+            # if self.fsm_state[i] == 0.0:
+            if self.swing_phases[i] > 0.0:
+                phase = self.swing_phases[i]
+                if phase == 0.0:
+                    phase = 1.0
+            
+                # Joint Space Control
+                p_des_global, _, _ = self.swing_traj_gen(i, phase, self.stance_time, swing_time)
+                self.publish_trajectory_marker(i, self.stance_time)
+                
+                p_des_base = R_mat.T @ (p_des_global - p_com)
+                
+                x_base_offset, y_base_offset, z_local = p_des_base - self.hip_offsets_local[i]
+                
+                gamma = self.hip_yaws_local[i]
+                cos_g = math.cos(gamma)
+                sin_g = math.sin(gamma)
+                
+                x_local = x_base_offset * cos_g + y_base_offset * sin_g
+                y_local = -x_base_offset * sin_g + y_base_offset * cos_g
+
+                x_local = x_local * 100.0
+                y_local = y_local * 100.0
+                z_local = z_local * 100.0
+
+                target_dist = math.sqrt(x_local**2 + y_local**2 + z_local**2)
+                
+                if target_dist > self.max_reach_cm:
+                    scale_factor = self.max_reach_cm / target_dist
+                    x_local *= scale_factor
+                    y_local *= scale_factor
+                    z_local *= scale_factor
+                
+                ik_leg_idx = self.ros_to_ik_map[i]
+                try:
+                    q1, q2, q3 = inv_kin(x_local, y_local, z_local, ik_leg_idx)
+                    q_des = np.array([q1, q2, q3])
+                except Exception as e:
+                    self.get_logger().error(str(e))
+                    q_des = self.q_des_prev[i]
+
+                if self.first_swing[i]:
+                    self.q_des_prev[i] = q_des
+                    
+                qdot_des = (q_des - self.q_des_prev[i]) / self.dt_control
+                self.q_des_prev[i] = q_des
+                
+                idx = slice(i*3, i*3+3)
+                q_act = q_joints[idx]
+                qdot_act = qdot[idx]
+                
+                tau_pd = self.Kp_joint @ (q_des - q_act) + self.Kd_joint @ (qdot_des - qdot_act)
+                
+                g_leg = g_vector_ctrl[idx]
+                tau_i = tau_pd + g_leg
+                
+                tau_swing[idx] = tau_i
             else:
                 self.clear_trajectory_marker(i)
                 
