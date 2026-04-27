@@ -34,7 +34,6 @@ class APFPlannerNode(Node):
     def __init__(self):
         super().__init__('apf_planner')
 
-        # Suppress the infinity math warnings from the gradients
         np.seterr(invalid='ignore')
 
         self.sub_floor = Subscriber(self, GridMap, '/elevation_map')
@@ -43,17 +42,15 @@ class APFPlannerNode(Node):
             [self.sub_floor, self.sub_ceil], queue_size=10, slop=0.5)
         self.sync.registerCallback(self.callback)
 
-        # RViz Path Visualization
         self.pub_apf_path = self.create_publisher(PointCloud2, '/apf_path_pc', 10)
-        
-        # The command for your RL Node
         self.pub_target_height = self.create_publisher(Float64, '/perception/target_height', 10)
 
-        # Temp Goal: Pointed straight down the Y-axis (Front of the THex robot)
+        # Set goal 3 meters straight down the Y-axis (the direction the camera faces)
         self.declare_parameter('goal_x', 0.0)
         self.declare_parameter('goal_y', 3.0)
 
         self.get_logger().info('Lean APF Planner Active. Ready to command RL.')
+
     # ==================================================================
     # CORE MATH (Kept mathematically identical to map2apf3.py)
     # ==================================================================
@@ -235,19 +232,25 @@ class APFPlannerNode(Node):
         
         if not path: return
 
+        # --- NEW: Print the world coordinates of the path ---
+        if len(path) > 1:
+            cx, cy = floor_msg.info.pose.position.x, floor_msg.info.pose.position.y
+            half_x, half_y = floor_msg.info.length_x / 2.0, floor_msg.info.length_y / 2.0
+            
+            c, r = path[1] # The immediate next step
+            wy = cy + half_y - (c + 0.5) * res
+            wx = cx + half_x - (r + 0.5) * res
+            
+            self.get_logger().info(f"APF STEP -> X: {wx:.2f}, Y: {wy:.2f} | GOAL: Y=3.0")
+
         heights_smooth, floor_heights = self.sample_smooth_height(path, opt_z, floor)
 
-        # --- THE PAYLOAD ---
-        # The 1D Gaussian filter has already smoothed the trajectory based on upcoming terrain.
-        # So heights_smooth[0] is the perfect instantaneous command for the RL policy right now.
         target_z = float(heights_smooth[0])
         
-        # Publish to RL Node
         msg = Float64()
         msg.data = target_z
         self.pub_target_height.publish(msg)
 
-        # Publish visual path for RViz
         self.publish_apf_path(floor_msg.header, floor_msg.info, path, heights_smooth, floor_heights)
 
 def main(args=None):
