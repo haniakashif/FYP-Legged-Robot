@@ -8,7 +8,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/base_link.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/base_link.STL" scale="1 1 1"/>
             </geometry>
             <material name="base_linkbase_link_visual">
                 <texture/>
@@ -18,7 +18,7 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/base_link_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/base_link_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -31,7 +31,7 @@
         <visual>
             <origin xyz="-2.22045e-16 -2.77556e-16 1.2326e-32" rpy="-9.43706e-33 2.22045e-16 -8.50015e-17"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_foot.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_foot.STL" scale="1 1 1"/>
             </geometry>
             <material name="bl_footbl_foot_visual">
                 <texture/>
@@ -41,7 +41,7 @@
         <collision>
             <origin xyz="-2.22045e-16 -2.77556e-16 1.2326e-32" rpy="-9.43706e-33 2.22045e-16 -8.50015e-17"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_foot_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_foot_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -54,7 +54,7 @@
         <visual>
             <origin xyz="1.11022e-16 1.38778e-16 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_hip.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_hip.STL" scale="1 1 1"/>
             </geometry>
             <material name="bl_hipbl_hip_visual">
                 <texture/>
@@ -64,7 +64,7 @@
         <collision>
             <origin xyz="1.11022e-16 1.38778e-16 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_hip_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_hip_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -77,7 +77,7 @@
         <visual>
             <origin xyz="5.55112e-17 2.77556e-17 -1.38778e-17" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_knee.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_knee.STL" scale="1 1 1"/>
             </geometry>
             <material name="bl_kneebl_knee_visual">
                 <texture/>
@@ -87,7 +87,7 @@
         <collision>
             <origin xyz="5.55112e-17 2.77556e-17 -1.38778e-17" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/bl_knee_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/bl_knee_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -100,7 +100,7 @@
         <visual>
             <origin xyz="5.55112e-17 5.55112e-17 -5.05557e-34" rpy="-8.67362e-19 3.55618e-17 3.64292e-17"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_foot.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_foot.STL" scale="1 1 1"/>
             </geometry>
             <material name="br_footbr_foot_visual">
                 <texture/>
@@ -110,7 +110,7 @@
         <collision>
             <origin xyz="5.55112e-17 5.55112e-17 -5.05557e-34" rpy="-8.67362e-19 3.55618e-17 3.64292e-17"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_foot_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_foot_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -123,7 +123,7 @@
         <visual>
             <origin xyz="-5.55112e-17 2.77556e-17 -2.1684e-19" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_hip.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_hip.STL" scale="1 1 1"/>
             </geometry>
             <material name="br_hipbr_hip_visual">
                 <texture/>
@@ -133,7 +133,7 @@
         <collision>
             <origin xyz="-5.55112e-17 2.77556e-17 -2.1684e-19" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_hip_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_hip_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -146,7 +146,7 @@
         <visual>
             <origin xyz="1.11022e-16 9.71445e-17 -1.38778e-17" rpy="1.84889e-32 -3.33067e-16 -1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_knee.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_knee.STL" scale="1 1 1"/>
             </geometry>
             <material name="br_kneebr_knee_visual">
                 <texture/>
@@ -156,7 +156,7 @@
         <collision>
             <origin xyz="1.11022e-16 9.71445e-17 -1.38778e-17" rpy="1.84889e-32 -3.33067e-16 -1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/br_knee_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/br_knee_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -169,7 +169,7 @@
         <visual>
             <origin xyz="-1.11022e-16 3.08149e-33 -2.55186e-33" rpy="5.10371e-33 -9.19403e-17 -1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_foot.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_foot.STL" scale="1 1 1"/>
             </geometry>
             <material name="fl_footfl_foot_visual">
                 <texture/>
@@ -179,7 +179,7 @@
         <collision>
             <origin xyz="-1.11022e-16 3.08149e-33 -2.55186e-33" rpy="5.10371e-33 -9.19403e-17 -1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_foot_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_foot_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -192,7 +192,7 @@
         <visual>
             <origin xyz="-2.77556e-17 -1.38778e-17 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_hip.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_hip.STL" scale="1 1 1"/>
             </geometry>
             <material name="fl_hipfl_hip_visual">
                 <texture/>
@@ -202,7 +202,7 @@
         <collision>
             <origin xyz="-2.77556e-17 -1.38778e-17 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_hip_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_hip_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -215,7 +215,7 @@
         <visual>
             <origin xyz="-5.55112e-17 3.46945e-17 -1.54074e-33" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_knee.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_knee.STL" scale="1 1 1"/>
             </geometry>
             <material name="fl_kneefl_knee_visual">
                 <texture/>
@@ -225,7 +225,7 @@
         <collision>
             <origin xyz="-5.55112e-17 3.46945e-17 -1.54074e-33" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fl_knee_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fl_knee_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -238,7 +238,7 @@
         <visual>
             <origin xyz="-1.11022e-16 -3.08149e-33 -1.38778e-17" rpy="0 -0 1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_foot.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_foot.STL" scale="1 1 1"/>
             </geometry>
             <material name="fr_footfr_foot_visual">
                 <texture/>
@@ -248,7 +248,7 @@
         <collision>
             <origin xyz="-1.11022e-16 -3.08149e-33 -1.38778e-17" rpy="0 -0 1.11022e-16"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_foot_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_foot_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -261,7 +261,7 @@
         <visual>
             <origin xyz="0 0 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_hip.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_hip.STL" scale="1 1 1"/>
             </geometry>
             <material name="fr_hipfr_hip_visual">
                 <texture/>
@@ -271,7 +271,7 @@
         <collision>
             <origin xyz="0 0 0" rpy="0 -0 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_hip_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_hip_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -284,7 +284,7 @@
         <visual>
             <origin xyz="-7.70372e-34 3.46945e-17 2.77556e-17" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_knee.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_knee.STL" scale="1 1 1"/>
             </geometry>
             <material name="fr_kneefr_knee_visual">
                 <texture/>
@@ -294,7 +294,7 @@
         <collision>
             <origin xyz="-7.70372e-34 3.46945e-17 2.77556e-17" rpy="0 -1.11022e-16 0"/>
             <geometry>
-                <mesh filename="model://THex_Quadruped/meshes/fr_knee_collision.STL" scale="1 1 1"/>
+                <mesh filename="package://rlpa_ros2/models/THex_Quadruped/meshes/fr_knee_collision.STL" scale="1 1 1"/>
             </geometry>
         </collision>
     </link>
@@ -492,5 +492,54 @@
         <visualize>true</visualize>
         <topic>imu</topic>
       </sensor>
+    </gazebo>
+
+    <link name="camera_link">
+        <inertial>
+            <mass value="0.001"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia ixx="1e-06" ixy="0" ixz="0" iyy="1e-06" iyz="0" izz="1e-06"/>
+        </inertial>
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.04 0.08 0.03"/> </geometry>
+            <material name="camera_mat">
+                <color rgba="0.2 0.8 0.2 1.0"/> </material>
+        </visual>
+    </link>
+
+    <joint name="camera_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="camera_link"/>
+        <origin xyz="0.0 0.05 0.15" rpy="0 0.0 1.5708"/>
+    </joint>
+
+    <gazebo reference="camera_link">
+        <sensor name="rgbd_camera" type="rgbd_camera">
+            <camera>
+                <horizontal_fov>1.92</horizontal_fov>
+                <image>
+                    <width>640</width>
+                    <height>480</height>
+                </image>
+                <clip>
+                    <near>0.05</near>
+                    <far>3.0</far> </clip>
+                <distortion>
+                    <k1>-0.0507</k1>
+                    <k2>0.0</k2>
+                    <k3>0.0</k3>
+                    <p1>0.0</p1>
+                    <p2>0.0</p2>
+                    <center>0.5 0.5</center>
+                </distortion>
+            </camera>
+            <always_on>1</always_on>
+            <update_rate>15</update_rate>
+            <visualize>true</visualize>
+            <topic>rgbd_camera</topic>
+            <enable_metrics>true</enable_metrics>
+        </sensor>
     </gazebo>
 </robot>

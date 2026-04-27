@@ -25,9 +25,6 @@ class RLPolicy(Node):
             self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
             raise ValueError("ONNX model must have input dimension of 48")
 
-        if self.expected_input_dim == 33:
-            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities from observations.")
-
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
         
         # event-driven instead of internal timer
@@ -48,10 +45,6 @@ class RLPolicy(Node):
 
         # ONNX expects a batch dimension: (1, 36)
         input_tensor = obs.reshape(1, -1)
-
-        # can I add a test here to see what is the input dimension in the ONNX file and exclude joint_velocities (indices 21 to 32) if it is 33 and keep it if 45
-        if self.expected_input_dim == 33:
-            input_tensor = np.delete(input_tensor, np.s_[21:33], axis=1)
 
         if input_tensor.shape[1] != self.expected_input_dim:
             self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")

@@ -9,16 +9,14 @@ import select
 # --- SETTINGS ---
 MAX_LIN_VEL = 1.0  # m/s
 MAX_ANG_VEL = 1.0  # rad/s
-MIN_HEIGHT = 0.04  # m
-MAX_HEIGHT = 0.11  # m
 
 msg = """
 ---------------------------
 Reading from the keyboard
 ---------------------------
 Controls:
-   q    w    e       r (Raise Height)
-   a         d       f (Lower Height)
+   q    w    e
+   a         d
    z    s    c
 
 W to increase linear velocity
@@ -57,7 +55,6 @@ class Teleop(Node):
         
         self.speed = MAX_LIN_VEL/2
         self.turn = MAX_ANG_VEL/2
-        self.target_height = 0.075 
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
@@ -85,12 +82,6 @@ class Teleop(Node):
         elif key == "D":
             self.turn = max(self.turn*0.9, 0.0)
             self.get_logger().info(f"Angular speed: {self.turn:.2f}")
-        elif key == "r":
-            self.target_height = min(self.target_height + 0.01, MAX_HEIGHT)
-            self.get_logger().info(f"Target Height: {self.target_height:.2f} m")
-        elif key == "f":
-            self.target_height = max(self.target_height - 0.01, MIN_HEIGHT)
-            self.get_logger().info(f"Target Height: {self.target_height:.2f} m")
         elif key == '\x03':
             self.destroy_node()
             rclpy.shutdown()
@@ -102,7 +93,7 @@ class Teleop(Node):
         twist = Twist()
         twist.linear.x = float(self.x * self.speed)
         twist.linear.y = float(self.y * self.speed)
-        twist.linear.z = float(self.target_height)
+        twist.linear.z = 0.0
         twist.angular.x = 0.0
         twist.angular.y = 0.0
         twist.angular.z = float(self.th * self.turn)

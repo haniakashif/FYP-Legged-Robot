@@ -1,0 +1,80 @@
+Panels:
+  - Class: rviz_common/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /RobotModel1
+        - /APF_Path1
+        - /Raw_Depth1
+      Splitter Ratio: 0.5
+    Tree Height: 500
+  - Class: rviz_common/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Alpha: 0.5
+      Color: 160; 160; 164
+      Name: Grid
+      Value: true
+    - Alpha: 1.0
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
+      Name: RobotModel
+      Value: true
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: Intensity
+      Size (m): 0.05
+      Style: Spheres
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /apf_path_pc
+      Name: APF_Path
+      Value: true
+    - Class: rviz_default_plugins/PointCloud2
+      Color Transformer: FlatColor
+      Color: 255; 255; 255
+      Size (m): 0.01
+      Style: Points
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /rgbd_camera/points
+      Name: Raw_Depth
+      Value: false # Set to false by default to save CPU. Check the box in RViz to turn it on!
+  Global Options:
+    Background Color: 48; 48; 48
+    Fixed Frame: base_link
+    Frame Rate: 30
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 2.5
+      Focal Point: 0; 0; 0
+      Name: Current View
+      Pitch: 0.4
+      Value: Orbit (rviz)
+      Yaw: 0.78
+Window Geometry:
+  Height: 800
+  Width: 1200

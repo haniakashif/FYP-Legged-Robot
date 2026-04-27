@@ -1,9 +1,10 @@
+# Start from the official ROS Humble image
 FROM osrf/ros:humble-desktop-full
 
-# Set non-interactive mode for apt-get
+# Non-interactive mode for apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
-# 1. Install basic tools
+# Basic tools
 RUN apt-get update && apt-get install -y \
     python3-pip \
     git \
@@ -13,14 +14,14 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# 2. Install Gazebo Harmonic
+# Gazebo Harmonic
 RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null \
     && apt-get update && apt-get install -y \
     gz-harmonic \
     && rm -rf /var/lib/apt/lists/*
 
-# 3. Install the ROS-Gazebo Bridge (ONLY Harmonic version)
+# ROS-Gazebo Bridge (Harmonic Version)
 # We set the environment variable so ROS knows we are using Harmonic
 ENV GZ_VERSION=harmonic
 RUN apt-get update --fix-missing \ 
@@ -36,14 +37,14 @@ RUN apt-get update --fix-missing \
     scipy \
     pin
 
-# 4. Install core ROS 2 Control libraries and URDF tools
+# ros2_control and xacro
 RUN apt-get update --fix-missing && apt-get install -y \
     ros-humble-ros2-control \
     ros-humble-ros2-controllers \
     ros-humble-xacro \
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Build gz_ros2_control from source (Required for Humble + Harmonic compatibility)
+# gz_ros2_control (building from source), required for Humble + Harmonic compatibility
 # Built into an underlay /opt/ workspace to prevent accidental overwriting by team mounts
 RUN apt-get update --fix-missing \
     && mkdir -p /opt/gz_control_ws/src \
@@ -56,26 +57,26 @@ RUN apt-get update --fix-missing \
     && /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build" \
     && rm -rf /var/lib/apt/lists/*
 
-# 6. Create the 'ros' user
+# user setup
 ARG USERNAME=ros
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+# Non-root user setup with sudo privileges, add to video/render groups for GUI access (for Gazebo and RViz) 
 RUN groupadd --gid $USER_GID $USERNAME \
     && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
     && apt-get update \
     && apt-get install -y sudo \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
-    # Fix: Create 'render' group if it doesn't exist, then add user to video/render
     && (getent group render || groupadd -r render) \
     && usermod -aG video,render $USERNAME
 
-# 7. Auto-source core ROS setup AND the underlay control workspace
+# Source ROS and gz_ros2_control workspace
 RUN echo "source /opt/ros/humble/setup.bash" >> /home/$USERNAME/.bashrc \
     && echo "source /opt/gz_control_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
     
-# 8. Install RViz and visualization dependencies (for debugging and visualization purposes)
+# RViz2
 RUN apt-get update && apt-get install -y \
     ros-humble-rviz2 \
     ros-humble-visualization-msgs \
@@ -86,6 +87,32 @@ RUN apt-get update && apt-get install -y \
     x11-apps \
     && rm -rf /var/lib/apt/lists/*
     
+# Perception dependencies
+RUN apt-get update && apt-get install -y \
+    ros-humble-grid-map-ros \
+    ros-humble-grid-map-msgs \
+    ros-humble-grid-map-rviz-plugin \
+    ros-humble-grid-map-core \
+    ros-humble-grid-map-cv \
+    ros-humble-pcl-ros \
+    ros-humble-pcl-conversions \
+    ros-humble-tf2-ros \
+    ros-humble-tf2-geometry-msgs \
+    ros-humble-tf2-eigen \
+    ros-humble-message-filters \
+    libeigen3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Kindr and Kindr_ros (required by elevation_mapping) added to a separate underlay
+RUN mkdir -p /opt/kindr_ws/src && cd /opt/kindr_ws/src \
+    && git clone https://github.com/ANYbotics/kindr.git \
+    && git clone -b ros2 https://github.com/SivertHavso/kindr_ros.git \
+    && cd /opt/kindr_ws \
+    && /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --cmake-args -DUSE_CMAKE=true"
+
+# Source into Kinder underlay
+RUN echo "source /opt/kindr_ws/install/setup.bash" >> /home/$USERNAME/.bashrc
+
 # Switch user
 USER $USERNAME
 WORKDIR /home/$USERNAME/ws

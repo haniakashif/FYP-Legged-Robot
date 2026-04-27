@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, Float64
 from sensor_msgs.msg import JointState, Imu
 from geometry_msgs.msg import Twist
 
@@ -40,13 +40,16 @@ class RLObs(Node):
         self.projected_gravity = None 
         self.last_action = [0.0 for _ in range(12)] 
         self.command = None 
-        self.target_height = None
+        self.target_height = 0.075
+        self.min_height = 0.06
+        self.max_height = 0.09
 
         # subscribers
         self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
         self.create_subscription(Imu, '/imu_sensor_broadcaster/imu', self.imu_cb, 1)
         self.create_subscription(Float64MultiArray, '/rl/actions', self.actions_cb, 1) 
         self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) 
+        self.create_subscription(Float64, '/perception/target_height', self.perception_cb, 1)
 
         # publisher
         self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) # the 33 here is just an artifact from when we mistook the buffer size for the array size - still, its fine as is
@@ -94,7 +97,10 @@ class RLObs(Node):
 
     def teleop_cb(self, msg):
         self.command = [msg.linear.x, msg.linear.y, msg.angular.z]
-        self.target_height = msg.linear.z # NEW: Extract height
+
+    def perception_cb(self, msg):
+        raw_h = msg.data
+        self.target_height = max(self.min_height, min(raw_h, self.max_height))
 
     def timer_callback(self):
         

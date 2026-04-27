@@ -40,6 +40,7 @@ class RLObs(Node):
         self.projected_gravity = None 
         self.last_action = [0.0 for _ in range(12)] 
         self.command = None 
+        self.target_height = None
 
         # subscribers
         self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
@@ -93,10 +94,11 @@ class RLObs(Node):
 
     def teleop_cb(self, msg):
         self.command = [msg.linear.x, msg.linear.y, msg.angular.z]
+        self.target_height = msg.linear.z
 
     def timer_callback(self):
         
-        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command]):
+        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command, self.target_height]):
             return
 
         if any(v is None for v in self.joint_states.values()):
@@ -105,7 +107,7 @@ class RLObs(Node):
         # self.get_logger().info("Publishing observation...")
     
         obs_list = []
-        # observation format [ang_vel, projected_gravity, command, joint_pos, joint_vel, last_action]
+        # observation format [ang_vel, projected_gravity, command, height_cmd, joint_pos, joint_vel, last_action]
 
         scaled_ang_vel = [x * 0.25 for x in self.ang_vel] # scale down angular velocity
         obs_list.extend(scaled_ang_vel)
@@ -116,6 +118,9 @@ class RLObs(Node):
 
         scaled_command = [x * 2 for x in self.command]
         obs_list.extend(scaled_command)
+
+        scaled_height_cmd = [self.target_height * 10.0, 0.0, 0.0]
+        obs_list.extend(scaled_height_cmd)
 
         # obs_list.extend(self.command)
 

@@ -9,9 +9,7 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx"
-
-        self.obs_dim = 33 # hardcoded in training
+        self.onnx_path = "../Policies/pa_2026-04-22_11-02-49_v1.onnx"
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:
@@ -23,12 +21,15 @@ class RLPolicy(Node):
 
         self.expected_input_dim = self.ort_session.get_inputs()[0].shape[1]
 
-        if self.expected_input_dim not in [33, 45]:
+        if self.expected_input_dim not in [33, 45, 48]:
             self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
-            raise ValueError("ONNX model must have input dimension of either 33 or 45")
+            raise ValueError("ONNX model must have input dimension of either 33, 45, or 48")
 
         if self.expected_input_dim == 33:
             self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities from observations.")
+
+        if self.expected_input_dim == 48:
+            self.get_logger().info("ONNX model expects 48 inputs, will include height command in observations.")
 
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
         
@@ -51,9 +52,11 @@ class RLPolicy(Node):
         # ONNX expects a batch dimension: (1, 36)
         input_tensor = obs.reshape(1, -1)
 
-        # can I add a test here to see what is the input dimension in the ONNX file and exclude joint_velocities (indices 21 to 32) if it is 33 and keep it if 45
-        if self.expected_input_dim == 33:
-            input_tensor = np.delete(input_tensor, np.s_[21:33], axis=1)
+        # can I add a test here to see what is the input dimension in the ONNX file and exclude joint_velocities (indices 24 to 35)and height command (indices 9 to 11) if it is 33 and exclude just height command if it is 45
+        if self.expected_input_dim != 48:
+            if self.expected_input_dim == 33:
+                input_tensor = np.delete(input_tensor, np.s_[24:36], axis=1)
+            input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)
 
         if input_tensor.shape[1] != self.expected_input_dim:
             self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")

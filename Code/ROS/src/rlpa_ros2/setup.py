@@ -28,12 +28,16 @@ setup(
         
         # 2. Install Config Files
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+
+        # 3. Install RViz Configs
+        (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
         
-    # 3. Install World Files (Recursive)
+    # 4. Install World Files (Recursive)
     ] + generate_data_files(os.path.join('share', package_name), 'worlds') + [
         
-    # 4. Install Model Files (Recursive)
+    # 5. Install Model Files (Recursive)
     ] + generate_data_files(os.path.join('share', package_name), 'models'),
+    
 
     install_requires=['setuptools'],
     zip_safe=True,
@@ -53,6 +57,8 @@ setup(
             'rl_action = rlpa_ros2.rl_action:main',
             'flight_recorder = rlpa_ros2.flight_recorder:main',
             'teleop = rlpa_ros2.teleop:main',
+            'perception_preprocessor = rlpa_ros2.perception_preprocessor:main',
+            'apf_planner = rlpa_ros2.apf_planner:main',
         ],
     },
 )
