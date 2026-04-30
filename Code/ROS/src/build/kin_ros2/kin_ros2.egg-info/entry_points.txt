@@ -1,0 +1,2 @@
+[console_scripts]
+kin_node = kin_ros2.kin_node:main

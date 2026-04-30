@@ -58,7 +58,7 @@ setup(
             'flight_recorder = rlpa_ros2.flight_recorder:main',
             'teleop = rlpa_ros2.teleop:main',
             'perception_preprocessor = rlpa_ros2.perception_preprocessor:main',
-            'apf_planner = rlpa_ros2.apf_planner:main',
+            'apf_planner2 = rlpa_ros2.apf_planner2:main',
         ],
     },
 )
