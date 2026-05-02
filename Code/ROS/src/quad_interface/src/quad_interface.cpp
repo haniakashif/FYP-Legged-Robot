@@ -22,22 +22,25 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         return hardware_interface::CallbackReturn::ERROR;
     }
 
-    // 1. Size our memory arrays to match the 12 joints defined in the URDF
+    // size arrays as per number of joints
     hw_states_.resize(info_.joints.size(), 0.0);
+    prev_raw_states_.resize(info_.joints.size(), 0.0);
     hw_commands_.resize(info_.joints.size(), 0.0);
 
+    // if no filter coeffs (can just set them to 1 if we don't want filtering)
     if (fir_coeffs_.empty()) {
         RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "fir_coeffs_ must contain at least one tap.");
         return hardware_interface::CallbackReturn::ERROR;
     }
 
+    // initialize state history for filtering
     state_history_.clear();
     state_history_.resize(info_.joints.size());
     for (auto & history : state_history_) {
         history.assign(fir_coeffs_.size(), 0.0);
     }
 
-    // 2. Open the physical UART serial port (/dev/serial0) and the USB port (/dev/ttyUSB0) on the Raspberry Pi 
+    // open the physical UART serial port (/dev/serial0) and the USB port (/dev/ttyUSB0) on the Raspberry Pi 
     serial_fd_ = open("/dev/serial0", O_RDWR | O_NOCTTY | O_NDELAY);
     if (serial_fd_ < 0) {
         RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "Failed to open serial port!");
@@ -50,7 +53,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         return hardware_interface::CallbackReturn::ERROR;
     }
 
-    // 3. Configure the UART port for the SSC-32U (115200 baud, 8N1)
+    // configure the UART port for the SSC-32U (115200 baud, 8N1)
     struct termios options;
     tcgetattr(serial_fd_, &options);
     cfsetispeed(&options, B115200);
@@ -58,7 +61,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     options.c_cflag |= (CLOCAL | CREAD | CS8); // 8 data bits, no parity, 1 stop bit
     tcsetattr(serial_fd_, TCSANOW, &options);
 
-    // 4. Configure the IMU port (115200 baud, 8N1, no flow control)
+    // configure the IMU port (115200 baud, 8N1, no flow control)
     struct termios imu_options;
     tcgetattr(imu_fd_, &imu_options);
     cfsetispeed(&imu_options, B115200);
@@ -80,6 +83,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     use_angular_velocity_ = false;
     use_linear_acceleration_ = false;
 
+    // which sensors to expect
     if (info_.hardware_parameters.count("use_orientation"))
         use_orientation_ = (info_.hardware_parameters.at("use_orientation") == "true" || info_.hardware_parameters.at("use_orientation") == "True");
     if (info_.hardware_parameters.count("use_angular_velocity"))
@@ -87,6 +91,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
     if (info_.hardware_parameters.count("use_linear_acceleration"))
         use_linear_acceleration_ = (info_.hardware_parameters.at("use_linear_acceleration") == "true" || info_.hardware_parameters.at("use_linear_acceleration") == "True");
 
+    // if using ADCs, open the I2C bus and prepare for communication with the ADS1015 boards
     if (use_adcs_) {
         i2c_fd_ = open("/dev/i2c-1", O_RDWR);
         if (i2c_fd_ < 0) {
@@ -98,6 +103,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         RCLCPP_INFO(rclcpp::get_logger("QuadHardwareInterface"), "ADCs disabled via URDF. Running in open-loop mode.");
     }
 
+    // if no calibration file in config
     if (info_.hardware_parameters.count("calibration_file") == 0) {
         RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), "calibration_file parameter missing from URDF!");
         return hardware_interface::CallbackReturn::ERROR;
@@ -110,7 +116,7 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         YAML::Node config = YAML::LoadFile(calib_filepath);
         YAML::Node joints_node = config["joints"];
 
-        // Safety check: Ensure YAML has exactly 12 joints like the URDF
+        // ensure YAML has exactly 12 joints like the URDF
         if (joints_node.size() != info_.joints.size()) {
             RCLCPP_ERROR(rclcpp::get_logger("QuadHardwareInterface"), 
                          "YAML joint count (%zu) does not match URDF joint count (%zu)!", 
@@ -119,7 +125,8 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         }
 
         calibrations_.resize(info_.joints.size());
-
+        
+        // calibrations_[i] corresponds to the i-th entry in the calibrations.yaml
         for (size_t i = 0; i < joints_node.size(); ++i) {
             calibrations_[i].volt_slope     = joints_node[i]["volt_slope"].as<double>();
             calibrations_[i].volt_intercept = joints_node[i]["volt_intercept"].as<double>();
@@ -148,7 +155,7 @@ std::vector<hardware_interface::StateInterface> QuadHardwareInterface::export_st
         state_interfaces.emplace_back(hardware_interface::StateInterface(info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
     }
 
-    // Export IMU States mapped specifically to "um7_imu"
+    // export imu states, under "um7_imu"
     state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.x", &imu_quat_x_));
     state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.y", &imu_quat_y_));
     state_interfaces.emplace_back(hardware_interface::StateInterface("um7_imu", "orientation.z", &imu_quat_z_));
@@ -173,7 +180,7 @@ std::vector<hardware_interface::CommandInterface> QuadHardwareInterface::export_
     return command_interfaces;
 }
 
-// --- IMU BYTE PARSER ---
+// for parsing IMU bytes
 void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
 {
     for (int i = 0; i < bytes_read; i++) {
@@ -231,7 +238,32 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
                         std::memcpy(&gx, &raw_x, sizeof(float));
                         std::memcpy(&gy, &raw_y, sizeof(float));
                         std::memcpy(&gz, &raw_z, sizeof(float));
-                        imu_gyro_x_ = gx; imu_gyro_y_ = gy; imu_gyro_z_ = gz;
+
+                        // convert from degrees/s to radians/s
+                        double raw_gx = gx * (M_PI / 180.0);
+                        double raw_gy = gy * (M_PI / 180.0);
+                        double raw_gz = gz * (M_PI / 180.0);
+
+                        // spike clamping
+                        double max_gyro_delta = 1; // 1 radian, adjust as needed
+                        double delta_gx = raw_gx - imu_gyro_x_;
+                        double delta_gy = raw_gy - imu_gyro_y_;
+                        double delta_gz = raw_gz - imu_gyro_z_;
+                        
+                        // clamp raw readings if delta exceeds threshold
+                        if (std::abs(delta_gx) > max_gyro_delta) {
+                            raw_gx = imu_gyro_x_ + (delta_gx > 0 ? max_gyro_delta : -max_gyro_delta);
+                        }
+                        if (std::abs(delta_gy) > max_gyro_delta) {
+                            raw_gy = imu_gyro_y_ + (delta_gy > 0 ? max_gyro_delta : -max_gyro_delta);
+                        }
+                        if (std::abs(delta_gz) > max_gyro_delta) {
+                            raw_gz = imu_gyro_z_ + (delta_gz > 0 ? max_gyro_delta : -max_gyro_delta);
+                        }
+
+                        imu_gyro_x_ = raw_gx;
+                        imu_gyro_y_ = raw_gy; 
+                        imu_gyro_z_ = raw_gz;
                     }
                     // Address 101 (0x65): Processed Linear Acceleration (32-bit IEEE floats, Big-Endian)
                     else if (use_linear_acceleration_ && imu_addr_ == 101 && is_batch && batch_len >= 3) {
@@ -253,6 +285,7 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
 
 hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+    // if IMU connected
     if (imu_fd_ >= 0) {
         uint8_t buffer[256];
         int bytes_read = ::read(imu_fd_, buffer, sizeof(buffer));
@@ -261,12 +294,12 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
         }
     }
 
-    if (!use_adcs_) // If ADCs are disabled, we skip reading and just return OK 
+    if (!use_adcs_) // if ADCs are disabled, we skip reading and just return OK 
     {
         return hardware_interface::return_type::OK;
     }
 
-    int addresses[3] = {0x48, 0x49, 0x4A}; // The 3 ADS1015 boards
+    int addresses[3] = {0x48, 0x49, 0x4A}; // The 3 ADS1015 boards (GND, 3.3V, SDA)
 
     // ADS1015 Config Register MSB for Single-Ended reads on A0, A1, A2, A3
     // Configures: Single-shot mode, +/- 4.096V range, 3300 Samples Per Second
@@ -274,7 +307,7 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
     uint8_t config_lsb = 0xE3; // Disables comparator, sets data rate
 
     // mapping between the order of ADC reads (A0-A3 for each board) and the URDF joint order in the ros2_control block/calibration.yaml/controllers,yaml
-    const int adc_to_urdf_map[12] = {5, 3, 10, 9, 7, 0, 2, 11, 4, 6, 1, 8};
+    const int adc_to_urdf_map[12] = {1, 5, 9, 0, 10, 3, 4, 6, 7, 8, 2, 11};
     int joint_index = 0;
 
     // Loop through the 4 channels (A0 to A3)
@@ -287,12 +320,34 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
             ::write(i2c_fd_, write_buf, 3);
         }
 
-        // 2. Wait for the ADCs to finish (3300 SPS = ~0.3ms. We wait 0.5ms to be safe)
-        usleep(500); 
+        // 2. Wait for the ADCs to finish (3300 SPS = ~0.3ms)
+        usleep(300); 
 
         // 3. Collect the data from all 3 chips
         for (int board = 0; board < 3; board++) {
             ioctl(i2c_fd_, I2C_SLAVE, addresses[board]);
+
+            bool is_ready = false;
+            int timeout_counter = 0;
+            uint8_t config_reg = 0x01;
+            uint8_t status_buf[2];
+
+            while (!is_ready && timeout_counter < 10) {
+                ::write(i2c_fd_, &config_reg, 1);
+                ::read(i2c_fd_, status_buf, 2);
+                
+                // Check the MSB (Bit 15). 0x80 is 10000000 in binary.
+                if ((status_buf[0] & 0x80) != 0) {
+                    is_ready = true;
+                } else {
+                    usleep(25); // Yield briefly so we don't choke the CPU, then check again
+                    timeout_counter++;
+                }
+            }
+
+            if (timeout_counter >= 10) {
+                RCLCPP_WARN(rclcpp::get_logger("QuadHardwareInterface"), "ADC 0x%X timeout on channel %d", addresses[board], channel);
+            }
             
             // Point to the Conversion Register (0x00)
             uint8_t reg = 0x00;
@@ -314,6 +369,17 @@ hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time &
             int urdf_idx = adc_to_urdf_map[joint_index];
 
             double raw_state = calibrations_[urdf_idx].volt_slope * voltage + calibrations_[urdf_idx].volt_intercept;
+
+            // Spike Clamping 
+            double max_delta = 0.105; // 6 degrees max change per 0.02s
+            double delta = raw_state - prev_raw_states_[urdf_idx];
+
+            if (std::abs(delta) > max_delta) 
+            {
+                raw_state = prev_raw_states_[urdf_idx] + (delta > 0 ? max_delta : -max_delta);
+            }
+
+            prev_raw_states_[urdf_idx] = raw_state;
 
             // FIR filter
             auto & history = state_history_[urdf_idx];
