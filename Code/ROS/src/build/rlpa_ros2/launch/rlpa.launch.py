@@ -1,1 +1,0 @@
-/home/syn/FYP-Legged-Robot/Code/ROS/src/rlpa_ros2/launch/rlpa.launch.py

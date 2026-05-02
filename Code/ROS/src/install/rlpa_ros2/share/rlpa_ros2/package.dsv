@@ -1,6 +1,0 @@
-source;share/rlpa_ros2/hook/pythonpath.dsv
-source;share/rlpa_ros2/hook/pythonpath.sh
-source;share/rlpa_ros2/hook/ament_prefix_path.dsv
-source;share/rlpa_ros2/hook/ament_prefix_path.sh
-source;../../build/rlpa_ros2/share/rlpa_ros2/hook/pythonpath_develop.dsv
-source;../../build/rlpa_ros2/share/rlpa_ros2/hook/pythonpath_develop.sh

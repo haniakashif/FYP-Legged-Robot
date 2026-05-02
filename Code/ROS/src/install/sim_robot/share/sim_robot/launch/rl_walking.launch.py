@@ -1,1 +1,0 @@
-/home/syn/FYP-Legged-Robot/Code/ROS/src/build/sim_robot/launch/rl_walking.launch.py
