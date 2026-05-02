@@ -1,0 +1,6 @@
+[console_scripts]
+flight_recorder = rl_ros2.flight_recorder:main
+rl_action = rl_ros2.rl_action:main
+rl_obs = rl_ros2.rl_obs:main
+rl_policy = rl_ros2.rl_policy:main
+teleop = rl_ros2.teleop:main

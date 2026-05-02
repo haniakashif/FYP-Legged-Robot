@@ -1,0 +1,7 @@
+[console_scripts]
+flight_recorder = sim_robot.flight_recorder:main
+kinematic_gait = sim_robot.kinematic_gait:main
+rl_action = sim_robot.rl_action:main
+rl_obs = sim_robot.rl_obs:main
+rl_policy = sim_robot.rl_policy:main
+teleop = sim_robot.teleop:main
