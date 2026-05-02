@@ -10,7 +10,7 @@ import select
 MAX_LIN_VEL = 1.0  # m/s
 MAX_ANG_VEL = 1.0  # rad/s
 MIN_HEIGHT = 0.04  # m
-MAX_HEIGHT = 0.15  # m
+MAX_HEIGHT = 0.11  # m
 
 msg = """
 ---------------------------

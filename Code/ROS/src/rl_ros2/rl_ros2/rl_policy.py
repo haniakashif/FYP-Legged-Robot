@@ -9,7 +9,7 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "../Policies/pa_2026-04-22_11-02-49_v1.onnx"
+        self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx"
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:
@@ -23,13 +23,15 @@ class RLPolicy(Node):
 
         if self.expected_input_dim not in [33, 45, 48]:
             self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
-            raise ValueError("ONNX model must have input dimension of either 33, 45, or 48")
+            raise ValueError(f"ONNX model must have input dimension of either 33, 45, or 48. Received: {self.expected_input_dim}")
 
         if self.expected_input_dim == 33:
-            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities from observations.")
-
-        if self.expected_input_dim == 48:
-            self.get_logger().info("ONNX model expects 48 inputs, will include height command in observations.")
+            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities and height command from observations.")
+        elif self.expected_input_dim == 45:
+            self.get_logger().info("ONNX model expects 45 inputs, will include joint velocities and exclude height command from observations.")
+        elif self.expected_input_dim == 48:
+            self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and height command in observations.")
+        
 
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
         
