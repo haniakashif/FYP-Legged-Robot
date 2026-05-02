@@ -1,96 +1,96 @@
 joints:
 
   - name: "bl_hip_joint"
-    volt_slope: 2.1442300730848514
-    volt_intercept: -2.4609372035520187
+    volt_slope: 2.1568350640575655
+    volt_intercept: -2.45985410572915
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2440
 
   - name: "br_hip_joint"
-    volt_slope: 2.1449576449152725
-    volt_intercept: -2.5909080589910425
+    volt_slope: 2.147624135075084
+    volt_intercept: -2.5993350724922104
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 700
     max_pwm: 2600
 
   - name: "fl_hip_joint"
-    volt_slope: 2.092811332150534
-    volt_intercept: -2.3905553718314514
+    volt_slope: 2.0664841839642176
+    volt_intercept: -2.3816178211357473
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 560
     max_pwm: 2440
 
   - name: "fr_hip_joint"
-    volt_slope: 2.1428633267601933
-    volt_intercept: -2.5007181593286356
+    volt_slope: 2.130274862200855
+    volt_intercept: -2.4907935011915567
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2400
 
   - name: "bl_knee_joint"
-    volt_slope: 2.0796679312005764
-    volt_intercept: -2.423170025141077
+    volt_slope: 2.1026198879970126
+    volt_intercept: -2.4284465932078922
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2500
 
   - name: "br_knee_joint"
-    volt_slope: 2.167613935279127
-    volt_intercept: -2.4535428411817652
+    volt_slope: 2.1592119649513246
+    volt_intercept: -2.4635159384547665
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2400
 
   - name: "fl_knee_joint"
-    volt_slope: 2.153670359179943
-    volt_intercept: -2.6231671376210155
+    volt_slope: 2.1273927116852196
+    volt_intercept: -2.6147905180652224
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2440
 
   - name: "fr_knee_joint"
-    volt_slope: 2.0391542585411684
-    volt_intercept: -2.534420609151124
+    volt_slope: 2.1702282931831935
+    volt_intercept: -2.6602793146777253
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 700
     max_pwm: 2560
 
   - name: "bl_foot_joint"
-    volt_slope: 2.0804880197395064
-    volt_intercept: -2.411207718290765
+    volt_slope: 2.095708993878368
+    volt_intercept: -2.411383951806943
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2500
 
   - name: "br_foot_joint"
-    volt_slope: 2.0713335122065626
-    volt_intercept: -2.41714603504946
+    volt_slope: 2.075476949944021
+    volt_intercept: -2.4220485183178524
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2500
 
   - name: "fl_foot_joint"
-    volt_slope: 2.062972213288069
-    volt_intercept: -2.439833145049992
+    volt_slope: 2.056053872314355
+    volt_intercept: -2.437153461836796
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 600
     max_pwm: 2500
 
   - name: "fr_foot_joint"
-    volt_slope: 1.9963476090364045
-    volt_intercept: -2.33407917077044
+    volt_slope: 2.006199085015835
+    volt_intercept: -2.346697522003715
     min_rad: -1.5707
     max_rad: 1.5707
     min_pwm: 560
