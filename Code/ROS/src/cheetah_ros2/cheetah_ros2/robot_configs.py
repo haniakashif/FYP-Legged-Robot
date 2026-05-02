@@ -41,7 +41,8 @@ class THexConfig():
     # Kd_balance_ori = np.diag([0.0, 0.0, 0.0])
     
     S = np.diag([1.0, 1.0, 1.0, 100.0, 100.0, 100.0])
-    alpha = 1e-4 * np.eye(12) 
+    alpha_diag = [0.1, 0.1, 1e-4] * 4 
+    alpha = np.diag(alpha_diag)
     beta = 1e-3 * np.eye(12)
     
     # Variances for stance (c) and swing (c_bar) transitions

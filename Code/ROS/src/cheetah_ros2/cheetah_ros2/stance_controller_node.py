@@ -356,6 +356,11 @@ class StanceController(Node):
         true_com = self.pin_data.com[0] 
         p_com = true_com
         
+        # # True Inertia Matrix from PInochio
+        # v_gen = np.zeros(self.pin_model.nv)
+        # pin.ccrba(self.pin_model, self.pin_data, q_gen, v_gen)
+        # I_com_world = self.pin_data.Ig.inertia
+
         pin.computeGeneralizedGravity(self.pin_model, self.pin_data, q_gen)
         g_vector_ctrl = self.pin_data.g[6:18][self.ctrl_to_pin]
         
@@ -453,6 +458,10 @@ class StanceController(Node):
         # inertia tensor is in robot frame, its rotated to world frame and then to yaw frame (where we have R_yaw as the rotation from yaw to world, so we do R_yaw^T to go from world to yaw)
         I_yaw = R_yaw.T @ R_mat @ I_body_local @ R_mat.T @ R_yaw
         tau_des_yaw = I_yaw @ omega_des_acc_yaw 
+
+        # # Use the total inertia in the yaw frame directly
+        # I_yaw = R_yaw.T @ I_com_world @ R_yaw
+        # tau_des_yaw = I_yaw @ omega_des_acc_yaw
         
         W_des_yaw = np.concatenate((F_des_yaw, tau_des_yaw)) # desired wrench in yaw-aligned frame
 
