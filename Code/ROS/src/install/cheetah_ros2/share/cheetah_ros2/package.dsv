@@ -1,0 +1,9 @@
+source;share/cheetah_ros2/hook/pythonpath.ps1
+source;share/cheetah_ros2/hook/pythonpath.dsv
+source;share/cheetah_ros2/hook/pythonpath.sh
+source;share/cheetah_ros2/hook/ament_prefix_path.ps1
+source;share/cheetah_ros2/hook/ament_prefix_path.dsv
+source;share/cheetah_ros2/hook/ament_prefix_path.sh
+source;../../build/cheetah_ros2/share/cheetah_ros2/hook/pythonpath_develop.ps1
+source;../../build/cheetah_ros2/share/cheetah_ros2/hook/pythonpath_develop.dsv
+source;../../build/cheetah_ros2/share/cheetah_ros2/hook/pythonpath_develop.sh

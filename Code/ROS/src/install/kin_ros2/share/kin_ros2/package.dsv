@@ -1,0 +1,9 @@
+source;share/kin_ros2/hook/pythonpath.ps1
+source;share/kin_ros2/hook/pythonpath.dsv
+source;share/kin_ros2/hook/pythonpath.sh
+source;share/kin_ros2/hook/ament_prefix_path.ps1
+source;share/kin_ros2/hook/ament_prefix_path.dsv
+source;share/kin_ros2/hook/ament_prefix_path.sh
+source;../../build/kin_ros2/share/kin_ros2/hook/pythonpath_develop.ps1
+source;../../build/kin_ros2/share/kin_ros2/hook/pythonpath_develop.dsv
+source;../../build/kin_ros2/share/kin_ros2/hook/pythonpath_develop.sh
