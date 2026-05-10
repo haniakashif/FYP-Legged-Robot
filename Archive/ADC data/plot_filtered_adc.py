@@ -5,7 +5,7 @@ import numpy as np
 from scipy.signal import lfilter
 
 # --- CONFIGURATION ---
-CSV_FILE = 'adc_calibration_log_pcb_1.csv'
+CSV_FILE = 'adc_calibration_log_pcb_2.csv'
 SUFFIX = "pcb_" + CSV_FILE.split('.')[0][-1] if CSV_FILE.startswith('adc_calibration_log_pcb_') else CSV_FILE.split('.')[0][-1]
 OUTPUT_DIR = 'filtered_plots_' + SUFFIX 
 
