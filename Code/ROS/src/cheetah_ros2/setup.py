@@ -45,7 +45,7 @@ setup(
             'gait_node = cheetah_ros2.gait_node:main',
             'fsm_node = cheetah_ros2.fsm_node:main',
             'estimator_node = cheetah_ros2.estimator_node:main',
-            # 'teleop_node = cheetah_ros2.teleop_node:main',
+            'teleop_node = cheetah_ros2.teleop_node:main',
             'stance_controller = cheetah_ros2.stance_controller_node:main',
             'swing_controller = cheetah_ros2.swing_controller_node:main'
         ],

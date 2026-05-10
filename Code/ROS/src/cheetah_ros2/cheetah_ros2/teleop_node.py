@@ -3,118 +3,125 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 import sys
-import select
 import termios
 import tty
+import select
 
-# Instructions to display in the terminal
+# --- SETTINGS ---
+MAX_LIN_VEL = 1.0  # m/s
+MAX_ANG_VEL = 1.0  # rad/s
+MIN_HEIGHT = 0.04  # m
+MAX_HEIGHT = 0.11  # m
+
 MSG = """
-Control Your THex Quadruped!
 ---------------------------
-Moving around:
-        UP
-   LEFT DOWN RIGHT
+Reading from the keyboard
+---------------------------
+Controls:
+   q    w    e       r (Raise Height)
+   a         d       f (Lower Height)
+   z    s    c
 
-Turning:
-   'q' : Turn Left (CCW)
-   'e' : Turn Right (CW)
+W to increase linear velocity
+S to decrease linear velocity
+A to increase angular velocity (left)
+D to decrease angular velocity (right)
 
-'ctrl+c' : Quit
-
-Current Speeds:
+CTRL-C to quit
 """
+
+moveBindings = {
+    'w': (0, 1, 0, 0),  # forward
+    's': (0, -1, 0, 0),  # backward
+    'q': (0, 1, 0, 1),  # turn forward right
+    'e': (0, 1, 0, -1),  # turn forward left
+    'z': (0, -1, 0, -1),  # turn backward right
+    'c': (0, -1, 0, 1),  # turn backward left
+    'a': (-1, 0, 0, 0),  # left strafe
+    'd': (1, 0, 0, 0),  # right
+}
 
 class TeleopNode(Node):
     def __init__(self):
         super().__init__('teleop_node')
         
-        # Publish to the standard ROS velocity topic
-        self.pub_cmd = self.create_publisher(Twist, '/cmd_vel', 10)
+        # Publish teleop commands for the gait controllers
+        self.pub_teleop = self.create_publisher(Twist, '/teleop', 1)
         
-        # Safe maximum speeds for a quadruped crawl/trot
-        self.max_lin_vel = 0.5  # m/s
-        self.max_ang_vel = 1.0  # rad/s
-        
-        # Step size for each key press
-        self.lin_step = 0.1
-        self.ang_step = 0.2
-        
-        # Current commanded velocities
-        self.cmd_xvel = 0.5
-        self.cmd_yvel = 0.5
-        self.cmd_yaw_rate = 0.0
+        self.speed = MAX_LIN_VEL / 2
+        self.turn = MAX_ANG_VEL / 2
+        self.target_height = 0.075
+        self.x = 0.0
+        self.y = 0.0
+        self.th = 0.0
         
         # Save terminal settings to restore them on exit
         self.settings = termios.tcgetattr(sys.stdin)
         
         print(MSG)
-        
-        # Run the input loop at 20Hz
-        self.timer = self.create_timer(0.05, self.keyboard_loop)
+
+        self.create_timer(0.1, self.timer_callback)
 
     def get_key(self):
-        """Captures a single keypress from the terminal without requiring 'Enter'."""
         tty.setraw(sys.stdin.fileno())
-        # Non-blocking read
-        rlist, _, _ = select.select([sys.stdin], [], [], 0.01)
+        rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
         if rlist:
             key = sys.stdin.read(1)
-            # Handle arrow keys (which send 3 characters starting with '\x1b')
-            if key == '\x1b':
-                key += sys.stdin.read(2)
         else:
             key = ''
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
         return key
 
-    def keyboard_loop(self):
+    def timer_callback(self):
         key = self.get_key()
-        
+
         updated = False
-        
+
         if key:
-            if key == '\x1b[A':    # Up Arrow
-                self.cmd_xvel += self.lin_step
+            if key in moveBindings.keys():
+                self.x = moveBindings[key][0]
+                self.y = moveBindings[key][1]
+                self.th = moveBindings[key][3]
                 updated = True
-            elif key == '\x1b[B':  # Down Arrow
-                self.cmd_xvel -= self.lin_step
-                updated = True
-            elif key == '\x1b[C':  # Right Arrow
-                self.cmd_yvel -= self.lin_step
-                updated = True
-            elif key == '\x1b[D':  # Left Arrow
-                self.cmd_yvel += self.lin_step
-                updated = True
-            elif key == 'q' or key == 'Q':
-                self.cmd_yaw_rate += self.ang_step
-                updated = True
-            elif key == 'e' or key == 'E':
-                self.cmd_yaw_rate -= self.ang_step
-                updated = True
-            elif key == ' ' or key == 's' or key == 'S':
-                self.cmd_xvel = 0.0
-                self.cmd_yvel = 0.0
-                self.cmd_yaw_rate = 0.0
-                updated = True
-            elif key == '\x03':    # Ctrl+C
+            elif key == 'W':
+                self.speed = min(self.speed * 1.1, MAX_LIN_VEL)
+                self.get_logger().info(f"Linear speed: {self.speed:.2f}")
+            elif key == 'S':
+                self.speed = max(self.speed * 0.9, 0.0)
+                self.get_logger().info(f"Linear speed: {self.speed:.2f}")
+            elif key == 'A':
+                self.turn = min(self.turn * 1.1, MAX_ANG_VEL)
+                self.get_logger().info(f"Angular speed: {self.turn:.2f}")
+            elif key == 'D':
+                self.turn = max(self.turn * 0.9, 0.0)
+                self.get_logger().info(f"Angular speed: {self.turn:.2f}")
+            elif key == 'r':
+                self.target_height = min(self.target_height + 0.01, MAX_HEIGHT)
+                self.get_logger().info(f"Target Height: {self.target_height:.2f} m")
+            elif key == 'f':
+                self.target_height = max(self.target_height - 0.01, MIN_HEIGHT)
+                self.get_logger().info(f"Target Height: {self.target_height:.2f} m")
+            elif key == '\x03':
                 raise KeyboardInterrupt
-                
-            # Clamp velocities to safe limits
-            self.cmd_xvel = max(min(self.cmd_xvel, self.max_lin_vel), -self.max_lin_vel)
-            self.cmd_yvel = max(min(self.cmd_yvel, self.max_lin_vel), -self.max_lin_vel)
-            self.cmd_yaw_rate = max(min(self.cmd_yaw_rate, self.max_ang_vel), -self.max_ang_vel)
+
+        if not key in moveBindings.keys() and key not in ('W', 'S', 'A', 'D', 'r', 'f'):
+            self.x = 0.0
+            self.y = 0.0
+            self.th = 0.0
 
         if updated:
-            # Print current state so you know what you are commanding
-            sys.stdout.write(f"\rVx: {self.cmd_xvel:.1f} m/s | Vy: {self.cmd_yvel:.1f} m/s | Wz: {self.cmd_yaw_rate:.1f} rad/s    ")
+            sys.stdout.write(f"\rVx: {self.x * self.speed:.1f} m/s | Vy: {self.y * self.speed:.1f} m/s | Wz: {self.th * self.turn:.1f} rad/s    ")
             sys.stdout.flush()
 
-        # Always publish the Twist message
-        msg = Twist()
-        msg.linear.x = float(self.cmd_xvel)
-        msg.linear.y = float(self.cmd_yvel)
-        msg.angular.z = float(self.cmd_yaw_rate)
-        self.pub_cmd.publish(msg)
+        twist = Twist()
+        twist.linear.x = float(self.x * self.speed)
+        twist.linear.y = float(self.y * self.speed)
+        twist.linear.z = float(self.target_height)
+        twist.angular.x = 0.0
+        twist.angular.y = 0.0
+        twist.angular.z = float(self.th * self.turn)
+
+        self.pub_teleop.publish(twist)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -124,10 +131,11 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        # Restore terminal settings gracefully
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, node.settings)
+        # Restore terminal settings gracefully
         node.destroy_node()
-        rclpy.shutdown()
+        if rclpy.ok():
+            rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

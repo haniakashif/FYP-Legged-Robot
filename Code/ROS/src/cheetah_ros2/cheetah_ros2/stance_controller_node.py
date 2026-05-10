@@ -5,6 +5,7 @@ import osqp
 import pinocchio as pin
 
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64MultiArray
 from scipy import sparse
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
@@ -87,6 +88,7 @@ class StanceController(Node):
         self.sub_swing = self.create_subscription(Float64MultiArray, '/swing_phases', self.swing_cb, 1)
         self.sub_nom = self.create_subscription(Float64MultiArray, '/fsm_state', self.nom_cb, 1)
         self.sub_jacobians = self.create_subscription(Float64MultiArray, '/foot_jacobians', self.jacobian_cb, 1)
+        self.sub_teleop = self.create_subscription(Twist, '/teleop', self.teleop_cb, 1)
         
         self.timer = self.create_timer(self.dt_control, self.control_loop)
 
@@ -113,6 +115,11 @@ class StanceController(Node):
     def jacobian_cb(self, msg): 
         # self.get_logger().info(f'Jacobian Callback: Received Jacobian data. {msg}')
         self.foot_jacobians = np.array(msg.data).reshape(4, 3, 12)
+
+    def teleop_cb(self, msg):
+        self.cmd_xvel = float(msg.linear.x)
+        self.cmd_yvel = float(msg.linear.y)
+        self.cmd_yaw_turn_rate = float(msg.angular.z)
 
     # for debugging
     def publish_target_marker(self, p_target: np.ndarray):

@@ -5,6 +5,7 @@ import math
 import pinocchio as pin
 
 from rclpy.node import Node
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64MultiArray, Float64
 from cheetah_ros2.linear_mpc_configs import LinearMpcConfig
 from cheetah_ros2.robot_configs import THexConfig
@@ -104,6 +105,7 @@ class SwingController(Node):
         self.sub_swing_phase = self.create_subscription(Float64MultiArray, '/swing_phases', self.swing_phase_cb, 1)
         self.sub_jacobians = self.create_subscription(Float64MultiArray, '/foot_jacobians', self.jacobian_cb, 1)
         self.sub_fsm = self.create_subscription(Float64MultiArray, '/fsm_state', self.fsm_state_cb, 1)
+        self.sub_teleop = self.create_subscription(Twist, '/teleop', self.teleop_cb, 1)
         
         self.dt_control = LinearMpcConfig.dt_control
         self.timer = self.create_timer(self.dt_control, self.control_loop)
@@ -185,6 +187,11 @@ class SwingController(Node):
         
     def fsm_state_cb(self, msg):
         self.fsm_state = np.array(msg.data)
+
+    def teleop_cb(self, msg):
+        self.cmd_xvel = float(msg.linear.x)
+        self.cmd_yvel = float(msg.linear.y)
+        self.cmd_yaw_turn_rate = float(msg.angular.z)
 
 
     def swing_phase_cb(self, msg):
