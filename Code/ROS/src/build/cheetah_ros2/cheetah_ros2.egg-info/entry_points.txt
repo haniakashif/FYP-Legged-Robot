@@ -1,8 +1,0 @@
-[console_scripts]
-effort_controller = cheetah_ros2.effort_controller:main
-estimator_node = cheetah_ros2.estimator_node:main
-fsm_node = cheetah_ros2.fsm_node:main
-gait_node = cheetah_ros2.gait_node:main
-stance_controller = cheetah_ros2.stance_controller_node:main
-swing_controller = cheetah_ros2.swing_controller_node:main
-

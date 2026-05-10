@@ -1,1 +1,0 @@
-/workspaces/FYP-Legged-Robot/Code/ROS/src/build/quad_interface/ament_cmake_core/quad_interfaceConfig-version.cmake

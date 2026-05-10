@@ -1,9 +1,0 @@
-[console_scripts]
-apf_planner2 = rlpa_ros2.apf_planner2:main
-flight_recorder = rlpa_ros2.flight_recorder:main
-perception_preprocessor = rlpa_ros2.perception_preprocessor:main
-rl_action = rlpa_ros2.rl_action:main
-rl_obs = rlpa_ros2.rl_obs:main
-rl_policy = rlpa_ros2.rl_policy:main
-teleop = rlpa_ros2.teleop:main
-

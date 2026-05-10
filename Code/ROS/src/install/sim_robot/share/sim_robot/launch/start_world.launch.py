@@ -1,1 +1,0 @@
-/workspaces/FYP-Legged-Robot/Code/ROS/src/build/sim_robot/launch/start_world.launch.py

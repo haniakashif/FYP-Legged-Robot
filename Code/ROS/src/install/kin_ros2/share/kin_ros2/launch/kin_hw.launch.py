@@ -1,1 +1,0 @@
-/workspaces/FYP-Legged-Robot/Code/ROS/src/build/kin_ros2/launch/kin_hw.launch.py

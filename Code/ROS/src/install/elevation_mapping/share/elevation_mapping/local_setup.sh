@@ -1,1 +1,0 @@
-/workspaces/FYP-Legged-Robot/Code/ROS/src/build/elevation_mapping/ament_cmake_environment_hooks/local_setup.sh
