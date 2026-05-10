@@ -4,6 +4,9 @@
 #include <deque>
 #include <vector>
 #include <string>
+#include <thread>
+#include <mutex>
+#include <atomic>
 
 // Core ROS 2 and Hardware Interface libraries
 #include "rclcpp/rclcpp.hpp"
@@ -32,6 +35,7 @@ class QuadHardwareInterface : public hardware_interface::SystemInterface
 public:
   // 1. The Setup Function
   hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
+  ~QuadHardwareInterface() override;
 
   // 2. The Memory Exporters
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
@@ -57,6 +61,17 @@ private:
   double imu_quat_x_ = 0.0, imu_quat_y_ = 0.0, imu_quat_z_ = 0.0, imu_quat_w_ = 1.0;
   double imu_gyro_x_ = 0.0, imu_gyro_y_ = 0.0, imu_gyro_z_ = 0.0;
   double imu_accel_x_ = 0.0, imu_accel_y_ = 0.0, imu_accel_z_ = 0.0;
+
+  // Threading for IMU
+  std::thread imu_thread_;
+  std::atomic<bool> stop_imu_thread_{false};
+  std::mutex imu_mutex_;
+  void imu_worker();
+
+  // Variables to hold the parsed data (protected by mutex)
+  double latest_imu_quat_x_ = 0.0, latest_imu_quat_y_ = 0.0, latest_imu_quat_z_ = 0.0, latest_imu_quat_w_ = 1.0;
+  double latest_imu_gyro_x_ = 0.0, latest_imu_gyro_y_ = 0.0, latest_imu_gyro_z_ = 0.0;
+  double latest_imu_accel_x_ = 0.0, latest_imu_accel_y_ = 0.0, latest_imu_accel_z_ = 0.0;
 
   // File descriptor for the Raspberry Pi's physical UART serial port
   int serial_fd_;

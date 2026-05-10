@@ -16,6 +16,17 @@
 namespace quad_interface
 {
 
+QuadHardwareInterface::~QuadHardwareInterface()
+{
+    stop_imu_thread_ = true;
+    if (imu_thread_.joinable()) {
+        imu_thread_.join();
+    }
+    if (serial_fd_ >= 0) close(serial_fd_);
+    if (i2c_fd_ >= 0) close(i2c_fd_);
+    if (imu_fd_ >= 0) close(imu_fd_);
+}
+
 hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware_interface::HardwareInfo & info)
 {
     if (hardware_interface::SystemInterface::on_init(info) != hardware_interface::CallbackReturn::SUCCESS) {
@@ -143,6 +154,13 @@ hardware_interface::CallbackReturn QuadHardwareInterface::on_init(const hardware
         return hardware_interface::CallbackReturn::ERROR;
     }
 
+    // Start the dedicated IMU polling thread
+    if (imu_fd_ >= 0) {
+        stop_imu_thread_ = false;
+        imu_thread_ = std::thread(&QuadHardwareInterface::imu_worker, this);
+        RCLCPP_INFO(rclcpp::get_logger("QuadHardwareInterface"), "IMU background thread started.");
+    }
+
     RCLCPP_INFO(rclcpp::get_logger("QuadHardwareInterface"), "Hardware initialized successfully.");
     return hardware_interface::CallbackReturn::SUCCESS;
 }
@@ -180,6 +198,21 @@ std::vector<hardware_interface::CommandInterface> QuadHardwareInterface::export_
     return command_interfaces;
 }
 
+void QuadHardwareInterface::imu_worker()
+{
+    uint8_t buffer[256];
+    while (!stop_imu_thread_) {
+        // Use a small timeout or non-blocking read to avoid locking the thread forever
+        int bytes_read = ::read(imu_fd_, buffer, sizeof(buffer));
+        if (bytes_read > 0) {
+            parse_imu_buffer(buffer, bytes_read);
+        } else {
+            // Small sleep to prevent pegging the CPU at 100% when no data is available
+            usleep(1000); 
+        }
+    }
+}
+
 // for parsing IMU bytes
 void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
 {
@@ -187,12 +220,27 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
         uint8_t byte = buffer[i];
 
         switch (imu_sync_state_) {
-            case 0: if (byte == 's') imu_sync_state_ = 1; break;
-            case 1: imu_sync_state_ = (byte == 'n') ? 2 : 0; break;
-            case 2: imu_sync_state_ = (byte == 'p') ? 3 : 0; break;
+            case 0: 
+                if (byte == 's') {
+                    imu_sync_state_ = 1; 
+                }
+                break;
+            case 1: 
+                imu_sync_state_ = (byte == 'n') ? 2 : 0; 
+                break;
+            case 2: 
+                imu_sync_state_ = (byte == 'p') ? 3 : 0; 
+                break;
             case 3: // Packet Type
                 imu_pt_ = byte;
                 imu_data_len_ = ((imu_pt_ & 0x40) ? ((imu_pt_ >> 2) & 0x0F) * 4 : 4);
+                
+                // Safety check: UM7 max payload is usually 64 bytes. If it's higher, it's a corrupted header.
+                if (imu_data_len_ > 64) {
+                    imu_sync_state_ = 0;
+                    break;
+                }
+                
                 imu_sync_state_ = 4;
                 break;
             case 4: // Address
@@ -224,10 +272,11 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
                         int16_t x = (imu_data_buf_[2] << 8) | imu_data_buf_[3];
                         int16_t y = (imu_data_buf_[4] << 8) | imu_data_buf_[5];
                         int16_t z = (imu_data_buf_[6] << 8) | imu_data_buf_[7];
-                        imu_quat_w_ = w / 29789.09;
-                        imu_quat_x_ = x / 29789.09;
-                        imu_quat_y_ = y / 29789.09;
-                        imu_quat_z_ = z / 29789.09;
+                        std::lock_guard<std::mutex> lock(imu_mutex_);
+                        latest_imu_quat_w_ = w / 29789.09;
+                        latest_imu_quat_x_ = x / 29789.09;
+                        latest_imu_quat_y_ = y / 29789.09;
+                        latest_imu_quat_z_ = z / 29789.09;
                     }
                     // Address 97: Processed Gyro (32-bit IEEE floats, Big-Endian)
                     else if (use_angular_velocity_ && imu_addr_ == 97 && is_batch && batch_len >= 3) {
@@ -239,31 +288,32 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
                         std::memcpy(&gy, &raw_y, sizeof(float));
                         std::memcpy(&gz, &raw_z, sizeof(float));
 
-                        // convert from degrees/s to radians/s
+                        // Convert from degrees/s to radians/s
                         double raw_gx = gx * (M_PI / 180.0);
                         double raw_gy = gy * (M_PI / 180.0);
                         double raw_gz = gz * (M_PI / 180.0);
 
                         // spike clamping
                         double max_gyro_delta = 1; // 1 radian, adjust as needed
-                        double delta_gx = raw_gx - imu_gyro_x_;
-                        double delta_gy = raw_gy - imu_gyro_y_;
-                        double delta_gz = raw_gz - imu_gyro_z_;
+                        double delta_gx = raw_gx - latest_imu_gyro_x_;
+                        double delta_gy = raw_gy - latest_imu_gyro_y_;
+                        double delta_gz = raw_gz - latest_imu_gyro_z_;
                         
                         // clamp raw readings if delta exceeds threshold
                         if (std::abs(delta_gx) > max_gyro_delta) {
-                            raw_gx = imu_gyro_x_ + (delta_gx > 0 ? max_gyro_delta : -max_gyro_delta);
+                            raw_gx = latest_imu_gyro_x_ + (delta_gx > 0 ? max_gyro_delta : -max_gyro_delta);
                         }
                         if (std::abs(delta_gy) > max_gyro_delta) {
-                            raw_gy = imu_gyro_y_ + (delta_gy > 0 ? max_gyro_delta : -max_gyro_delta);
+                            raw_gy = latest_imu_gyro_y_ + (delta_gy > 0 ? max_gyro_delta : -max_gyro_delta);
                         }
                         if (std::abs(delta_gz) > max_gyro_delta) {
-                            raw_gz = imu_gyro_z_ + (delta_gz > 0 ? max_gyro_delta : -max_gyro_delta);
+                            raw_gz = latest_imu_gyro_z_ + (delta_gz > 0 ? max_gyro_delta : -max_gyro_delta);
                         }
 
-                        imu_gyro_x_ = raw_gx;
-                        imu_gyro_y_ = raw_gy; 
-                        imu_gyro_z_ = raw_gz;
+                        std::lock_guard<std::mutex> lock(imu_mutex_);
+                        latest_imu_gyro_x_ = raw_gx;
+                        latest_imu_gyro_y_ = raw_gy; 
+                        latest_imu_gyro_z_ = raw_gz;
                     }
                     // Address 101 (0x65): Processed Linear Acceleration (32-bit IEEE floats, Big-Endian)
                     else if (use_linear_acceleration_ && imu_addr_ == 101 && is_batch && batch_len >= 3) {
@@ -274,9 +324,15 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
                         std::memcpy(&ax, &raw_x, sizeof(float));
                         std::memcpy(&ay, &raw_y, sizeof(float));
                         std::memcpy(&az, &raw_z, sizeof(float));
-                        imu_accel_x_ = ax; imu_accel_y_ = ay; imu_accel_z_ = az;
+                        std::lock_guard<std::mutex> lock(imu_mutex_);
+                        latest_imu_accel_x_ = ax; latest_imu_accel_y_ = ay; latest_imu_accel_z_ = az;
                     }
+                } else {
+                    // CRITICAL: If checksum fails, we likely latched onto a false 's' byte mid-payload.
+                    // We must aggressively reset to avoid reading garbage.
+                    imu_sync_state_ = 0;
                 }
+                
                 imu_sync_state_ = 0;
                 break;
         }
@@ -285,13 +341,21 @@ void QuadHardwareInterface::parse_imu_buffer(uint8_t* buffer, int bytes_read)
 
 hardware_interface::return_type QuadHardwareInterface::read(const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
-    // if IMU connected
+    // 1. Grab the latest IMU data from the background thread safely
     if (imu_fd_ >= 0) {
-        uint8_t buffer[256];
-        int bytes_read = ::read(imu_fd_, buffer, sizeof(buffer));
-        if (bytes_read > 0) {
-            parse_imu_buffer(buffer, bytes_read);
-        }
+        std::lock_guard<std::mutex> lock(imu_mutex_);
+        imu_quat_x_ = latest_imu_quat_x_;
+        imu_quat_y_ = latest_imu_quat_y_;
+        imu_quat_z_ = latest_imu_quat_z_;
+        imu_quat_w_ = latest_imu_quat_w_;
+        
+        imu_gyro_x_ = latest_imu_gyro_x_;
+        imu_gyro_y_ = latest_imu_gyro_y_;
+        imu_gyro_z_ = latest_imu_gyro_z_;
+        
+        imu_accel_x_ = latest_imu_accel_x_;
+        imu_accel_y_ = latest_imu_accel_y_;
+        imu_accel_z_ = latest_imu_accel_z_;
     }
 
     if (!use_adcs_) // if ADCs are disabled, we skip reading and just return OK 
