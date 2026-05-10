@@ -4,9 +4,12 @@ from std_msgs.msg import Float64MultiArray, Float64
 from sensor_msgs.msg import JointState, Imu
 from geometry_msgs.msg import Twist
 
-def R_from_q(q): 
+def R_from_q(q):
     x, y, z, w = q
-    s = 1/(x*x + y*y + z*z + w*w)
+    norm_sq = x*x + y*y + z*z + w*w
+    if norm_sq < 1e-12:
+        return [[1,0,0],[0,1,0],[0,0,1]]
+    s = 1/norm_sq
     R = [[0 for _ in range(3)] for _ in range(3)]
     R[0][0] = 1 - 2*s*(y*y + z*z)
     R[0][1] = 2*s*(x*y - z*w)
@@ -83,10 +86,11 @@ class RLObs(Node):
             self.joint_states[base_name] = new_pos
         
     def imu_cb(self, msg):
-        self.ang_vel = [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
-        
         orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+        if sum(v*v for v in orientation) < 1e-12:
+            return
 
+        self.ang_vel = [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
         Rq = R_from_q(orientation)
 
         # multiplication with R_t of [0, 0, -1]

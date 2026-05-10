@@ -1,0 +1,311 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+<world name="robot_in_cave">
+      <scene>
+      <sky>
+    </sky>
+      </scene>
+      
+  <!-- =========================================================
+       Physics & Core Plugins (from Simple.sdf)
+       ========================================================= -->
+  <physics name="1ms" type="ignored">
+    <max_step_size>0.001</max_step_size>
+    <real_time_factor>1.0</real_time_factor>
+  </physics>
+  <plugin filename="gz-sim-physics-system"    name="gz::sim::systems::Physics"/>
+  <plugin filename="gz-sim-sensors-system"    name="gz::sim::systems::Sensors">
+    <render_engine>ogre2</render_engine>
+  </plugin>
+  <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+  <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+  <!-- =========================================================
+       Lighting — dim ambient to feel like a cave interior
+       ========================================================= -->
+  <light type="directional" name="sun">
+    <cast_shadows>true</cast_shadows>
+    <pose>0 0 10 0 0 0</pose>
+    <diffuse>1.0 0.75 0.4 1</diffuse>
+    <specular>1.0 1.0 1.0 1</specular>
+    <direction>0.0 0.5 -0.5</direction>
+  </light>
+
+  <!-- =========================================================
+       GUI — richer panel set from CameraTube.sdf
+       ========================================================= -->
+  <gui fullscreen="0">
+
+    <plugin filename="MinimalScene" name="3D View">
+      <gz-gui>
+        <title>3D View</title>
+        <property type="bool"   key="showTitleBar">false</property>
+        <property type="string" key="state">docked</property>
+      </gz-gui>
+      <engine>ogre2</engine>
+      <scene>scene</scene>
+      <ambient_light>0.0 0.0 0.0</ambient_light>
+      <background_color>0.0 0.0 0.0</background_color>
+      <!-- Camera starts behind and above the robot spawn point -->
+      <camera_pose>-2.5 -0.82 1.58 0.00 0.29 0</camera_pose>
+    </plugin>
+
+    <plugin filename="TransformControl" name="Transform control">
+      <gz-gui>
+        <title>Transform control</title>
+        <anchors target="3D View">
+          <line own="left"  target="left"/>
+          <line own="top"   target="top"/>
+        </anchors>
+        <property key="resizable"    type="bool">false</property>
+        <property key="width"        type="double">250</property>
+        <property key="height"       type="double">50</property>
+        <property key="state"        type="string">floating</property>
+        <property key="showTitleBar" type="bool">false</property>
+        <property key="cardBackground" type="string">#777777</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+      <gz-gui>
+        <property key="state"        type="string">floating</property>
+        <property key="width"        type="double">5</property>
+        <property key="height"       type="double">5</property>
+        <property key="showTitleBar" type="bool">false</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="GzSceneManager" name="Scene Manager">
+      <gz-gui>
+        <property key="resizable"    type="bool">false</property>
+        <property key="width"        type="double">5</property>
+        <property key="height"       type="double">5</property>
+        <property key="state"        type="string">floating</property>
+        <property key="showTitleBar" type="bool">false</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="InteractiveViewControl" name="Interactive view control">
+      <gz-gui>
+        <property key="resizable"    type="bool">false</property>
+        <property key="width"        type="double">5</property>
+        <property key="height"       type="double">5</property>
+        <property key="state"        type="string">floating</property>
+        <property key="showTitleBar" type="bool">false</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="CameraTracking" name="Camera Tracking">
+      <gz-gui>
+        <property key="resizable"    type="bool">false</property>
+        <property key="width"        type="double">5</property>
+        <property key="height"       type="double">5</property>
+        <property key="state"        type="string">floating</property>
+        <property key="showTitleBar" type="bool">false</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="WorldControl" name="World control">
+      <gz-gui>
+        <title>World control</title>
+        <property type="bool"   key="showTitleBar">false</property>
+        <property type="bool"   key="resizable">false</property>
+        <property type="double" key="height">72</property>
+        <property type="double" key="z">1</property>
+        <property type="string" key="state">floating</property>
+        <anchors target="3D View">
+          <line own="left"   target="left"/>
+          <line own="bottom" target="bottom"/>
+        </anchors>
+      </gz-gui>
+      <play_pause>true</play_pause>
+      <step>true</step>
+      <start_paused>true</start_paused>
+      <use_event>true</use_event>
+    </plugin>
+
+    <plugin filename="WorldStats" name="World stats">
+      <gz-gui>
+        <title>World stats</title>
+        <property type="bool"   key="showTitleBar">false</property>
+        <property type="bool"   key="resizable">false</property>
+        <property type="double" key="height">110</property>
+        <property type="double" key="width">290</property>
+        <property type="double" key="z">1</property>
+        <property type="string" key="state">floating</property>
+        <anchors target="3D View">
+          <line own="right"  target="right"/>
+          <line own="bottom" target="bottom"/>
+        </anchors>
+      </gz-gui>
+      <sim_time>true</sim_time>
+      <real_time>true</real_time>
+      <real_time_factor>true</real_time_factor>
+      <iterations>true</iterations>
+    </plugin>
+
+    <plugin filename="ComponentInspector" name="Component inspector">
+      <gz-gui>
+        <property type="string" key="state">docked</property>
+      </gz-gui>
+    </plugin>
+
+    <plugin filename="EntityTree" name="Entity tree">
+      <gz-gui>
+        <property type="string" key="state">docked</property>
+      </gz-gui>
+    </plugin>
+
+    <!-- Image display panels — only useful when the camera sensor below is enabled -->
+    <!--
+    <plugin filename="ImageDisplay" name="Image Display - RGBD Image">
+      <gz-gui>
+        <title>RGBD: image</title>
+        <property key="state"  type="string">floating</property>
+        <property type="double" key="width">350</property>
+        <property type="double" key="height">315</property>
+        <property type="double" key="y">320</property>
+      </gz-gui>
+      <topic>/rgbd_camera/image</topic>
+      <topic_picker>false</topic_picker>
+    </plugin>
+    <plugin filename="ImageDisplay" name="Image Display - RGBD Depth">
+      <gz-gui>
+        <title>RGBD: depth</title>
+        <property key="state"  type="string">floating</property>
+        <property type="double" key="width">350</property>
+        <property type="double" key="height">315</property>
+        <property type="double" key="x">500</property>
+        <property type="double" key="y">320</property>
+      </gz-gui>
+      <topic>/rgbd_camera/depth_image</topic>
+      <topic_picker>false</topic_picker>
+    </plugin>
+    -->
+
+  </gui>
+
+  <!-- =========================================================
+       Cave environment — procedural mesh from CameraTube.sdf
+       Pose kept exactly as authored: x=-9.11 y=24.08 z=17.78
+       roll=-1.56 pitch=0.29 yaw=0
+       keeping copy of old cave environment here in case: /home/syn/.gazebo/models/my_cave_model/meshes/mesh.obj
+       pose params: near left up
+       ========================================================= -->
+  <model name="hard_cave">
+    <static>true</static>
+    <link name="link">
+      <pose>5.5 0.0 0.0 0.00 0.0 3.14</pose>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>floors/hard4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>floors/hard4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.0 0.0 0.0 1</ambient>   <!-- Dark grey/brown base shadow -->
+          <diffuse>0.20 0.20 0.20 1</diffuse>   <!-- Dark matte rock color -->
+          <specular>0.0 0.0 0.0 1</specular>    <!-- Kills 100% of the sparkle/shine -->
+        </material>
+      </visual>
+    </link>
+  </model>
+
+  <model name="med_cave">
+    <static>true</static>
+    <link name="link">
+      <pose>-1.0 0.0 0.0 0.00 0.0 3.14</pose>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>floors/medium4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>floors/medium4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.0 0.0 0.0 1</ambient>   <!-- Dark grey/brown base shadow -->
+          <diffuse>0.20 0.20 0.20 1</diffuse>   <!-- Dark matte rock color -->
+          <specular>0.0 0.0 0.0 1</specular>    <!-- Kills 100% of the sparkle/shine -->
+        </material>
+      </visual>
+    </link>
+  </model>
+
+  <model name="easy_cave">
+    <static>true</static>
+    <link name="link">
+      <pose>-7.5 0.0 0.0 0.00 0.0 3.14</pose>
+      <collision name="collision">
+        <geometry>
+          <mesh>
+            <uri>floors/easy4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>floors/easy4.obj</uri>
+            <scale>0.06 0.06 0.06</scale>
+          </mesh>
+        </geometry>
+        <material>
+          <ambient>0.0 0.0 0.0 1</ambient>   <!-- Dark grey/brown base shadow -->
+          <diffuse>0.20 0.20 0.20 1</diffuse>   <!-- Dark matte rock color -->
+          <specular>0.0 0.0 0.0 1</specular>    <!-- Kills 100% of the sparkle/shine -->
+        </material>
+      </visual>
+    </link>
+  </model>
+
+
+  <!-- =========================================================
+       Ground plane — wide flat base so the robot doesn't fall
+       ========================================================= -->
+  <model name="ground_plane">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <box><size>100 100 0.1</size></box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box><size>100 100 0.1</size></box>
+        </geometry>
+        <material>
+          <ambient>0.0 0.0 0.0 1</ambient>
+          <diffuse>0.05 0.05 0.05 1</diffuse>
+          <specular>0.2 0.13 0.05 1</specular>
+        </material>
+      </visual>
+    </link>
+  </model>
+
+  <!-- =========================================================
+       Robot — THex_Quadruped from Simple.sdf
+       Spawned at the entrance of cave module 1 (x=0.2, z=0.2)
+       ========================================================= -->
+
+
+</world>
+</sdf>
