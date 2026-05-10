@@ -14,8 +14,9 @@ class RLPolicy(Node):
         self.last_command = np.zeros(12, dtype=np.float32)
 
         # self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
-        self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
-        # self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
+        # self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
+        # self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
+        self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:
@@ -27,16 +28,18 @@ class RLPolicy(Node):
 
         self.expected_input_dim = self.ort_session.get_inputs()[0].shape[1]
 
-        if self.expected_input_dim not in [33, 45, 48]:
+        if self.expected_input_dim not in [33, 45, 48, 51]:
             self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
-            raise ValueError(f"ONNX model must have input dimension of either 33, 45, or 48. Received: {self.expected_input_dim}")
+            raise ValueError(f"ONNX model must have input dimension of either 33, 45, 48, or 51. Received: {self.expected_input_dim}")
 
         if self.expected_input_dim == 33:
-            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities and height command from observations.")
+            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities, height command, and sprawl command from observations.")
         elif self.expected_input_dim == 45:
-            self.get_logger().info("ONNX model expects 45 inputs, will include joint velocities and exclude height command from observations.")
+            self.get_logger().info("ONNX model expects 45 inputs, will include joint velocities, exclude height command and sprawl command from observations.")
         elif self.expected_input_dim == 48:
-            self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and height command in observations.")
+            self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and height command, exclude sprawl command from observations.")
+        elif self.expected_input_dim == 51:
+            self.get_logger().info("ONNX model expects 51 inputs, will include joint velocities, height command, and sprawl command in observations.")
         
 
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
@@ -68,11 +71,20 @@ class RLPolicy(Node):
         # ONNX expects a batch dimension: (1, 36)
         input_tensor = obs.reshape(1, -1)
 
-        # can I add a test here to see what is the input dimension in the ONNX file and exclude joint_velocities (indices 24 to 35)and height command (indices 9 to 11) if it is 33 and exclude just height command if it is 45
-        if self.expected_input_dim != 48:
+        # For 51D: keep all (ang_vel + gravity + command + height + sprawl + joint_pos + joint_vel + last_action)
+        # For 48D: delete sprawl [12:15]
+        # For 45D: delete height [9:12] and sprawl [15:18] (after joint_vel shift)
+        # For 33D: delete joint_velocities [24:36] and height [9:12] and sprawl
+        if self.expected_input_dim != 51:
             if self.expected_input_dim == 33:
-                input_tensor = np.delete(input_tensor, np.s_[24:36], axis=1)
-            input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)
+                input_tensor = np.delete(input_tensor, np.s_[27:39], axis=1)  # delete joint_velocities
+                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl after removing joint_vel
+                input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
+            elif self.expected_input_dim == 45:
+                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
+                input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
+            elif self.expected_input_dim == 48:
+                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
 
         if input_tensor.shape[1] != self.expected_input_dim:
             self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")

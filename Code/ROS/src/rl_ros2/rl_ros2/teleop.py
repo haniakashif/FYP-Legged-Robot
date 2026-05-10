@@ -11,6 +11,8 @@ MAX_LIN_VEL = 1.0  # m/s
 MAX_ANG_VEL = 1.0  # rad/s
 MIN_HEIGHT = 0.04  # m
 MAX_HEIGHT = 0.11  # m
+MIN_SPRAWL = 0.28  # m (28 cm)
+MAX_SPRAWL = 0.35  # m (35 cm)
 
 msg = """
 ---------------------------
@@ -19,7 +21,8 @@ Reading from the keyboard
 Controls:
    q    w    e       r (Raise Height)
    a         d       f (Lower Height)
-   z    s    c
+   z    s    c       u (Increase Sprawl)
+                     o (Decrease Sprawl)
 
 W to increase linear velocity
 S to decrease linear velocity
@@ -57,7 +60,8 @@ class Teleop(Node):
         
         self.speed = MAX_LIN_VEL/2
         self.turn = MAX_ANG_VEL/2
-        self.target_height = 0.075 
+        self.target_height = 0.075
+        self.sprawl = (MIN_SPRAWL + MAX_SPRAWL) / 2.0  # Start at middle
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
@@ -91,6 +95,12 @@ class Teleop(Node):
         elif key == "f":
             self.target_height = max(self.target_height - 0.01, MIN_HEIGHT)
             self.get_logger().info(f"Target Height: {self.target_height:.2f} m")
+        elif key == "u":
+            self.sprawl = min(self.sprawl + 0.01, MAX_SPRAWL)
+            self.get_logger().info(f"Sprawl: {self.sprawl:.2f} m")
+        elif key == "o":
+            self.sprawl = max(self.sprawl - 0.01, MIN_SPRAWL)
+            self.get_logger().info(f"Sprawl: {self.sprawl:.2f} m")
         elif key == '\x03':
             self.destroy_node()
             rclpy.shutdown()
@@ -103,7 +113,7 @@ class Teleop(Node):
         twist.linear.x = float(self.x * self.speed)
         twist.linear.y = float(self.y * self.speed)
         twist.linear.z = float(self.target_height)
-        twist.angular.x = 0.0
+        twist.angular.x = float(self.sprawl)
         twist.angular.y = 0.0
         twist.angular.z = float(self.th * self.turn)
         

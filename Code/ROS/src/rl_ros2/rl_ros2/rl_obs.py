@@ -44,6 +44,7 @@ class RLObs(Node):
         self.last_action = [0.0 for _ in range(12)] 
         self.command = None 
         self.target_height = None
+        self.sprawl_cmd = None
 
         # subscribers
         self.create_subscription(JointState, '/joint_states', self.joint_state_cb, 1)
@@ -107,10 +108,11 @@ class RLObs(Node):
     def teleop_cb(self, msg):
         self.command = [msg.linear.x, msg.linear.y, msg.angular.z]
         self.target_height = msg.linear.z
+        self.sprawl_cmd = msg.angular.x
 
     def timer_callback(self):
         
-        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command, self.target_height]):
+        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command, self.target_height, self.sprawl_cmd]):
             return
 
         if any(v is None for v in self.joint_states.values()):
@@ -133,6 +135,9 @@ class RLObs(Node):
 
         scaled_height_cmd = [self.target_height * 10.0, 0.0, 0.0]
         obs_list.extend(scaled_height_cmd)
+
+        scaled_sprawl_cmd = [self.sprawl_cmd * 10.0, 0.0, 0.0]
+        obs_list.extend(scaled_sprawl_cmd)
 
         # obs_list.extend(self.command)
 
