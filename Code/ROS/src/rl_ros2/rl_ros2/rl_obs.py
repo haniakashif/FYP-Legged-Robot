@@ -29,6 +29,9 @@ class RLObs(Node):
         self.joints = ["bl_hip", "br_hip", "fl_hip", "fr_hip",
                         "bl_knee", "br_knee", "fl_knee", "fr_knee",
                         "bl_foot", "br_foot", "fl_foot", "fr_foot"] 
+        
+        self.last_msg_time = None
+        self.vel_alpha = 0.5
 
         # observation variables
         self.joint_states = {} # for storing latest joint readings
@@ -55,7 +58,21 @@ class RLObs(Node):
 
     def joint_state_cb(self, msg): 
         
-        alpha = 0.5
+        current_time = msg.header.stamp.sec + (msg.header.stamp.nanosec * 1e-9)
+
+        if self.last_msg_time is None:
+            self.last_msg_time = current_time
+            for i, full_name in enumerate(msg.name):
+                base_name = full_name.replace('_joint', '')
+                self.joint_states[base_name] = msg.position[i]
+                self.joint_velocities[base_name] = 0.0
+            return  
+
+        actual_dt = current_time - self.last_msg_time
+        self.last_msg_time = current_time
+
+        if actual_dt <= 0.001:
+            actual_dt = self.dt
 
         for i, full_name in enumerate(msg.name):
             parts = full_name.split('_')
@@ -68,14 +85,9 @@ class RLObs(Node):
             new_pos = msg.position[i]
             old_pos = self.joint_states[base_name]
 
-            if old_pos is not None:
-                raw_vel = (new_pos - old_pos) / self.dt
-                if self.joint_velocities[base_name] is not None:
-                    self.joint_velocities[base_name] = alpha * raw_vel + (1 - alpha) * self.joint_velocities[base_name]
-                else:
-                    self.joint_velocities[base_name] = raw_vel
-            else:
-                self.joint_velocities[base_name] = 0.0
+            raw_vel = (new_pos - old_pos) / actual_dt
+            
+            self.joint_velocities[base_name] = (self.vel_alpha * raw_vel) + ((1.0 - self.vel_alpha) * self.joint_velocities[base_name])
             
             self.joint_states[base_name] = new_pos
         

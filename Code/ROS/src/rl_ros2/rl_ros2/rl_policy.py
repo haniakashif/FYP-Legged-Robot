@@ -4,12 +4,18 @@ from std_msgs.msg import Float64MultiArray
 import numpy as np
 import onnxruntime as ort
 import os
-
+ 
 class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx"
+        self.interp_steps = 200 # number of steps to interpolate the command to zero when user command goes to zero, to avoid abrupt stops
+        self.interp_counter = 0
+        self.last_command = np.zeros(12, dtype=np.float32)
+
+        # self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
+        self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
+        # self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:
@@ -46,10 +52,18 @@ class RLPolicy(Node):
 
         # self.get_logger().info("Received observation, running policy...")
 
-        if (obs[6:9] == 0.0).all(): # if user command is zero, publish zero actions to avoid unintended movement
+        if (obs[6:9] == 0.0).all(): # if user command is zero, interpolate in joint space to zero actions to avoid abrupt stops
             # self.get_logger().info("Zero command received, publishing zero actions.")
-            self.action_pub.publish(Float64MultiArray(data=[0.0 for _ in range(12)]))
+            self.interp_counter = min(self.interp_counter + 1, self.interp_steps)
+            zero_command = np.zeros(12, dtype=np.float32)
+            interp_command = Float64MultiArray()
+            alpha = self.interp_counter / self.interp_steps
+            interp_command.data = (alpha * zero_command + (1 - alpha) * self.last_command).tolist()
+            self.action_pub.publish(interp_command)
             return
+
+        self.interp_counter = 0 # reset interpolation counter when non-zero command is received
+        self.last_command = obs[-12:] # save last command for interpolation
 
         # ONNX expects a batch dimension: (1, 36)
         input_tensor = obs.reshape(1, -1)

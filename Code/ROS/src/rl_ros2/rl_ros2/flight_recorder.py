@@ -21,7 +21,7 @@ class FlightRecorder(Node):
         # We subscribe to EVERYTHING relevant
         self.create_subscription(Float64MultiArray, '/rl/observations', self.obs_cb, 1)
         self.create_subscription(Float64MultiArray, '/rl/actions', self.act_cb, 1)
-        self.create_subscription(Twist, '/cmd_vel', self.cmd_cb, 1)
+        self.create_subscription(Twist, '/teleop', self.cmd_cb, 1)
         self.create_subscription(JointState, '/joint_states', self.joint_cb, 1)
         
         # Buffers for latest data (to synchronize loosely)
@@ -37,7 +37,7 @@ class FlightRecorder(Node):
 
     def obs_cb(self, msg): self.latest_obs = msg.data
     def act_cb(self, msg): self.latest_act = msg.data
-    def cmd_cb(self, msg): self.latest_cmd = [msg.linear.x, msg.linear.y, msg.angular.z]
+    def cmd_cb(self, msg): self.latest_cmd = [msg.linear.x, msg.linear.y, msg.angular.z, msg.linear.z]
     def joint_cb(self, msg): self.latest_joints = msg.position
 
     def logging_loop(self):
@@ -50,7 +50,6 @@ class FlightRecorder(Node):
         # Create a single row
         row = {'time': timestamp}
         
-        # Add Observations (Obs_0, Obs_1...)
         for i, val in enumerate(self.latest_obs):
             row[f'obs_{i}'] = val
             
@@ -59,11 +58,16 @@ class FlightRecorder(Node):
             for i, val in enumerate(self.latest_act):
                 row[f'act_{i}'] = val
                 
-        # Add Commands (Cmd_X, Cmd_Y, Cmd_Yaw)
+        # Add Commands (Cmd_X, Cmd_Y, Cmd_Yaw, Cmd_Height)
         if self.latest_cmd:
             row['cmd_x'] = self.latest_cmd[0]
             row['cmd_y'] = self.latest_cmd[1]
             row['cmd_yaw'] = self.latest_cmd[2]
+            row['cmd_height'] = self.latest_cmd[3] # FIXED: Added height logging
+
+        if self.latest_joints:
+            for i, val in enumerate(self.latest_joints):
+                row[f'raw_joint_{i}'] = val
 
         self.history.append(row)
 
