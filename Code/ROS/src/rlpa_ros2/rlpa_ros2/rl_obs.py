@@ -1,15 +1,20 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float64MultiArray, Float64
+from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import JointState, Imu
 from geometry_msgs.msg import Twist
 
-def R_from_q(q):
+def R_from_q(q): 
     x, y, z, w = q
     norm_sq = x*x + y*y + z*z + w*w
-    if norm_sq < 1e-12:
-        return [[1,0,0],[0,1,0],[0,0,1]]
-    s = 1/norm_sq
+    if norm_sq <= 1e-12:
+        return [
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0]
+        ]
+
+    s = 1 / norm_sq
     R = [[0 for _ in range(3)] for _ in range(3)]
     R[0][0] = 1 - 2*s*(y*y + z*z)
     R[0][1] = 2*s*(x*y - z*w)
@@ -32,6 +37,9 @@ class RLObs(Node):
         self.joints = ["bl_hip", "br_hip", "fl_hip", "fr_hip",
                         "bl_knee", "br_knee", "fl_knee", "fr_knee",
                         "bl_foot", "br_foot", "fl_foot", "fr_foot"] 
+        
+        self.last_msg_time = None
+        self.vel_alpha = 0.5
 
         # observation variables
         self.joint_states = {} # for storing latest joint readings
@@ -44,6 +52,7 @@ class RLObs(Node):
         self.last_action = [0.0 for _ in range(12)] 
         self.command = None 
         self.target_height = 0.075
+        self.sprawl_cmd = 0.35
         self.min_height = 0.06
         self.max_height = 0.09
 
@@ -52,8 +61,8 @@ class RLObs(Node):
         self.create_subscription(Imu, '/imu_sensor_broadcaster/imu', self.imu_cb, 1)
         self.create_subscription(Float64MultiArray, '/rl/actions', self.actions_cb, 1) 
         self.create_subscription(Twist, '/teleop', self.teleop_cb, 1) 
-        self.create_subscription(Float64, '/perception/target_height', self.perception_cb, 1)
-
+        self.create_subscription(Float64MultiArray, '/perception/spatial_commands', self.perception_cb, 1)
+        
         # publisher
         self.obs_pub = self.create_publisher(Float64MultiArray, "/rl/observations", 33) # the 33 here is just an artifact from when we mistook the buffer size for the array size - still, its fine as is
 
@@ -61,7 +70,21 @@ class RLObs(Node):
 
     def joint_state_cb(self, msg): 
         
-        alpha = 0.5
+        current_time = msg.header.stamp.sec + (msg.header.stamp.nanosec * 1e-9)
+
+        if self.last_msg_time is None:
+            self.last_msg_time = current_time
+            for i, full_name in enumerate(msg.name):
+                base_name = full_name.replace('_joint', '')
+                self.joint_states[base_name] = msg.position[i]
+                self.joint_velocities[base_name] = 0.0
+            return  
+
+        actual_dt = current_time - self.last_msg_time
+        self.last_msg_time = current_time
+
+        if actual_dt <= 0.001:
+            actual_dt = self.dt
 
         for i, full_name in enumerate(msg.name):
             parts = full_name.split('_')
@@ -74,23 +97,21 @@ class RLObs(Node):
             new_pos = msg.position[i]
             old_pos = self.joint_states[base_name]
 
-            if old_pos is not None:
-                raw_vel = (new_pos - old_pos) / self.dt
-                if self.joint_velocities[base_name] is not None:
-                    self.joint_velocities[base_name] = alpha * raw_vel + (1 - alpha) * self.joint_velocities[base_name]
-                else:
-                    self.joint_velocities[base_name] = raw_vel
-            else:
-                self.joint_velocities[base_name] = 0.0
+            raw_vel = (new_pos - old_pos) / actual_dt
+            
+            self.joint_velocities[base_name] = (self.vel_alpha * raw_vel) + ((1.0 - self.vel_alpha) * self.joint_velocities[base_name])
             
             self.joint_states[base_name] = new_pos
         
     def imu_cb(self, msg):
+        self.ang_vel = [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
+        
         orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
-        if sum(v*v for v in orientation) < 1e-12:
+
+        if all(abs(v) <= 1e-12 for v in orientation):
+            self.projected_gravity = [0.0, 0.0, -1.0]
             return
 
-        self.ang_vel = [msg.angular_velocity.x, msg.angular_velocity.y, msg.angular_velocity.z]
         Rq = R_from_q(orientation)
 
         # multiplication with R_t of [0, 0, -1]
@@ -103,12 +124,13 @@ class RLObs(Node):
         self.command = [msg.linear.x, msg.linear.y, msg.angular.z]
 
     def perception_cb(self, msg):
-        raw_h = msg.data
+        raw_h = msg.data[0]
         self.target_height = max(self.min_height, min(raw_h, self.max_height))
+        self.sprawl_cmd = msg.data[1]
 
     def timer_callback(self):
         
-        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command, self.target_height]):
+        if any(v is None for v in [self.ang_vel, self.projected_gravity, self.command, self.target_height, self.sprawl_cmd]):
             return
 
         if any(v is None for v in self.joint_states.values()):
@@ -131,6 +153,9 @@ class RLObs(Node):
 
         scaled_height_cmd = [self.target_height * 10.0, 0.0, 0.0]
         obs_list.extend(scaled_height_cmd)
+
+        scaled_sprawl_cmd = [self.sprawl_cmd * 10.0, 0.0, 0.0]
+        obs_list.extend(scaled_sprawl_cmd)
 
         # obs_list.extend(self.command)
 

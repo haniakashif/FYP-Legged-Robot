@@ -6,8 +6,7 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1
-        - /APF_Path1
-        - /Raw_Depth1
+        - /Aligned_Cave1
       Splitter Ratio: 0.5
     Tree Height: 500
   - Class: rviz_common/Views
@@ -34,30 +33,18 @@ Visualization Manager:
       Name: RobotModel
       Value: true
     - Class: rviz_default_plugins/PointCloud2
-      Color Transformer: Intensity
-      Size (m): 0.05
-      Style: Spheres
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /apf_path_pc
-      Name: APF_Path
-      Value: true
-    - Class: rviz_default_plugins/PointCloud2
       Color Transformer: FlatColor
       Color: 255; 255; 255
-      Size (m): 0.01
+      Size (m): 0.02
       Style: Points
       Topic:
         Depth: 5
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /rgbd_camera/points
-      Name: Raw_Depth
-      Value: false # Set to false by default to save CPU. Check the box in RViz to turn it on!
+        Value: /aligned_cave_cloud
+      Name: Aligned_Cave
+      Value: true
   Global Options:
     Background Color: 48; 48; 48
     Fixed Frame: base_link
