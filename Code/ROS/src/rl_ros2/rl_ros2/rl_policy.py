@@ -13,10 +13,13 @@ class RLPolicy(Node):
         self.interp_counter = 0
         self.last_command = np.zeros(12, dtype=np.float32)
 
-        # self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
+        self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
         # self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
         # self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
-        self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
+        # self.onnx_path = "../Policies/pa_2026-05-11_05-16-41_v1.onnx" # sprawl PA
+        # self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
+
+        self.height_cmd_in_obs = False # if the network is 48D, then this decides whether to include height or sprawl
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:
@@ -36,8 +39,10 @@ class RLPolicy(Node):
             self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities, height command, and sprawl command from observations.")
         elif self.expected_input_dim == 45:
             self.get_logger().info("ONNX model expects 45 inputs, will include joint velocities, exclude height command and sprawl command from observations.")
-        elif self.expected_input_dim == 48:
+        elif self.expected_input_dim == 48 and self.height_cmd_in_obs:
             self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and height command, exclude sprawl command from observations.")
+        elif self.expected_input_dim == 48 and not self.height_cmd_in_obs:
+            self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and sprawl command, exclude height command from observations.")
         elif self.expected_input_dim == 51:
             self.get_logger().info("ONNX model expects 51 inputs, will include joint velocities, height command, and sprawl command in observations.")
         
@@ -84,7 +89,10 @@ class RLPolicy(Node):
                 input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
                 input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
             elif self.expected_input_dim == 48:
-                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
+                if self.height_cmd_in_obs:
+                    input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
+                else:
+                    input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
 
         if input_tensor.shape[1] != self.expected_input_dim:
             self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")
