@@ -9,13 +9,13 @@ class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
 
-        self.interp_steps = 200 # number of steps to interpolate the command to zero when user command goes to zero, to avoid abrupt stops
+        self.interp_steps = 30 # number of steps to interpolate the command to zero when user command goes to zero, to avoid abrupt stops
         self.interp_counter = 0
         self.last_command = np.zeros(12, dtype=np.float32)
 
-        self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
+        # self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
         # self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
-        # self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
+        self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
         # self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")

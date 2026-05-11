@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /RobotModel1
         - /Aligned_Cave1
+        - /Spatial_Constraint_Marker1
       Splitter Ratio: 0.5
     Tree Height: 500
   - Class: rviz_common/Views
@@ -44,6 +45,17 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /aligned_cave_cloud
       Name: Aligned_Cave
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Topic:           
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /perception/spatial_marker
+      Name: Spatial_Constraint_Marker
+      Namespaces:
+        spatial_constraint: true
       Value: true
   Global Options:
     Background Color: 48; 48; 48

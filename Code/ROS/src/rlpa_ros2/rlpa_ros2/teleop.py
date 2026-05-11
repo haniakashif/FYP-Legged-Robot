@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from std_msgs.msg import Float64  # NEW: For sending the lookahead parameter
 import sys
 import termios
 import tty
@@ -19,10 +20,9 @@ Controls:
    a         d
    z    s    c
 
-W to increase linear velocity
-S to decrease linear velocity
-A to increase angular velocity (left)
-D to decrease angular velocity (right)
+W/S to increase/decrease linear velocity
+A/D to increase/decrease angular velocity
+T/G to increase/decrease Lookahead Distance (Debugging)
 
 CTRL-C to quit
 """
@@ -53,6 +53,10 @@ class Teleop(Node):
         super().__init__('teleop')
         self.pub_teleop = self.create_publisher(Twist, '/teleop', 1) 
         
+        # NEW: Publisher for the lookahead max
+        self.pub_lookahead = self.create_publisher(Float64, '/perception/lookahead_max', 1)
+        self.lookahead_max = 0.30 # Starting default
+
         self.speed = MAX_LIN_VEL/2
         self.turn = MAX_ANG_VEL/2
         self.x = 0.0
@@ -82,6 +86,20 @@ class Teleop(Node):
         elif key == "D":
             self.turn = max(self.turn*0.9, 0.0)
             self.get_logger().info(f"Angular speed: {self.turn:.2f}")
+        elif key == "T":
+            self.lookahead_max += 0.05
+            self.get_logger().info(f"Lookahead Max increased to: {self.lookahead_max:.2f}m")
+            lh_msg = Float64()
+            lh_msg.data = float(self.lookahead_max)
+            self.pub_lookahead.publish(lh_msg)
+        elif key == "G":
+            # Don't let it go below the min bound!
+            self.lookahead_max = max(0.06, self.lookahead_max - 0.05)
+            self.get_logger().info(f"Lookahead Max decreased to: {self.lookahead_max:.2f}m")
+            lh_msg = Float64()
+            lh_msg.data = float(self.lookahead_max)
+            self.pub_lookahead.publish(lh_msg)
+            
         elif key == '\x03':
             self.destroy_node()
             rclpy.shutdown()
