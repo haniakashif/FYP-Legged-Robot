@@ -11,8 +11,8 @@ MAX_LIN_VEL = 1.0  # m/s
 MAX_ANG_VEL = 1.0  # rad/s
 MIN_HEIGHT = 0.04  # m
 MAX_HEIGHT = 0.11  # m
-MIN_SPRAWL = 0.33  # m (35 cm)
-MAX_SPRAWL = 0.40  # m (42 cm)
+MIN_SPRAWL = 0.24  # m 
+MAX_SPRAWL = 0.32  # m 
 
 msg = """
 ---------------------------

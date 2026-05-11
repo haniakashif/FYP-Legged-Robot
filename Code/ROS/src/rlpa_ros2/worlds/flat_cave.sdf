@@ -17,10 +17,8 @@
   </plugin>
   <plugin filename="gz-sim-user-commands-system"    name="gz::sim::systems::UserCommands"/>
   <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
-
-  <!-- =========================================================
-       Lighting — dim ambient to feel like a cave interior
-       ========================================================= -->
+  <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
+  
   <light type="directional" name="sun">
     <cast_shadows>true</cast_shadows>
     <pose>0 0 10 0 0 0</pose>
@@ -49,16 +47,14 @@
     </link>
   </model>
 
-
-
   <!-- Module 1: normal  x=0.0→0.8  W=0.65  H=0.42 -->
   <model name="cave_m1_normal">
     <static>true</static>
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>0.4 0 0.42 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.65 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.65 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.65 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.65 0.02</size></box></geometry>
         <material><ambient>0.4 0.35 0.25 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -83,8 +79,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>1.2000000000000002 0 0.24 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.65 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.65 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.65 0.01</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.65 0.02</size></box></geometry>
         <material><ambient>0.6 0.35 0.2 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -109,8 +105,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>2.0 0 0.19 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.65 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.65 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.65 0.01</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.65 0.02</size></box></geometry>
         <material><ambient>0.7 0.25 0.15 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -135,8 +131,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>2.8000000000000003 0 0.42 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.42 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.42 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.42 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.42 0.02</size></box></geometry>
         <material><ambient>0.25 0.4 0.55 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -161,8 +157,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>3.6 0 0.42 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.38 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.38 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.38 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.38 0.02</size></box></geometry>
         <material><ambient>0.15 0.3 0.6 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -187,8 +183,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>4.4 0 0.24 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.42 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.42 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.42 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.42 0.02</size></box></geometry>
         <material><ambient>0.5 0.25 0.45 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -213,8 +209,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>5.200000000000001 0 0.19 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.38 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.38 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.38 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.38 0.02</size></box></geometry>
         <material><ambient>0.6 0.15 0.5 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
@@ -239,8 +235,8 @@
     <pose>0 0 0 0 0 0</pose>
     <link name="ceiling">
       <pose>6.000000000000001 0 0.42 0 0 0</pose>
-      <collision name="c"><geometry><box><size>0.8 0.65 0.05</size></box></geometry></collision>
-      <visual name="v"><geometry><box><size>0.8 0.65 0.05</size></box></geometry>
+      <collision name="c"><geometry><box><size>0.8 0.65 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.65 0.02</size></box></geometry>
         <material><ambient>0.4 0.35 0.25 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>

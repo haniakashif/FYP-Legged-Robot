@@ -86,7 +86,7 @@ class PerceptionPreprocessor(Node):
 
         # --- HEIGHT LOGIC (CRAWL) ---
         # The robot needs about 13cm of total vertical space (body thickness + camera)
-        target_height = tunnel_height - 0.13
+        target_height = tunnel_height - 0.15
         target_height = np.clip(target_height, self.min_height, self.max_height)
 
         # --- SPRAWL LOGIC (SQUEEZE) ---

@@ -536,10 +536,51 @@
                 </distortion>
             </camera>
             <always_on>1</always_on>
-            <update_rate>15</update_rate>
+            <update_rate>2</update_rate>
             <visualize>true</visualize>
             <topic>rgbd_camera</topic>
             <enable_metrics>true</enable_metrics>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="base_link">
+        <sensor name="body_contact" type="contact">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <contact><collision>base_link_collision</collision></contact>
+            <topic>/environment_collisions</topic>
+        </sensor>
+    </gazebo>
+    <gazebo reference="fl_foot">
+        <sensor name="fl_foot_contact" type="contact">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <contact><collision>fl_foot_collision</collision></contact>
+            <topic>/environment_collisions</topic>
+        </sensor>
+    </gazebo>
+    <gazebo reference="fr_foot">
+        <sensor name="fr_foot_contact" type="contact">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <contact><collision>fr_foot_collision</collision></contact>
+            <topic>/environment_collisions</topic>
+        </sensor>
+    </gazebo>
+    <gazebo reference="bl_foot">
+        <sensor name="bl_foot_contact" type="contact">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <contact><collision>bl_foot_collision</collision></contact>
+            <topic>/environment_collisions</topic>
+        </sensor>
+    </gazebo>
+    <gazebo reference="br_foot">
+        <sensor name="br_foot_contact" type="contact">
+            <always_on>true</always_on>
+            <update_rate>50</update_rate>
+            <contact><collision>br_foot_collision</collision></contact>
+            <topic>/environment_collisions</topic>
         </sensor>
     </gazebo>
 </robot>

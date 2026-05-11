@@ -54,7 +54,11 @@ def generate_launch_description():
     # 6. ROS <-> GAZEBO BRIDGE
     bridge = Node(
         package='ros_gz_bridge', executable='parameter_bridge',
-        parameters=[{'config_file': bridge_config, 'expand_gz_topic_names': True}], output='screen'
+        # arguments=[
+        #     '/environment_collisions@ros_gz_interfaces/msg/Contacts[gz.msgs.Contacts'
+        # ],
+        parameters=[{'config_file': bridge_config, 'expand_gz_topic_names': True}], 
+        output='screen'
     )
 
     # 7. ROS2_CONTROL SPAWNERS

@@ -3,8 +3,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 import numpy as np
 import onnxruntime as ort
-import os
- 
+
 class RLPolicy(Node):
     def __init__(self):
         super().__init__('rl_policy')
@@ -13,50 +12,71 @@ class RLPolicy(Node):
         self.interp_counter = 0
         self.last_command = np.zeros(12, dtype=np.float32)
 
-        # self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
-        # self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
-        self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
-        # self.onnx_path = "../Policies/pa_2026-04-28_23-46-54_v1.onnx"  # height + sprawl PA
+        path_regular = "../Policies/2026-04-20_09-49-36_v1.onnx"
+        path_crawl   = "../Policies/pa_2026-04-28_01-01-12_v1.onnx"
+        path_squeeze = "../Policies/pa_2026-05-11_09-17-58_v1.onnx"
 
-        self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
-        try:
-            self.ort_session = ort.InferenceSession(self.onnx_path)
-            self.input_name = self.ort_session.get_inputs()[0].name
-        except Exception as e:
-            self.get_logger().error(f"Failed to load ONNX: {e}")
-            raise
+        self.crawl_threshold = 0.08 # height command threshold to switch to crawl policy
+        self.squeeze_threshold = 0.35 # sprawl command threshold to switch to squeeze policy
 
-        self.expected_input_dim = self.ort_session.get_inputs()[0].shape[1]
-
-        if self.expected_input_dim not in [33, 45, 48, 51]:
-            self.get_logger().error(f"Unexpected input dimension in ONNX model: {self.expected_input_dim}")
-            raise ValueError(f"ONNX model must have input dimension of either 33, 45, 48, or 51. Received: {self.expected_input_dim}")
-
-        if self.expected_input_dim == 33:
-            self.get_logger().info("ONNX model expects 33 inputs, will exclude joint velocities, height command, and sprawl command from observations.")
-        elif self.expected_input_dim == 45:
-            self.get_logger().info("ONNX model expects 45 inputs, will include joint velocities, exclude height command and sprawl command from observations.")
-        elif self.expected_input_dim == 48:
-            self.get_logger().info("ONNX model expects 48 inputs, will include joint velocities and height command, exclude sprawl command from observations.")
-        elif self.expected_input_dim == 51:
-            self.get_logger().info("ONNX model expects 51 inputs, will include joint velocities, height command, and sprawl command in observations.")
+        self.get_logger().info("Loading ONNX models into memory...")
         
+        self.sess_regular, self.name_regular, self.dim_regular = self.load_model(path_regular, "Regular")
+        self.sess_crawl, self.name_crawl, self.dim_crawl = self.load_model(path_crawl, "Crawl")
+        self.sess_squeeze, self.name_squeeze, self.dim_squeeze = self.load_model(path_squeeze, "Squeeze")
 
         self.action_pub = self.create_publisher(Float64MultiArray, '/rl/actions', 1)
-        
-        # event-driven instead of internal timer
         self.create_subscription(Float64MultiArray, '/rl/observations', self.obs_cb, 1)
 
-        self.get_logger().info("RL Policy Node Ready!")
+        self.current_state = "regular" # Used to track and log state changes
+
+        self.get_logger().info("Policy node ready!")
+
+    def load_model(self, path, label):
+        try:
+            session = ort.InferenceSession(path)
+            name = session.get_inputs()[0].name
+            dim = session.get_inputs()[0].shape[1]
+            self.get_logger().info(f"[{label} Policy] Loaded. Expected input dim: {dim}")
+            return session, name, dim
+        except Exception as e:
+            self.get_logger().error(f"Failed to load {label} ONNX: {e}")
+            raise
+
+    def slice_observation(self, obs, expected_dim, policy_type):
+        input_tensor = obs.reshape(1, -1) 
+        
+        if expected_dim == 51:
+            return input_tensor
+            
+        elif expected_dim == 48:
+            if policy_type == "crawl":
+                # delete sprawl
+                return np.delete(input_tensor, np.s_[12:15], axis=1)
+            elif policy_type == "squeeze":
+                # delete height
+                return np.delete(input_tensor, np.s_[9:12], axis=1)
+            else:
+                self.get_logger().error(f"Unexpected policy type for 48D model: {policy_type}")
+                return input_tensor
+                
+        elif expected_dim == 45:
+            input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)
+            input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)
+            return input_tensor
+            
+        elif expected_dim == 33:
+            input_tensor = np.delete(input_tensor, np.s_[27:39], axis=1)
+            input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)
+            input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)
+            return input_tensor
+
+        return input_tensor
 
     def obs_cb(self, msg):
-        
         obs = np.array(msg.data, dtype=np.float32)
 
-        # self.get_logger().info("Received observation, running policy...")
-
-        if (obs[6:9] == 0.0).all(): # if user command is zero, interpolate in joint space to zero actions to avoid abrupt stops
-            # self.get_logger().info("Zero command received, publishing zero actions.")
+        if (obs[6:9] == 0.0).all():
             self.interp_counter = min(self.interp_counter + 1, self.interp_steps)
             zero_command = np.zeros(12, dtype=np.float32)
             interp_command = Float64MultiArray()
@@ -65,38 +85,43 @@ class RLPolicy(Node):
             self.action_pub.publish(interp_command)
             return
 
-        self.interp_counter = 0 # reset interpolation counter when non-zero command is received
-        self.last_command = obs[-12:] # save last command for interpolation
+        self.interp_counter = 0
+        self.last_command = obs[-12:]
 
-        # ONNX expects a batch dimension: (1, 36)
-        input_tensor = obs.reshape(1, -1)
+        # obtain actual height values from the scaled commands
+        current_target_height = obs[9] / 10.0
+        current_target_sprawl = obs[12] / 10.0
 
-        # For 51D: keep all (ang_vel + gravity + command + height + sprawl + joint_pos + joint_vel + last_action)
-        # For 48D: delete sprawl [12:15]
-        # For 45D: delete height [9:12] and sprawl [15:18] (after joint_vel shift)
-        # For 33D: delete joint_velocities [24:36] and height [9:12] and sprawl
-        if self.expected_input_dim != 51:
-            if self.expected_input_dim == 33:
-                input_tensor = np.delete(input_tensor, np.s_[27:39], axis=1)  # delete joint_velocities
-                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl after removing joint_vel
-                input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
-            elif self.expected_input_dim == 45:
-                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
-                input_tensor = np.delete(input_tensor, np.s_[9:12], axis=1)   # delete height
-            elif self.expected_input_dim == 48:
-                input_tensor = np.delete(input_tensor, np.s_[12:15], axis=1)  # delete sprawl
+        if current_target_height < self.crawl_threshold:
+            active_sess = self.sess_crawl
+            input_name = self.name_crawl
+            expected_dim = self.dim_crawl
+            policy_type = "crawl"
+            
+        elif current_target_sprawl < self.squeeze_threshold:
+            active_sess = self.sess_squeeze
+            input_name = self.name_squeeze
+            expected_dim = self.dim_squeeze
+            policy_type = "squeeze"
+            
+        else:
+            active_sess = self.sess_regular
+            input_name = self.name_regular
+            expected_dim = self.dim_regular
+            policy_type = "regular"
 
-        if input_tensor.shape[1] != self.expected_input_dim:
-            self.get_logger().error(f"Input tensor has wrong shape: {input_tensor.shape}, expected (1, {self.expected_input_dim})")
+        if policy_type != self.current_state:
+            self.get_logger().info(f"Switching policy to -> {policy_type.upper()}")
+            self.current_state = policy_type
+
+        input_tensor = self.slice_observation(obs, expected_dim, policy_type)
+
+        if input_tensor.shape[1] != expected_dim:
+            self.get_logger().error(f"Shape mismatch! Expected {expected_dim}, got {input_tensor.shape[1]}")
             return
 
-        # Run inference
-        outputs = self.ort_session.run(None, {self.input_name: input_tensor})
-        raw_actions = outputs[0][0] # Remove batch dim
-
-        # self.get_logger().info(f"Actions:")
-        # for i, action in enumerate(raw_actions):
-        #     self.get_logger().info(f"  Action {i}: {action:.4f}")
+        outputs = active_sess.run(None, {input_name: input_tensor})
+        raw_actions = outputs[0][0] 
 
         out_msg = Float64MultiArray()
         out_msg.data = raw_actions.tolist()
