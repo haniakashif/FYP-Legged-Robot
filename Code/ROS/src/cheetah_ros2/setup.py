@@ -20,11 +20,11 @@ data_files = [
     ('share/' + package_name, ['package.xml']),
     (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
     (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
-    (os.path.join('share', package_name, 'worlds'), glob('worlds/*.sdf')),
     (os.path.join('share', package_name, 'rviz'), glob('rviz/*.rviz')),
 ]
 
-# Append the nested model directories dynamically
+# Append the nested model and world directories dynamically
+data_files.extend(generate_data_files(os.path.join('share', package_name), 'worlds'))
 data_files.extend(generate_data_files(os.path.join('share', package_name), 'models'))
 
 setup(
