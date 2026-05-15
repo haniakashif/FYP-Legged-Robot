@@ -9,8 +9,8 @@ from scipy.signal import lfilter
 APPLY_FILTER = True 
 
 # --- CONFIGURATION ---
-CSV_FILE = 'adc_calibration_log_pcb_2.csv'
-YAML_FILE = 'calibration_curves_pcb_2/joint_calibration.yaml'
+CSV_FILE = 'adc_calibration_log_pcb_3.csv'
+YAML_FILE = 'calibration_curves_pcb_3/joint_calibration.yaml'
 CSV_SUFFIX = "pcb_" + CSV_FILE.split('.')[0][-1] if CSV_FILE.startswith('adc_calibration_log_pcb_') else CSV_FILE.split('.')[0][-1]
 YAML_SUFFIX = "pcb_" + YAML_FILE.split('/')[0][-1] if YAML_FILE.startswith('calibration_curves_pcb_') else YAML_FILE.split('/')[0][-1]
 OUTPUT_DIR = 'state_tracking_plots_' + CSV_SUFFIX  + '_' + YAML_SUFFIX  
