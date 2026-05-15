@@ -1,16 +1,24 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Imu
 import sys
 import termios
 import tty
 import select
+import math
+
+def yaw_from_q(q):
+    x, y, z, w = q
+    siny_cosp = 2.0 * (w * z + x * y)
+    cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
+    return math.atan2(siny_cosp, cosy_cosp)
 
 # --- SETTINGS ---
 MAX_LIN_VEL = 1.0  # m/s
 MAX_ANG_VEL = 1.0  # rad/s
-MIN_HEIGHT = 0.04  # m
-MAX_HEIGHT = 0.11  # m
+MIN_HEIGHT = 0.02  # m
+MAX_HEIGHT = 0.08  # m
 MIN_SPRAWL = 0.24  # m 
 MAX_SPRAWL = 0.32  # m 
 
@@ -28,6 +36,7 @@ W to increase linear velocity
 S to decrease linear velocity
 A to increase angular velocity (left)
 D to decrease angular velocity (right)
+P to toggle local versus global frame
 
 CTRL-C to quit
 """
@@ -56,6 +65,9 @@ def getKey(settings):
 class Teleop(Node):
     def __init__(self):
         super().__init__('teleop')
+
+        self.create_subscription(Imu, '/imu_sensor_broadcaster/imu', self.imu_cb, 1)
+
         self.pub_teleop = self.create_publisher(Twist, '/teleop', 1) 
         
         self.speed = MAX_LIN_VEL/2
@@ -65,10 +77,21 @@ class Teleop(Node):
         self.x = 0.0
         self.y = 0.0
         self.th = 0.0
+        self.yaw = None
+        self.yaw0 = None
+        self.local_frame = True  
 
         self.settings = termios.tcgetattr(sys.stdin)
         print(msg)
         self.create_timer(0.1, self.timer_callback)
+
+    def imu_cb(self, msg):
+        orientation = [msg.orientation.x, msg.orientation.y, msg.orientation.z, msg.orientation.w]
+        yaw = yaw_from_q(orientation)
+        if self.yaw0 is None:
+            self.yaw0 = yaw
+        self.yaw = yaw - self.yaw0
+        self.yaw = -self.yaw
 
     def timer_callback(self):
         key = getKey(self.settings)
@@ -101,6 +124,10 @@ class Teleop(Node):
         elif key == "o":
             self.sprawl = max(self.sprawl - 0.01, MIN_SPRAWL)
             self.get_logger().info(f"Sprawl: {self.sprawl:.2f} m")
+        elif key == "P":
+            self.local_frame = not self.local_frame
+            frame_type = "LOCAL" if self.local_frame else "GLOBAL"
+            self.get_logger().info(f"Switched to {frame_type} frame for teleop commands")
         elif key == '\x03':
             self.destroy_node()
             rclpy.shutdown()
@@ -116,6 +143,14 @@ class Teleop(Node):
         twist.angular.x = float(self.sprawl)
         twist.angular.y = 0.0
         twist.angular.z = float(self.th * self.turn)
+
+        if not self.local_frame and self.yaw is not None:
+            c = math.cos(self.yaw)
+            s = math.sin(self.yaw)
+            local_x = twist.linear.x
+            local_y = twist.linear.y
+            twist.linear.x = c * local_x - s * local_y
+            twist.linear.y = s * local_x + c * local_y
         
         self.pub_teleop.publish(twist)
 
