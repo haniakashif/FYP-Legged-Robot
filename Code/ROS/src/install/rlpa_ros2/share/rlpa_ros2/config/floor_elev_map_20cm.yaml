@@ -1,0 +1,27 @@
+floor_elevation_mapping:
+  ros__parameters:
+    map_frame_id: "camera_link"
+    robot_base_frame_id: "camera_link"
+    track_point_frame_id: "camera_link"
+    use_tf_robot_pose: false
+    track_robot_with_tf: false
+    length_in_x: 4.0
+    length_in_y: 4.0
+    resolution: 0.05
+    min_variance: 0.001
+    max_variance: 0.05
+    robot_pose_with_covariance_topic: ""
+    robot_odom_topic: ""
+    time_tolerance: 1.0
+    enable_visibility_cleanup: true
+    visibility_cleanup_rate: 1.0
+    scanning_duration: 0.5
+    enable_continuous_cleanup: true
+    input_sources: ["front_lidar"]
+    front_lidar:
+        type: pointcloud
+        topic: /filtered_points
+        queue_size: 10
+        publish_on_update: true
+        sensor_processor:
+            type: perfect
