@@ -57,7 +57,7 @@ def generate_launch_description():
         arguments=[
             '-name', 'THex_Quadruped',
             '-topic', 'robot_description',
-            '-x', '12.76', '-y', '3.53', '-z', '-2.47',
+            '-x', '12.73', '-y', '3.53', '-z', '-2.47',
             '-R', '0.12', '-P', '0.04', '-Y', '0.09'
         ],
         output='screen'

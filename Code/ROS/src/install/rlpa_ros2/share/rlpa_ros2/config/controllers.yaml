@@ -1,0 +1,42 @@
+controller_manager:
+  ros__parameters:
+    # How fast the Controller Manager runs. 
+    update_rate: 50  
+
+    # 1. The Sensor Broadcasters
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
+    # 2. The Joint Commander
+    joint_group_position_controller:
+      type: position_controllers/JointGroupPositionController
+
+# Configuration for the IMU Broadcaster
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: "um7_imu"
+    frame_id: "base_link"
+
+# Configuration for the Joint Commander
+joint_group_position_controller:
+  ros__parameters:
+    # List the joints here in the same order the policy outputs them so it automatically routes Index 0 to bl_hip, Index 1 to br_hip, etc.
+    joints:
+      - bl_hip_joint
+      - br_hip_joint
+      - fl_hip_joint
+      - fr_hip_joint
+      - bl_knee_joint
+      - br_knee_joint
+      - fl_knee_joint
+      - fr_knee_joint
+      - bl_foot_joint
+      - br_foot_joint
+      - fl_foot_joint
+      - fr_foot_joint
+    
+    # Command type
+    interface_name: position

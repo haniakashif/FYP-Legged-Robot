@@ -192,16 +192,14 @@
        keeping copy of old cave environment here in case: /home/syn/.gazebo/models/my_cave_model/meshes/mesh.obj
        pose params: near left up
        ========================================================= -->
-
-
-  <model name="weird_cave">
+  <model name="hard_cave">
     <static>true</static>
     <link name="link">
-      <pose>0.0 -4.0 6.0 0.00 0.0 3.14</pose>
+      <pose>5.5 0.0 0.0 0.00 0.0 3.14</pose>
       <collision name="collision">
         <geometry>
           <mesh>
-            <uri>floors/cave.obj</uri>
+            <uri>floors/hard4.obj</uri>
             <scale>0.06 0.06 0.06</scale>
           </mesh>
         </geometry>
@@ -209,7 +207,7 @@
       <visual name="visual">
         <geometry>
           <mesh>
-            <uri>floors/cave.obj</uri>
+            <uri>floors/hard4.obj</uri>
             <scale>0.06 0.06 0.06</scale>
           </mesh>
         </geometry>
@@ -245,6 +243,11 @@
       </visual>
     </link>
   </model>
+
+  <!-- =========================================================
+       Robot — THex_Quadruped from Simple.sdf
+       Spawned at the entrance of cave module 1 (x=0.2, z=0.2)
+       ========================================================= -->
 
 
 </world>

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 # --- CONFIGURATION ---
-CSV_FILE = 'adc_calibration_log_pcb_2.csv'
+CSV_FILE = 'adc_calibration_log_pcb_3.csv'
 SUFFIX = "pcb_" + CSV_FILE.split('.')[0][-1] if CSV_FILE.startswith('adc_calibration_log_pcb_') else CSV_FILE.split('.')[0][-1]
 OUTPUT_DIR = 'joint_plots_' + SUFFIX
 

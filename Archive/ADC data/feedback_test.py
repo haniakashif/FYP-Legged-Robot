@@ -26,7 +26,7 @@ CONFIG_LSB = 0xE3
 # JOINT MAPPING
 JOINTS = [
     # Board 1: 0x48 (GND)
-    {"name": "br_hip",  "pin": 4,  "min_pwm": 500, "max_pwm": 2700, "min_rad": -1.5707, "max_rad": 1.5707},
+    {"name": "br_hip",  "pin": 4,  "min_pwm": 600, "max_pwm": 2700, "min_rad": -1.5707, "max_rad": 1.5707},
     {"name": "bl_hip",  "pin": 16, "min_pwm": 600, "max_pwm": 2440, "min_rad": -1.5707, "max_rad": 1.5707},
     {"name": "bl_knee", "pin": 17, "min_pwm": 600, "max_pwm": 2500, "min_rad": -1.5707, "max_rad": 1.5707},
     {"name": "bl_foot", "pin": 18, "min_pwm": 600, "max_pwm": 2500, "min_rad": -1.5707, "max_rad": 1.5707},

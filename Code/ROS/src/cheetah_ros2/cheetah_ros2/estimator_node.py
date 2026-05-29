@@ -51,6 +51,8 @@ class EstimatorNode(Node):
         # Ground Truth Tracking Variables
         self.p_com = np.zeros(3)
         self.v_com = np.zeros(3)
+        # Offset to keep odom/local frames near the spawn origin.
+        self.odom_origin = None
         
         self.controller_joint_names = [
             'fl_hip_joint','fl_knee_joint','fl_foot_joint',
@@ -169,10 +171,15 @@ class EstimatorNode(Node):
     def odom_cb(self, msg):
         # self.get_logger().info(f'Odometry Callback: Received odometry data. {msg}')
 
-        # world frame
-        self.p_com[0] = msg.pose.pose.position.x
-        self.p_com[1] = msg.pose.pose.position.y
-        self.p_com[2] = msg.pose.pose.position.z
+        # world frame (recenter at the initial pose so odom stays near origin)
+        raw_pos = np.array([
+            msg.pose.pose.position.x,
+            msg.pose.pose.position.y,
+            msg.pose.pose.position.z
+        ])
+        if self.odom_origin is None:
+            self.odom_origin = raw_pos.copy()
+        self.p_com = raw_pos - self.odom_origin
         
         # world frame
         self.quat[0] = msg.pose.pose.orientation.w

@@ -15,10 +15,10 @@ class RLPolicy(Node):
 
         self.onnx_path = "../Policies/2026-04-20_09-49-36_v1.onnx" # best sim no PA
         # self.onnx_path = "../Policies/2026-05-09_15-50-31_v1.onnx" # best hardware
-        # self.onnx_path = "../Policies/pa_2026-04-28_01-01-12_v1.onnx" # height PA
+        # self.onnx_path = "../Policies/pa_2026-05-11_10-16-55_v1.onnx" # height PA
+        self.height_cmd_in_obs = True # if the network is 48D, then this decides whether to include height or sprawl
         # self.onnx_path = "../Policies/pa_2026-05-11_09-17-58_v1.onnx" # sprawl PA
-
-        self.height_cmd_in_obs = False # if the network is 48D, then this decides whether to include height or sprawl
+        # self.height_cmd_in_obs = False # if the network is 48D, then this decides whether to include height or sprawl
 
         self.get_logger().info(f"Loading ONNX model from {self.onnx_path}...")
         try:

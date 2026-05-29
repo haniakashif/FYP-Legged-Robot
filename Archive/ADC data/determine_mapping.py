@@ -6,7 +6,7 @@ import yaml
 from scipy import stats
 
 # --- CONFIGURATION ---
-CSV_FILE = 'adc_calibration_log_pcb_2.csv'
+CSV_FILE = 'adc_calibration_log_pcb_3.csv'
 SUFFIX = "pcb_" + CSV_FILE.split('.')[0][-1] if CSV_FILE.startswith('adc_calibration_log_pcb_') else CSV_FILE.split('.')[0][-1]
 OUTPUT_DIR = 'calibration_curves_' + SUFFIX
 SETTLING_TIME = 1.0 # Seconds to ignore after a command change

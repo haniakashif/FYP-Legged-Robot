@@ -1,0 +1,347 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="lidar_sensor">
+    <physics name="1ms" type="ignored">
+      <max_step_size>0.1</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+
+    <gui fullscreen="0">
+
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui>
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <ambient_light>0.4 0.4 0.4</ambient_light>
+        <background_color>0.8 0.8 0.8</background_color>
+        <camera_pose>-6 0 6 0 0.5 0</camera_pose>
+      </plugin>
+      <plugin filename="TransformControl" name="Transform control">
+        <gz-gui>
+            <title>Transform control</title>
+            <anchors target="3D View">
+            <line own="left" target="left"/>
+            <line own="top" target="top"/>
+            </anchors>
+            <property key="resizable" type="bool">false</property>
+            <property key="width" type="double">250</property>
+            <property key="height" type="double">50</property>
+            <property key="state" type="string">floating</property>
+            <property key="showTitleBar" type="bool">false</property>
+            <property key="cardBackground" type="string">#777777</property>
+        </gz-gui>
+        </plugin>
+
+      <plugin filename="EntityContextMenuPlugin" name="Entity context menu">
+        <gz-gui>
+          <property key="state" type="string">floating</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="GzSceneManager" name="Scene Manager">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="InteractiveViewControl" name="Interactive view control">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="CameraTracking" name="Camera Tracking">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="WorldControl" name="World control">
+        <gz-gui>
+          <title>World control</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="bool" key="resizable">false</property>
+          <property type="double" key="height">72</property>
+          <property type="double" key="z">1</property>
+
+          <property type="string" key="state">floating</property>
+          <anchors target="3D View">
+            <line own="left" target="left"/>
+            <line own="bottom" target="bottom"/>
+          </anchors>
+        </gz-gui>
+
+        <play_pause>true</play_pause>
+        <step>true</step>
+        <start_paused>true</start_paused>
+        <use_event>true</use_event>
+
+      </plugin>
+
+      <plugin filename="WorldStats" name="World stats">
+        <gz-gui>
+          <title>World stats</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="bool" key="resizable">false</property>
+          <property type="double" key="height">110</property>
+          <property type="double" key="width">290</property>
+          <property type="double" key="z">1</property>
+
+          <property type="string" key="state">floating</property>
+          <anchors target="3D View">
+            <line own="right" target="right"/>
+            <line own="bottom" target="bottom"/>
+          </anchors>
+        </gz-gui>
+
+        <sim_time>true</sim_time>
+        <real_time>true</real_time>
+        <real_time_factor>true</real_time_factor>
+        <iterations>true</iterations>
+      </plugin>
+
+      <plugin filename="ComponentInspector" name="Component inspector">
+        <gz-gui>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="EntityTree" name="Entity tree">
+        <gz-gui>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="ImageDisplay" name="Image Display 3">
+        <gz-gui>
+          <title>RGBD: image</title>
+          <property key="state" type="string">floating</property>
+          <property type="double" key="width">350</property>
+          <property type="double" key="height">315</property>
+          <property type="double" key="y">320</property>
+        </gz-gui>
+        <topic>rgbd_camera/image</topic>
+        <topic_picker>false</topic_picker>
+      </plugin>
+      <plugin filename="ImageDisplay" name="Image Display 3">
+        <gz-gui>
+          <title>RGBD: depth</title>
+          <property key="state" type="string">floating</property>
+          <property type="double" key="width">350</property>
+          <property type="double" key="height">315</property>
+          <property type="double" key="x">500</property>
+          <property type="double" key="y">320</property>
+        </gz-gui>
+        <topic>rgbd_camera/depth_image</topic>
+        <topic_picker>false</topic_picker>
+      </plugin>
+    </gui>
+
+    <model name="my_cave_model">
+      <static>true</static>
+      <link name="link">
+        <pose>-9.11 24.08 17.78 -1.56 0.29 0</pose>
+
+        <collision name="collision">
+          <geometry>
+            <mesh>
+              <uri>file:///home/syn/.gazebo/models/my_cave_model/meshes/mesh.obj</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/syn/.gazebo/models/my_cave_model/meshes/mesh.obj</uri>
+              <scale>1 1 1</scale>
+            </mesh>
+          </geometry>
+
+        </visual>
+      </link>
+    </model>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>20 20 0.1</size>
+            </box>
+          </geometry>
+        </collision>
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>20 20 0.1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.8 0.8 0.8 1</ambient>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.8 0.8 0.8 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="box">
+      <static>true</static>
+      <pose>1.16 1.19 1.31 0 0 0</pose>
+      <link name="box_link">
+        <inertial>
+          <inertia>
+            <ixx>1</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>1</iyy>
+            <iyz>0</iyz>
+            <izz>1</izz>
+          </inertia>
+          <mass>1.0</mass>
+        </inertial>
+        <collision name="box_collision">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="box_visual">
+          <geometry>
+            <box>
+              <size>1 1 1</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>1 0 0 1</ambient>
+            <diffuse>1 0 0 1</diffuse>
+            <specular>1 0 0 1</specular>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <model name="animated_rgbd_camera">
+  <static>true</static>
+  <pose>1.51 2 1.82 0 0 0.34</pose>
+
+  <link name="link">
+    <visual name="visual">
+      <geometry>
+        <box>
+          <size>0.1 0.1 0.1</size>
+        </box>
+      </geometry>
+      <material>
+        <ambient>0 1 0 1</ambient>
+        <diffuse>0 1 0 1</diffuse>
+      </material>
+    </visual>
+
+    <light type="point" name="actor_light_1">
+      <pose>0 0 0 0 0 0</pose>
+      <diffuse>1.0 0.6 0 1</diffuse>
+      <specular>0.01 0.01 0.01 1</specular>
+      <attenuation>
+        <range>10</range>
+        <constant>0.5</constant>
+        <linear>0.01</linear>
+        <quadratic>5</quadratic>
+      </attenuation>
+      <cast_shadows>true</cast_shadows>
+    </light>
+
+    <sensor name="rgbd_camera" type="rgbd_camera">
+      <camera>
+        <horizontal_fov>1.92</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+        </image>
+        <clip>
+          <far>2</far>
+        </clip>
+        <distortion>
+          <k1>-0.0507</k1>
+          <k2>0.0</k2>
+          <k3>0.0</k3>
+          <p1>0.0</p1>
+          <p2>0.0</p2>
+          <center>0.5 0.5</center>
+        </distortion>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>15</update_rate>
+      <visualize>true</visualize>
+      <topic>rgbd_camera</topic>
+      <enable_metrics>true</enable_metrics>
+    </sensor>
+
+    <!-- <sensor name="ground_source_camera" type="rgbd_camera">
+      <pose>0 0 0 0 0 0</pose>
+      <camera>
+        <horizontal_fov>1.92</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>20</far>
+        </clip>
+        <distortion>
+          <k1>-0.0507</k1>
+          <k2>0.0</k2>
+          <k3>0.0</k3>
+          <p1>0.0</p1>
+          <p2>0.0</p2>
+          <center>0.5 0.5</center>
+        </distortion>
+      </camera>
+      <always_on>1</always_on>
+      <update_rate>15</update_rate>
+      <visualize>false</visualize>
+      <topic>rgbd_camera/ground_source</topic>
+      <enable_metrics>true</enable_metrics>
+    </sensor> -->
+  </link>
+</model>
+    </world>
+</sdf>

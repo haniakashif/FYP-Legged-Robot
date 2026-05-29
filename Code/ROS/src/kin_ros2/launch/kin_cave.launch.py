@@ -8,19 +8,21 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    pkg_share = get_package_share_directory('rl_ros2')
-
+    pkg_share = get_package_share_directory('kin_ros2')
     gz_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=[
             os.path.join(pkg_share, 'models'),
             ':',
+            os.path.join(pkg_share, 'worlds'),
+            ':',
+            os.path.join(pkg_share, 'worlds', 'my_cave_model'),
+            ':',
             os.environ.get('GZ_SIM_RESOURCE_PATH', '')
         ]
     )
 
-    world_file = os.path.join(pkg_share, 'worlds', 'rough_cave.sdf')
-    bridge_config = os.path.join(pkg_share, 'config', 'ros_gz_bridge.yaml')
+    world_file = os.path.join(pkg_share, 'worlds', 'my_cave_model', 'model.sdf')
 
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -33,8 +35,8 @@ def generate_launch_description():
     with open(urdf_file_path, 'r') as infp:
         robot_desc = infp.read()
 
-    yaml_path = os.path.join(pkg_share, 'config', 'controllers.yaml')
-    robot_desc = robot_desc.replace('$(find_pkg_share rl_ros2)/config/controllers.yaml', yaml_path)
+    kin_yaml_path = os.path.join(pkg_share, 'config', 'controllers.yaml')
+    robot_desc = robot_desc.replace('$(find_pkg_share rl_ros2)/config/controllers.yaml', kin_yaml_path)
 
     rsp_node = Node(
         package='robot_state_publisher',
@@ -53,12 +55,13 @@ def generate_launch_description():
         arguments=[
             '-name', 'THex_Quadruped',
             '-topic', 'robot_description',
-            '-x', '-2.59', '-y', '-4.65', '-z', '0.6',
-            '-R', '0.0', '-P', '0.0', '-Y', '1.5'
+            '-x', '12.76', '-y', '3.53', '-z', '-2.47',
+            '-R', '0.12', '-P', '0.04', '-Y', '0.09'
         ],
         output='screen'
     )
 
+    bridge_config = os.path.join(pkg_share, 'config', 'ros_gz_bridge.yaml')
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -90,34 +93,10 @@ def generate_launch_description():
         output='screen',
     )
 
-    rl_obs = Node(
-        package='rl_ros2',
-        executable='rl_obs',
-        name='rl_obs',
-        parameters=[{'use_sim_time': True}],
-        output='screen'
-    )
-
-    rl_policy = Node(
-        package='rl_ros2',
-        executable='rl_policy',
-        name='rl_policy',
-        parameters=[{'use_sim_time': True}],
-        output='screen'
-    )
-
-    rl_action = Node(
-        package='rl_ros2',
-        executable='rl_action',
-        name='rl_action',
-        parameters=[{'use_sim_time': True}],
-        output='screen'
-    )
-
-    flight_recorder = Node(
-        package='rl_ros2',
-        executable='flight_recorder',
-        name='flight_recorder',
+    kin_node = Node(
+        package='kin_ros2',
+        executable='kin_node',
+        name='kin_node',
         parameters=[{'use_sim_time': True}],
         output='screen'
     )
@@ -131,8 +110,5 @@ def generate_launch_description():
         load_joint_state_broadcaster,
         load_imu_sensor_broadcaster,
         load_joint_group_position_controller,
-        rl_obs,
-        rl_policy,
-        rl_action,
-        flight_recorder
+        kin_node
     ])
