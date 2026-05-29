@@ -8,7 +8,7 @@ class cpgNode(Node):
     def __init__(self):
         super().__init__('cpg_node')
 
-        self.target_freq = 100  # Hz
+        self.target_freq = 50  # Hz
         self.dt = 1.0 / self.target_freq
         self.cpg = CPGController()
         

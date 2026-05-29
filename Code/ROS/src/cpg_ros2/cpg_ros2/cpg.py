@@ -4,18 +4,18 @@ from typing import Tuple
 class CPGController:
     def __init__(self):
         # evolved params
-        self.gamma = 0.4667385325267626
-        self.duty_cycle = 0.47195128733459635
-        self.coupling_w = 1.9310020188685904
-        self.mu_r0 = 0.6
-        self.mu_o0 = -0.21911851460214207
+        self.gamma = 0.33242948003377987
+        self.duty_cycle = 0.4172964738872599
+        self.coupling_w = 1.814359554786942
+        self.mu_r0 = 0.5977562499535333
+        self.mu_o0 = -0.06821011367710861
         self.psi_1 = 0.6283185307179586
-        self.mu_r1 = 0.294344090757077
-        self.mu_o1 = 0.45487757554633923
-        self.psi_2 = -0.31000664280442275
-        self.mu_r2_1 = 0.7
-        self.mu_r2_2 = 0.0
-        self.mu_o2 = 0.8635076097043282
+        self.mu_r1 = 0.2878435438298354
+        self.mu_o1 = 0.4279269256411492
+        self.psi_2 = -0.47850751097630134
+        self.mu_r2_1 = 0.697308337055854
+        self.mu_r2_2 = 0.007488975240002193
+        self.mu_o2 = 0.85
         
         self.omega = 0.25  # Hz
         self.target_offsets = np.array([0.0, 0.5, 0.25, 0.75]) * 2 * np.pi
