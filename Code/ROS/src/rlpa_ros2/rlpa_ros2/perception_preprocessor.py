@@ -10,7 +10,7 @@ from scipy.spatial.transform import Rotation as R
 class PerceptionPreprocessor(Node):
     def __init__(self):
         super().__init__('perception_preprocessor')
-        
+
         self.pc_sub = self.create_subscription(PointCloud2, '/rgbd_camera/points', self.pc_callback, 10)
         self.imu_sub = self.create_subscription(Imu, '/imu_sensor_broadcaster/imu', self.imu_callback, 10)
         
@@ -18,6 +18,12 @@ class PerceptionPreprocessor(Node):
         self.cmd_pub = self.create_publisher(Float64MultiArray, '/perception/spatial_commands', 10)
         self.marker_pub = self.create_publisher(Marker, '/perception/spatial_marker', 10)
         self.lh_sub = self.create_subscription(Float64, '/perception/lookahead_max', self.lookahead_cb, 10)
+
+        # Debug: per-cell clearance analysis (mirrors map2apf3 Phases 2-3)
+        self.pub_h_avail   = self.create_publisher(PointCloud2, '/debug_h_avail_pc',     10)
+        self.pub_w_avail   = self.create_publisher(PointCloud2, '/debug_w_avail_pc',     10)
+        self.pub_z_targets = self.create_publisher(PointCloud2, '/debug_z_targets_pc',   10)
+        self.pub_safe_mask = self.create_publisher(PointCloud2, '/debug_safe_spaces_pc', 10)
 
         # --- KINEMATIC LIMITS ---
         self.min_height = 0.06
@@ -164,12 +170,14 @@ class PerceptionPreprocessor(Node):
         marker.color.b = 0.0
         self.marker_pub.publish(marker)
 
+
 def main(args=None):
     rclpy.init(args=args)
     node = PerceptionPreprocessor()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == '__main__':
     main()

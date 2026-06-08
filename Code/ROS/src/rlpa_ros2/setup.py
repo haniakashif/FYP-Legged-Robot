@@ -60,6 +60,10 @@ setup(
             'perception_preprocessor = rlpa_ros2.perception_preprocessor:main',
             'apf_planner = rlpa_ros2.apf_planner:main',
             'apf_planner2 = rlpa_ros2.apf_planner2:main',
+            'apf_perception_node = rlpa_ros2.apf_perception_node:main',
+            'ceiling_filter_node = rlpa_ros2.ceiling_filter_node:main',
+            'ceiling_flipper_node = rlpa_ros2.ceiling_flipper_node:main',
+            'map_flipper_node = rlpa_ros2.map_flipper_node:main',
         ],
     },
 )

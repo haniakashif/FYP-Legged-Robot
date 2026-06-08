@@ -18,7 +18,7 @@
   <plugin filename="gz-sim-user-commands-system"    name="gz::sim::systems::UserCommands"/>
   <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
   <plugin filename="gz-sim-contact-system" name="gz::sim::systems::Contact"/>
-  
+
   <light type="directional" name="sun">
     <cast_shadows>true</cast_shadows>
     <pose>0 0 10 0 0 0</pose>
@@ -241,14 +241,144 @@
         <transparency>0.2</transparency></visual>
     </link>
     <link name="left_wall">
-      <pose>6.000000000000001 -0.325 0.21 0 0 0</pose>
+      <pose>2.8 -0.325 0.21 0 0 0</pose>
       <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
       <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
         <material><ambient>0.35200000000000004 0.308 0.22 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
     <link name="right_wall">
-      <pose>6.000000000000001 0.325 0.21 0 0 0</pose>
+      <pose>2.8 0.325 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.35200000000000004 0.308 0.22 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+  </model>
+  <!-- Module 4: squeeze_moderate  x=3.2→4.0  W=0.42  H=0.42 -->
+  <model name="cave_m4_squeeze_moderate">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+    <link name="ceiling">
+      <pose>3.6 0 0.42 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.42 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.42 0.02</size></box></geometry>
+        <material><ambient>0.25 0.4 0.55 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_wall">
+      <pose>3.6 -0.24 0.24 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.22 0.35200000000000004 0.48400000000000004 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_wall">
+      <pose>3.6 0.24 0.24 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.22 0.35200000000000004 0.48400000000000004 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+  </model>
+  <!-- Module 5: squeeze_extreme  x=4.0→4.8  W=0.38  H=0.42 -->
+  <model name="cave_m5_squeeze_extreme">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+    <link name="ceiling">
+      <pose>4.4 0 0.42 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.38 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.38 0.02</size></box></geometry>
+        <material><ambient>0.15 0.3 0.6 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_wall">
+      <pose>4.4 -0.19 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.132 0.264 0.528 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_wall">
+      <pose>4.4 0.19 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.132 0.264 0.528 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+  </model>
+  <!-- Module 6: both_moderate  x=4.8→5.6  W=0.42  H=0.24 -->
+  <model name="cave_m6_both_moderate">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+    <link name="ceiling">
+      <pose>5.2 0 0.24 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.42 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.42 0.02</size></box></geometry>
+        <material><ambient>0.5 0.25 0.45 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_wall">
+      <pose>5.2 -0.21 0.12 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.24</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.24</size></box></geometry>
+        <material><ambient>0.44 0.22 0.396 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_wall">
+      <pose>5.2 0.21 0.12 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.24</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.24</size></box></geometry>
+        <material><ambient>0.44 0.22 0.396 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+  </model>
+  <!-- Module 7: both_extreme  x=5.6→6.4  W=0.38  H=0.19 -->
+  <model name="cave_m7_both_extreme">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+    <link name="ceiling">
+      <pose>6.0 0 0.19 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.38 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.38 0.02</size></box></geometry>
+        <material><ambient>0.6 0.15 0.5 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_wall">
+      <pose>6.0 -0.19 0.095 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.19</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.19</size></box></geometry>
+        <material><ambient>0.528 0.132 0.44 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_wall">
+      <pose>6.0 0.19 0.095 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.19</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.19</size></box></geometry>
+        <material><ambient>0.528 0.132 0.44 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+  </model>
+  <!-- Module 8: normal_exit  x=6.4→7.2  W=0.65  H=0.42 -->
+  <model name="cave_m8_normal_exit">
+    <static>true</static>
+    <pose>0 0 0 0 0 0</pose>
+    <link name="ceiling">
+      <pose>6.8 0 0.42 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.65 0.02</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.65 0.02</size></box></geometry>
+        <material><ambient>0.4 0.35 0.25 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_wall">
+      <pose>6.8 -0.325 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
+        <material><ambient>0.35200000000000004 0.308 0.22 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_wall">
+      <pose>6.8 0.325 0.21 0 0 0</pose>
       <collision name="c"><geometry><box><size>0.8 0.05 0.42</size></box></geometry></collision>
       <visual name="v"><geometry><box><size>0.8 0.05 0.42</size></box></geometry>
         <material><ambient>0.35200000000000004 0.308 0.22 0.5</ambient></material>
@@ -413,6 +543,34 @@
       <pose>3.2 0.325 0.23 0 0 0</pose>
       <collision name="c"><geometry><box><size>0.02 0.02 0.46</size></box></geometry></collision>
       <visual name="v"><geometry><box><size>0.02 0.02 0.46</size></box></geometry>
+        <material><ambient>0.25 0.2 0.15 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_flange">
+      <pose>3.2 -0.2675 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.02 0.11500000000000002 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.02 0.11500000000000002 0.42</size></box></geometry>
+        <material><ambient>0.3 0.22 0.12 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_flange">
+      <pose>3.2 0.2675 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.02 0.11500000000000002 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.02 0.11500000000000002 0.42</size></box></geometry>
+        <material><ambient>0.3 0.22 0.12 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="left_outer_cap">
+      <pose>3.2 -0.325 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.02 0.02 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.02 0.02 0.42</size></box></geometry>
+        <material><ambient>0.25 0.2 0.15 0.5</ambient></material>
+        <transparency>0.2</transparency></visual>
+    </link>
+    <link name="right_outer_cap">
+      <pose>3.2 0.325 0.21 0 0 0</pose>
+      <collision name="c"><geometry><box><size>0.02 0.02 0.42</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.02 0.02 0.42</size></box></geometry>
         <material><ambient>0.25 0.2 0.15 0.5</ambient></material>
         <transparency>0.2</transparency></visual>
     </link>
